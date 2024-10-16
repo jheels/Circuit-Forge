@@ -1,7 +1,33 @@
 import { useState } from 'react'
-import { Anvil, Moon, Sun, Settings, Microchip, Codesandbox } from 'lucide-react'
+import { Anvil, Moon, Sun, Settings, Microchip, Code, LucideIcon } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+interface TooltipButtonProps {
+    icon: LucideIcon
+    tooltip: string
+}
+
+function TooltipButton({ icon: Icon, tooltip}: TooltipButtonProps) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Icon className="h-7 w-7" />
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <p>{tooltip}</p>
+            </TooltipContent>
+        </Tooltip>
+    )
+}
 
 export default function Navbar() {
     const [isDarkMode, setIsDarkMode] = useState(false)
@@ -12,14 +38,12 @@ export default function Navbar() {
                 <Anvil strokeWidth={2} className="h-8 w-8 mr-2" />
                 <span className="text-2xl">Circuit<b>Forge</b></span>
             </div>
-            <div className="flex items-center space-x-10">
-                <div className="flex items-center space-x-5"> {/* Increased space between buttons */}
-                    <Button variant="ghost" size="icon">
-                        <Codesandbox className="h-7 w-7" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                        <Microchip className="h-7 w-7" />
-                    </Button>
+            <div className="flex items-center space-x-8">
+                <div className="flex items-center space-x-6">
+                    <TooltipProvider>
+                        <TooltipButton icon={Code} tooltip="Simulator" />
+                        <TooltipButton icon={Microchip} tooltip="IC Editor" />
+                    </TooltipProvider>
                 </div>
                 <div className="flex items-center space-x-2">
                     <Switch
@@ -29,8 +53,8 @@ export default function Navbar() {
                     />
                     {isDarkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                     <Button variant="ghost" size="icon">
-                    <Settings className="h-6 w-6" />
-                </Button>
+                        <Settings className="h-6 w-6" />
+                    </Button>
                 </div>
             </div>
         </nav>
