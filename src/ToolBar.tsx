@@ -1,10 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
+import { useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+    Menubar,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarSeparator,
+    MenubarShortcut,
+    MenubarTrigger,
+} from "@/components/ui/menubar"
 
 interface DropdownItem {
     label: string
     shortcut?: string
+    isSeparator?: boolean
 }
 
 interface ToolbarDropdownProps {
@@ -12,43 +22,40 @@ interface ToolbarDropdownProps {
     items: DropdownItem[]
 }
 
-function ToolBarDropdown({ label, items }: ToolbarDropdownProps) {
-    const [isOpen, setIsOpen] = useState(false);
-
+function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
     return (
-        <div className="relative" onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
-            <Button variant="ghost" size="sm" className="hover:bg-gray-100  px-3 py-1.5">
-                {label}
-            </Button>
-            {isOpen && (
-                <div className="absolute left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                    {items.map((item, index) => (
-                        <div key={index} className="px-4 py-2 hover:bg-gray-100 flex justify-between items-center">
-                            <span className="text-sm">{item.label}</span>
-                            {item.shortcut && <span className="text-xs text-gray-400">{item.shortcut}</span>}
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+        <MenubarMenu>
+            <MenubarTrigger className="px-3 py-1.5">{label}</MenubarTrigger>
+            <MenubarContent>
+                {items.map((item, index) =>
+                    item.isSeparator ? (
+                        <MenubarSeparator key={index} />
+                    ) : (
+                        <MenubarItem key={index}>
+                            {item.label}
+                            {item.shortcut && <MenubarShortcut>{item.shortcut}</MenubarShortcut>}
+                        </MenubarItem>
+                    )
+                )}            </MenubarContent>
+        </MenubarMenu>
     )
 }
 
-function ToolBar() {
-    const [projectName, setProjectName] = useState("Untitled Project");
+function Toolbar() {
+    const [projectName, setProjectName] = useState("Untitled Project")
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
-    const [isEditingName, setIsEditingName] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const MAX_LENGTH = 20;
+    const [isEditingName, setIsEditingName] = useState(false)
+    const inputRef = useRef<HTMLInputElement>(null)
+    const MAX_LENGTH = 20
 
     useEffect(() => {
         if (isEditingName && inputRef.current) {
-            inputRef.current.focus();
+            inputRef.current.focus()
         }
     }, [isEditingName])
 
     const handleProjectNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProjectName(e.target.value);
+        setProjectName(e.target.value)
     }
 
     const handleProjectNameBlur = () => {
@@ -57,45 +64,66 @@ function ToolBar() {
         } else {
             setPreviousProjectName(projectName)
         }
-        setIsEditingName(false);
+        setIsEditingName(false)
     }
 
     const handleProjectNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            handleProjectNameBlur();
+            handleProjectNameBlur()
         }
     }
 
     const clipText = (text: string, maxLength: number) => {
-        return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+        return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }
 
+    const menuItems = [
+        {
+            label: "File",
+            items: [
+                { label: "Save", shortcut: "⌘S" },
+                { label: "Save As", shortcut: "⇧⌘S" },
+                { isSeparator: true },
+                { label: "Export", shortcut: "⌘E" },
+                { label: "Import", shortcut: "⌘I" },
+            ],
+        },
+        {
+            label: "Edit",
+            items: [
+                { label: "Undo", shortcut: "⌘Z" },
+                { label: "Redo", shortcut: "⇧⌘Z" },
+                { isSeparator: true },
+                { label: "Cut", shortcut: "⌘X" },
+                { label: "Copy", shortcut: "⌘C" },
+                { label: "Paste", shortcut: "⌘V" },
+            ],
+        },
+        {
+            label: "View",
+            items: [
+                { label: "Zoom In", shortcut: "⌘+" },
+                { label: "Zoom Out", shortcut: "⌘-" },
+                { isSeparator: true },
+                { label: "Reset Zoom", shortcut: "⌘0" },
+            ],
+        },
+        {
+            label: "Help",
+            items: [
+                { label: "Documentation", shortcut: "F1" },
+                { label: "About" },
+            ],
+        },
+    ]
+
     return (
-        <div className="bg-white text-black py-0.5 flex justify-between items-center shadow-md">
-            <div className="flex items-center">
-                <ToolBarDropdown label="File" items={[
-                    { label: "Save", shortcut: "⌘S" },
-                    { label: "Save As", shortcut: "⇧⌘S" },
-                    { label: "Export", shortcut: "⌘E" },
-                    { label: "Import", shortcut: "⌘I" },
-                ]} />
-                <ToolBarDropdown label="Edit" items={[
-                    { label: "Undo", shortcut: "⌘Z" },
-                    { label: "Redo", shortcut: "⇧⌘Z" },
-                    { label: "Cut", shortcut: "⌘X" },
-                    { label: "Copy", shortcut: "⌘C" },
-                    { label: "Paste", shortcut: "⌘V" },
-                ]} />
-                <ToolBarDropdown label="View" items={[
-                    { label: "Zoom In", shortcut: "⌘+" },
-                    { label: "Zoom Out", shortcut: "⌘-" },
-                    { label: "Reset Zoom", shortcut: "⌘0" },
-                ]} />
-                <ToolBarDropdown label="Help" items={[
-                    { label: "Documentation", shortcut: "F1" },
-                    { label: "About" },
-                ]} />
-            </div>
+        <div className="bg-background text-foreground  flex justify-between items-center shadow-md">
+            <Menubar className="border-none shadow-none">
+                {menuItems.map((menu, index) => (
+                    <ToolbarDropdown key={index} label={menu.label} items={menu.items} />
+                ))}
+            </Menubar>
             <div className="flex items-center space-x-4 pr-3">
                 {isEditingName ? (
                     <Input
@@ -110,16 +138,15 @@ function ToolBar() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="font-semibold hover:bg-gray-100 cursor-text"
+                        className="font-semibold hover:bg-accent hover:text-accent-foreground cursor-text"
                         onClick={() => setIsEditingName(true)}
                     >
                         {clipText(projectName, MAX_LENGTH)}
                     </Button>
                 )}
             </div>
-
         </div>
     )
 }
 
-export default ToolBar;
+export default Toolbar

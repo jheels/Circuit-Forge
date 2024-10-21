@@ -1,5 +1,5 @@
 import { useState} from 'react'
-import { Anvil, Moon, Sun, Settings, Microchip, Code, LucideIcon } from 'lucide-react'
+import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard, LucideIcon } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -43,7 +43,7 @@ export function Navbar() {
                 <div className="flex items-center space-x-8">
                     <div className="flex items-center space-x-6">
                         <TooltipProvider>
-                            <TooltipButton icon={Code} tooltip="Simulator" />
+                            <TooltipButton icon={CircuitBoard} tooltip="Simulator" />
                             <TooltipButton icon={Microchip} tooltip="IC Editor" />
                         </TooltipProvider>
                     </div>
