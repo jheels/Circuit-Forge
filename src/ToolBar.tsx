@@ -42,7 +42,10 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
 }
 
 function Toolbar() {
-    const [projectName, setProjectName] = useState("Untitled Project")
+    const [projectName, setProjectName] = useState(() => {
+        // Retrieve the project name from localStorage if it exists
+        return localStorage.getItem('projectName') || 'Untitled Project';
+    });
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -53,6 +56,12 @@ function Toolbar() {
             inputRef.current.focus()
         }
     }, [isEditingName])
+
+    useEffect(() => {
+        // Save the project name to localStorage whenever it changes
+        localStorage.setItem('projectName', projectName);
+    }, [projectName]);
+
 
     const handleProjectNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setProjectName(e.target.value)
@@ -118,7 +127,7 @@ function Toolbar() {
     ]
 
     return (
-        <div className="bg-background text-foreground  flex justify-between items-center shadow-md">
+        <div className="bg-background text-foreground flex justify-between items-center shadow-md z-50">
             <Menubar className="border-none shadow-none">
                 {menuItems.map((menu, index) => (
                     <ToolbarDropdown key={index} label={menu.label} items={menu.items} />
