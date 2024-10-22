@@ -90,6 +90,7 @@ function Toolbar() {
         {
             label: "File",
             items: [
+                { label: "New", shortcut: "⌘N" },
                 { label: "Save", shortcut: "⌘S" },
                 { label: "Save As", shortcut: "⇧⌘S" },
                 { isSeparator: true },
