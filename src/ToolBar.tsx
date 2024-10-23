@@ -36,7 +36,8 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
                             {item.shortcut && <MenubarShortcut>{item.shortcut}</MenubarShortcut>}
                         </MenubarItem>
                     )
-                )}            </MenubarContent>
+                )}
+            </MenubarContent>
         </MenubarMenu>
     )
 }
@@ -128,7 +129,7 @@ function Toolbar() {
     ]
 
     return (
-        <div className="bg-background text-foreground flex justify-between items-center shadow-md z-50">
+        <div className="bg-white text-foreground flex justify-between items-center shadow-md z-10">
             <Menubar className="border-none shadow-none">
                 {menuItems.map((menu, index) => (
                     <ToolbarDropdown key={index} label={menu.label} items={menu.items} />

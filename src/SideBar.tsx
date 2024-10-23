@@ -3,6 +3,9 @@ import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import TooltipButton from './ToolTipButton'
+
+
 interface ComponentTile {
     id: string;
     name: string;
@@ -54,9 +57,7 @@ export default function SideBar() {
                                 />
                                 <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600" />
                             </div>
-                            <Button variant="ghost" size="icon" className="bg-gray-200 text-gray-600">
-                                <Download className="h-6 w-6" />
-                            </Button>
+                            <TooltipButton icon={Download} tooltip="Import Chip" />
                         </div>
                     </div>
 

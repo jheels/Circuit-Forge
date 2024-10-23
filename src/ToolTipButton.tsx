@@ -1,0 +1,32 @@
+import { LucideIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+interface TooltipButtonProps {
+    icon: LucideIcon
+    tooltip: string
+}
+
+function TooltipButton({ icon: Icon, tooltip }: TooltipButtonProps) {
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Icon className="h-7 w-7" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{tooltip}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
+export default TooltipButton;

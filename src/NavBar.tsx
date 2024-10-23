@@ -1,34 +1,8 @@
 import { useState } from 'react'
-import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard, LucideIcon } from 'lucide-react'
+import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
-import ToolBar from './ToolBar'
-interface TooltipButtonProps {
-    icon: LucideIcon
-    tooltip: string
-}
-
-function TooltipButton({ icon: Icon, tooltip }: TooltipButtonProps) {
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Icon className="h-7 w-7" />
-                </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-                <p>{tooltip}</p>
-            </TooltipContent>
-        </Tooltip>
-    )
-}
-
+import TooltipButton from './ToolTipButton'
 
 export function Navbar() {
     const [isDarkMode, setIsDarkMode] = useState(false)
@@ -41,10 +15,8 @@ export function Navbar() {
             </div>
             <div className="flex items-center space-x-8">
                 <div className="flex items-center space-x-6">
-                    <TooltipProvider>
                         <TooltipButton icon={CircuitBoard} tooltip="Simulator" />
                         <TooltipButton icon={Microchip} tooltip="IC Editor" />
-                    </TooltipProvider>
                 </div>
                 <div className="flex items-center space-x-2">
                     <Switch
