@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-import TooltipButton from './ToolTipButton'
-
+import ImportChipDialog from './ImportChipDialog';
 
 interface ComponentTile {
     id: string;
@@ -21,6 +19,8 @@ const dummyComponents: ComponentTile[] = Array(36).fill(null).map((_, i) => ({
 export default function SideBar() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isOpen, setIsOpen] = useState(true);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const filteredComponents = dummyComponents.filter(component =>
         component.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -28,6 +28,15 @@ export default function SideBar() {
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
+    };
+
+    const handleImport = () => {
+        if (selectedFile) {
+            // Implement your file import logic here
+            console.log('Importing file:', selectedFile.name);
+            setIsImportDialogOpen(false);
+            setSelectedFile(null);
+        }
     };
 
     return (
@@ -57,7 +66,9 @@ export default function SideBar() {
                                 />
                                 <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600" />
                             </div>
-                            <TooltipButton icon={Download} tooltip="Import Chip" />
+                            <Button variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
+                                <Download className="h-7 w-7" />
+                            </Button>
                         </div>
                     </div>
 
@@ -84,6 +95,13 @@ export default function SideBar() {
                     </div>
                 </>
             )}
+            <ImportChipDialog
+                isOpen={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+                selectedFile={selectedFile}
+                onFileChange={setSelectedFile}
+                onImport={handleImport}
+            />
         </div>
     );
 }

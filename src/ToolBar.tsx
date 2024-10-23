@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/menubar"
 
 interface DropdownItem {
-    label: string
+    label?: string
     shortcut?: string
     isSeparator?: boolean
 }
@@ -91,7 +91,7 @@ function Toolbar() {
         {
             label: "File",
             items: [
-                { label: "New", shortcut: "⌘N" },
+                { label: "New Project", shortcut: "⌘N" },
                 { label: "Save", shortcut: "⌘S" },
                 { label: "Save As", shortcut: "⇧⌘S" },
                 { isSeparator: true },
