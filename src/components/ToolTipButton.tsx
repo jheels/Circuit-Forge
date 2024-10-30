@@ -10,14 +10,16 @@ import {
 interface TooltipButtonProps {
     icon: LucideIcon
     tooltip: string
+    isSelected?: boolean
+    onClick?: () => void
 }
 
-function TooltipButton({ icon: Icon, tooltip }: TooltipButtonProps) {
+function TooltipButton({ icon: Icon, tooltip, isSelected, onClick }: TooltipButtonProps) {
     return (
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className={isSelected ? "bg-white text-black" : ""} onClick={onClick}>
                         <Icon className="h-7 w-7" />
                     </Button>
                 </TooltipTrigger>

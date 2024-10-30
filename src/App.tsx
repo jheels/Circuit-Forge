@@ -1,20 +1,17 @@
-import NavBar from './NavBar';
-import SideBar from './SideBar';
-import ToolBar from './ToolBar';
+import { useState } from 'react';
+import NavBar from './components/topbars/NavBar';
+import Simulator from './pages/Simulator';
+import ICEditor from './pages/ICEditor';
 
 function App() {
-  return (
-    <div className="relative flex flex-col h-screen">
-      <NavBar />
-      <ToolBar />
-      <div className="flex flex-grow overflow-hidden">
-        <div className="flex-grow p-4">
-          {/* Your main content for component editing */}
+    const [selectedTool, setSelectedTool] = useState<'simulator' | 'ic-editor'>('simulator');
+
+    return (
+        <div className="relative flex flex-col h-screen">
+            <NavBar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
+            {selectedTool === 'simulator' ? <Simulator /> : <ICEditor />}
         </div>
-        <SideBar />
-      </div>
-    </div>
-  );
+    );
 }
 
 export default App;

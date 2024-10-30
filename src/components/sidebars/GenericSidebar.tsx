@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ImportChipDialog from './ImportChipDialog';
+import ImportChipDialog from '../dialogs/ImportChipDialog';
 
 interface ComponentTile {
     id: string;
@@ -10,19 +10,17 @@ interface ComponentTile {
     description: string;
 }
 
-const dummyComponents: ComponentTile[] = Array(36).fill(null).map((_, i) => ({
-    id: `component-${i + 1}`,
-    name: `Component ${i + 1}`,
-    description: `Description for Component ${i + 1}`
-}));
+interface GenericSidebarProps {
+    components: ComponentTile[];
+}
 
-export default function SideBar() {
+export default function GenericSidebar({ components }: GenericSidebarProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isOpen, setIsOpen] = useState(true);
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    const filteredComponents = dummyComponents.filter(component =>
+    const filteredComponents = components.filter(component =>
         component.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
