@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -14,11 +14,31 @@ function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (
     const [highContrast, setHighContrast] = useState(false)
     const [voiceOver, setVoiceOver] = useState(false)
 
+    useEffect(() => {
+        // Retrieve settings from localStorage when the component mounts
+        const savedHighContrast = localStorage.getItem('highContrast') === 'true';
+        const savedVoiceOver = localStorage.getItem('voiceOver') === 'true';
+        setHighContrast(savedHighContrast);
+        setVoiceOver(savedVoiceOver);
+    }, []);
+
+    useEffect(() => {
+        if (!open) {
+            // Reset to saved settings when the dialog is closed without saving
+            const savedHighContrast = localStorage.getItem('highContrast') === 'true';
+            const savedVoiceOver = localStorage.getItem('voiceOver') === 'true';
+            setHighContrast(savedHighContrast);
+            setVoiceOver(savedVoiceOver);
+        }
+    }, [open]);
+
     const handleSettingsSave = () => {
-        // Save settings
-        onOpenChange(false)
-        console.log('Settings saved', { highContrast, voiceOver })
-    }
+        // Save settings to localStorage
+        localStorage.setItem('highContrast', highContrast.toString());
+        localStorage.setItem('voiceOver', voiceOver.toString());
+        onOpenChange(false);
+        console.log('Settings saved', { highContrast, voiceOver });
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
