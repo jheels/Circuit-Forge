@@ -2,8 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ImportChipDialog from '../src/components/dialogs/ImportChipDialog';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
 
 describe('ImportChipDialog', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    })
+
     it('should render ImportChipDialog with correct headers', () => {
         render(
             <ImportChipDialog
@@ -135,9 +140,10 @@ describe('ImportChipDialog', () => {
         expect(onOpenChange).toHaveBeenCalled();
     });
 
-    it('should call onOpenChange when backdrop is clicked.', () => {
+    it('should call onOpenChange when backdrop is clicked.', async () => {
         const onOpenChange = vi.fn();
-    
+        const user = userEvent.setup();
+
         render(
             <ImportChipDialog
                 isOpen={true}
@@ -147,11 +153,31 @@ describe('ImportChipDialog', () => {
                 onImport={() => {}}
             />
         );
+        
+        const backdrop = screen.getByTestId('dialog-overlay')
     
-        const backdrop = screen.getByTestId('dialog-overlay');
-        fireEvent.click(backdrop);
-        onOpenChange(false);
+        // Simulate clicking on the backdrop
+        await user.click(backdrop)    
+        expect(onOpenChange).toHaveBeenCalled();
+            
+    });
+    //  Add tests to close dialog box when using spacebar, escape or return key
+
+    it('should call onOpenChange when escape key is pressed.', () => {
+        const onOpenChange = vi.fn();
+
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={onOpenChange}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+
+        fireEvent.keyDown(document, { key: 'Escape' });
+
         expect(onOpenChange).toHaveBeenCalled();
     });
-
 });
