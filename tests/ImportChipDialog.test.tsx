@@ -161,7 +161,6 @@ describe('ImportChipDialog', () => {
         expect(onOpenChange).toHaveBeenCalled();
             
     });
-    //  Add tests to close dialog box when using spacebar, escape or return key
 
     it('should call onOpenChange when escape key is pressed.', () => {
         const onOpenChange = vi.fn();
@@ -177,6 +176,25 @@ describe('ImportChipDialog', () => {
         );
 
         fireEvent.keyDown(document, { key: 'Escape' });
+
+        expect(onOpenChange).toHaveBeenCalled();
+    });
+
+    it('should call onOpenChange when close button is clicked.', () => {
+        const onOpenChange = vi.fn();
+
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={onOpenChange}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+
+        const closeButton = screen.getByText('Close').closest('button');
+        fireEvent.click(closeButton);
 
         expect(onOpenChange).toHaveBeenCalled();
     });
