@@ -21,7 +21,7 @@ describe('ImportChipDialog', () => {
         expect(screen.getByText('Import')).toBeInTheDocument();
     });
 
-    it('should call onFileChange with the selected file', () => {
+    it('should update to the selected .chip file.', () => {
         const file = new File(['dummy content'], 'example.chip', { type: 'application/octet-stream' });
         const onFileChange = vi.fn();
 
@@ -41,7 +41,7 @@ describe('ImportChipDialog', () => {
         expect(onFileChange).toHaveBeenCalledWith(file);
     });
 
-    it('should display an error alert for non-.chip file', () => {
+    it('should display an error alert for non-.chip file.', () => {
         const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
         const onFileChange = vi.fn();
         const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
@@ -62,6 +62,96 @@ describe('ImportChipDialog', () => {
         expect(onFileChange).toHaveBeenCalledWith(null);
         expect(alertMock).toHaveBeenCalledWith('Please select a valid .chip file');
         alertMock.mockRestore();
+    });
+
+    it('should disable import button when no file is selected.', () => {
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={() => {}}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+
+        const importButton = screen.getByText('Import').closest('button');
+        expect(importButton).toBeDisabled();
+    });
+
+    it('should enable import button when a file is selected.', () => {
+        const file = new File(['dummy content'], 'example.chip', { type: 'application/octet-stream' });
+
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={() => {}}
+                selectedFile={file}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+
+        const importButton = screen.getByText('Import').closest('button');
+        expect(importButton).not.toBeDisabled();
+    });
+
+    it('should call onImport when import button is clicked.', () => {
+        const file = new File(['dummy content'], 'example.chip', { type: 'application/octet-stream' });
+        const onImport = vi.fn();
+
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={() => {}}
+                selectedFile={file}
+                onFileChange={() => {}}
+                onImport={onImport}
+            />
+        );
+
+        const importButton = screen.getByText('Import').closest('button');
+        fireEvent.click(importButton);
+
+        expect(onImport).toHaveBeenCalled();
+    });
+
+    it('should call onOpenChange when close button is clicked.', () => {
+        const onOpenChange = vi.fn();
+
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={onOpenChange}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+
+        const closeButton = screen.getByText('Close').closest('button');
+        fireEvent.click(closeButton);
+
+        expect(onOpenChange).toHaveBeenCalled();
+    });
+
+    it('should call onOpenChange when backdrop is clicked.', () => {
+        const onOpenChange = vi.fn();
+    
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={onOpenChange}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+    
+        const backdrop = screen.getByTestId('dialog-overlay');
+        fireEvent.click(backdrop);
+        onOpenChange(false);
+        expect(onOpenChange).toHaveBeenCalled();
     });
 
 });
