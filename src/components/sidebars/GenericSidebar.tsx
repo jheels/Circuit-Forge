@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ImportChipDialog from '../dialogs/ImportChipDialog';
+import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
 
 interface ComponentTile {
     id: string;
@@ -10,11 +10,12 @@ interface ComponentTile {
     description: string;
 }
 
-interface GenericSidebarProps {
+interface GenericSideBarProps {
     components: ComponentTile[];
+    showImportChipDialog: boolean;
 }
 
-export default function GenericSidebar({ components }: GenericSidebarProps) {
+export default function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isOpen, setIsOpen] = useState(true);
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function GenericSidebar({ components }: GenericSidebarProps) {
         <div className={`relative h-full bg-gray-200 ${isOpen ? 'w-1/5' : 'w-3'} flex-shrink-0 transition-all duration-300`}>
             <button
                 onClick={toggleSidebar}
+                data-testid="toggleSidebar"
                 className="absolute -left-3 top-1/2 -translate-y-1/2 h-16 w-6 flex items-center justify-center bg-gray-300"
             >
                 {isOpen ? (
@@ -64,9 +66,11 @@ export default function GenericSidebar({ components }: GenericSidebarProps) {
                                 />
                                 <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600" />
                             </div>
+                            {showImportChipDialog && (
                             <Button variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
                                 <Download className="h-7 w-7" />
                             </Button>
+                            )}
                         </div>
                     </div>
 
@@ -93,13 +97,14 @@ export default function GenericSidebar({ components }: GenericSidebarProps) {
                     </div>
                 </>
             )}
-            <ImportChipDialog
-                isOpen={isImportDialogOpen}
-                onOpenChange={setIsImportDialogOpen}
-                selectedFile={selectedFile}
-                onFileChange={setSelectedFile}
-                onImport={handleImport}
-            />
+            {showImportChipDialog && (
+                <ImportChipDialog
+                    isOpen={isImportDialogOpen}
+                    onOpenChange={setIsImportDialogOpen}
+                    selectedFile={selectedFile}
+                    onFileChange={setSelectedFile}
+                    onImport={handleImport}
+            />)}
         </div>
     );
 }

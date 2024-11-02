@@ -1,11 +1,11 @@
-import GenericSidebar from './GenericSidebar';
+import GenericSideBar from './GenericSideBar';
 
-const dummyComponents = Array(36).fill(null).map((_, i) => ({
+const dummyComponents = Array(1).fill(null).map((_, i) => ({
     id: `component-${i + 1}`,
     name: `Component ${i + 1}`,
     description: `Description for Component ${i + 1}`
 }));
 
 export default function SimSideBar() {
-    return <GenericSidebar components={dummyComponents} />;
+    return <GenericSideBar components={dummyComponents} showImportChipDialog={true} />;
 }

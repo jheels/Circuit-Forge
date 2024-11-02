@@ -1,5 +1,5 @@
-import ICEditorSideBar from '../components/sidebars/ICEditorSideBar';
-import Toolbar from "../components/topbars/ToolBar";
+import ICEditorSideBar from '@/components/sidebars/ICEditorSideBar';
+import Toolbar from "@/components/topbars/ToolBar";
 
 export default function ICEditor() {
     return (
