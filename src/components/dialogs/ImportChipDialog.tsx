@@ -25,7 +25,7 @@ const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOpenChang
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <Dialog open={isOpen} onOpenChange={onOpenChange} data-testid="importChipDialog">
             <DialogContent className="sm:max-w-[425px] p-4">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-semibold">Import Chip</DialogTitle>

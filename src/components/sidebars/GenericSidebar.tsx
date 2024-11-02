@@ -31,7 +31,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
 
     const handleImport = () => {
         if (selectedFile) {
-            // Implement your file import logic here
+            // Implement file import logic here
             console.log('Importing file:', selectedFile.name);
             setIsImportDialogOpen(false);
             setSelectedFile(null);
@@ -39,7 +39,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
     };
 
     return (
-        <div className={`relative h-full bg-gray-200 ${isOpen ? 'w-1/5' : 'w-3'} flex-shrink-0 transition-all duration-300`}>
+        <div data-testid="sidebar" className={`relative h-full bg-gray-200 ${isOpen ? 'w-1/5' : 'w-3'} flex-shrink-0 transition-all duration-300`}>
             <button
                 onClick={toggleSidebar}
                 data-testid="toggleSidebar"
@@ -60,14 +60,14 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
                                 <Input
                                     type="text"
                                     placeholder="Search"
-                                    className="pr-8 py-1 w-full h-8"
+                                    className="pr-8 py-1 w-full h-[40px]"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                                 <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600" />
                             </div>
                             {showImportChipDialog && (
-                            <Button variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
+                            <Button data-testid="importChipButton" variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
                                 <Download className="h-7 w-7" />
                             </Button>
                             )}
@@ -98,7 +98,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
                 </>
             )}
             {showImportChipDialog && (
-                <ImportChipDialog
+                <ImportChipDialog 
                     isOpen={isImportDialogOpen}
                     onOpenChange={setIsImportDialogOpen}
                     selectedFile={selectedFile}

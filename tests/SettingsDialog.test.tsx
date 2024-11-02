@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import SettingsDialog from '../src/components/dialogs/SettingsDialog';
+import SettingsDialog from '@/components/dialogs/SettingsDialog';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
