@@ -58,7 +58,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
                         <div className="flex items-center space-x-2">
                             <div className="relative flex-grow">
                                 <Input
-                                    type="text"
+                                    type="text" 
                                     placeholder="Search"
                                     className="pr-8 py-1 w-full h-[40px]"
                                     value={searchTerm}
