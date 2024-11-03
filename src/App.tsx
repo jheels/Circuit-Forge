@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import NavBar from './components/topbars/NavBar';
+import NavBar from '@/components/topbars/NavBar';
 import Simulator from './pages/Simulator';
 import ICEditor from './pages/ICEditor';
 
