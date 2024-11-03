@@ -3,6 +3,7 @@ import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
+import { useSidebar } from '@/context/SidebarContext';
 
 interface ComponentTile {
     id: string;
@@ -16,18 +17,14 @@ interface GenericSideBarProps {
 }
 
 export default function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
+    const { isOpen, toggleSidebar } = useSidebar();
     const [searchTerm, setSearchTerm] = useState('');
-    const [isOpen, setIsOpen] = useState(true);
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const filteredComponents = components.filter(component =>
         component.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
 
     const handleImport = () => {
         if (selectedFile) {
@@ -39,7 +36,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
     };
 
     return (
-        <div data-testid="sidebar" className={`relative h-full bg-gray-200 ${isOpen ? 'w-1/5' : 'w-3'} flex-shrink-0 transition-all duration-300`}>
+        <div data-testid="sidebar" className={`relative h-full bg-gray-200 ${isOpen ? 'w-1/5' : 'w-3'} flex-shrink-0`}>
             <button
                 onClick={toggleSidebar}
                 data-testid="toggleSidebar"

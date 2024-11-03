@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
+import { useSidebar } from '@/context/SidebarContext';
 
 const Editor = () => {
-    const [stageWidth, setStageWidth] = useState(window.innerWidth * 0.8);
+    console.log(window.innerWidth);
+    const { isOpen } = useSidebar();
+    const [stageWidth, setStageWidth] = useState(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState(window.innerHeight - 100); // 100 is the height of the header
     const [scale, setScale] = useState(1);
     const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -12,13 +15,14 @@ const Editor = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            setStageWidth(window.innerWidth * 0.8);
+            setStageWidth(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
             setStageHeight(window.innerHeight - 100);
         };
-
         window.addEventListener('resize', handleResize);
+        handleResize();
+        
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, [isOpen]);
 
     const handleWheel = (e) => {
         e.evt.preventDefault();
