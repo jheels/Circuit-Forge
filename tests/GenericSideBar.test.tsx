@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import GenericSideBar from '@/components/sidebars/GenericSideBar';
+import { SidebarProvider } from '@/context/SidebarContext';
 
 const mockComponents = [
     { id: '1', name: 'Component 1', description: 'Description 1' },
@@ -10,8 +11,12 @@ const mockComponents = [
 ];
 
 describe('GenericSideBar', () => {
+    const renderWithContext = (component) => {
+        return render(<SidebarProvider>{component}</SidebarProvider>);
+    };
+
     it('should render with search input, visibility toggle, and import button.', () => {
-        render(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
 
         const toggleButton = screen.getByTestId('toggleSidebar');
         const ImportChipButton = screen.getByTestId('importChipButton');
@@ -25,7 +30,7 @@ describe('GenericSideBar', () => {
     });
 
     it('should toggle visibility when the toggle button is clicked.', () => {
-        render(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
 
         const toggleButton = screen.getByTestId('toggleSidebar');
         const sidebar = screen.getByTestId('sidebar');
@@ -38,7 +43,7 @@ describe('GenericSideBar', () => {
     });
 
     it('should open the import dialog when the import button is clicked.', () => {
-        render(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
         const importChipButton = screen.getByTestId('importChipButton');
 
         expect(screen.queryByText('Import Chip')).not.toBeInTheDocument();
@@ -47,7 +52,7 @@ describe('GenericSideBar', () => {
     });
 
     it('should filter the components based on the search term.', () => {
-        render(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
         const searchInput = screen.getByPlaceholderText('Search');
 
         expect(screen.getByText('Component 1')).toBeInTheDocument();
