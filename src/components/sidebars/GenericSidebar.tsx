@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDrag } from 'react-dnd';
 import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,39 @@ interface GenericSideBarProps {
     components: ComponentTile[];
     showImportChipDialog: boolean;
 }
+
+const DraggableComponent = ({ component }: { component: ComponentTile }) => {
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: 'COMPONENT',
+        item: { id: component.id, name: component.name },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    }));
+
+    return (
+        <div
+            ref={drag}
+            className={`flex flex-col items-center bg-white rounded-lg shadow-sm p-2 ${isDragging ? 'opacity-50' : ''}`}
+        >
+            <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2">
+                <span className="text-xs text-center truncate mr-1">{component.name}</span>
+            </div>
+            <div className="flex items-center justify-center w-full">
+                <span className="text-xs text-center truncate mr-1">{component.name}</span>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-0 h-4 w-4"
+                    title={component.description}
+                >
+                    <Info className="h-3 w-3" />
+                </Button>
+            </div>
+        </div>
+    );
+};
+
 
 export default function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
     const { isOpen, toggleSidebar } = useSidebar();
@@ -74,21 +108,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
                     <div className="p-4 h-[calc(100vh-10rem)] overflow-y-scroll">
                         <div className="grid grid-cols-3 gap-4">
                             {filteredComponents.map((component) => (
-                                <div key={component.id} className="flex flex-col items-center bg-white rounded-lg shadow-sm p-2">
-                                    <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2">
-                                    </div>
-                                    <div className="flex items-center justify-center w-full">
-                                        <span className="text-xs text-center truncate mr-1">{component.name}</span>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-0 h-4 w-4"
-                                            title={component.description}
-                                        >
-                                            <Info className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                </div>
+                                <DraggableComponent key={component.id} component={component} />
                             ))}
                         </div>
                     </div>

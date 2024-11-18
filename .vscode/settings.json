@@ -3,6 +3,7 @@
         "clsx",
         "dialog",
         "Lucide",
-        "tailwindcss"
+        "tailwindcss",
+        "uuidv"
     ]
 }
