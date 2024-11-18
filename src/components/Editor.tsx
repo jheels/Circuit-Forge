@@ -1,86 +1,125 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDrop } from 'react-dnd';
-import { Stage, Layer, Rect, Text } from 'react-konva';
-import { useSidebar } from '@/context/SidebarContext';
+import { Stage, Layer, Rect } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
+import { useSidebar } from '@/context/SidebarContext';
+
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 3;
+const SCALE_BY = 1.05;
 
 const Editor = () => {
     const { isOpen } = useSidebar();
     const [stageWidth, setStageWidth] = useState(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
-    const [stageHeight, setStageHeight] = useState(window.innerHeight - 100); // 100 is the height of the header
+    const [stageHeight, setStageHeight] = useState(window.innerHeight - 100);
     const [scale, setScale] = useState(1);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [components, setComponents] = useState([]);
+    
     const stageRef = useRef(null);
+    const positionRef = useRef(position);
+    const scaleRef = useRef(scale);
 
-
-    const MIN_SCALE = 0.25;
-    const MAX_SCALE = 3;
-
+    // Update refs when state changes
     useEffect(() => {
-        const handleResize = () => {
-            setStageWidth(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
-            setStageHeight(window.innerHeight - 100);
-        };
-        window.addEventListener('resize', handleResize);
-        handleResize();
+        positionRef.current = position;
+        scaleRef.current = scale;
+    }, [position, scale]);
 
-        return () => window.removeEventListener('resize', handleResize);
+
+    const handleResize = useCallback(() => {
+        setStageWidth(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
+        setStageHeight(window.innerHeight - 100);
     }, [isOpen]);
 
-    const handleWheel = (e) => {
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => window.removeEventListener('resize', handleResize);
+    }, [handleResize]);
+
+    const wheelTimeoutRef = useRef(null);
+    const handleWheel = useCallback((e) => {
         e.evt.preventDefault();
-        const scaleBy = 1.1;
-        const stage = e.target.getStage();
-        const oldScale = stage.scaleX();
 
-        const mousePointTo = {
-            x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-            y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-        };
+        if (wheelTimeoutRef.current) {
+            cancelAnimationFrame(wheelTimeoutRef.current);
+        }
 
-        let newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-        newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
-        setScale(newScale);
+        wheelTimeoutRef.current = requestAnimationFrame(() => {
+            const stage = e.target.getStage();
+            const oldScale = stage.scaleX();
+            const pointer = stage.getPointerPosition();
 
-        const newPos = {
-            x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-            y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-        };
-        setPosition(newPos);
-    };
+            const mousePointTo = {
+                x: pointer.x / oldScale - stage.x() / oldScale,
+                y: pointer.y / oldScale - stage.y() / oldScale,
+            };
+
+            const newScale = Math.min(
+                MAX_SCALE,
+                Math.max(
+                    MIN_SCALE,
+                    e.evt.deltaY > 0 ? oldScale / SCALE_BY : oldScale * SCALE_BY
+                )
+            );
+
+            const newPos = {
+                x: -(mousePointTo.x - pointer.x / newScale) * newScale,
+                y: -(mousePointTo.y - pointer.y / newScale) * newScale,
+            };
+
+            setScale(newScale);
+            setPosition(newPos);
+        });
+    }, []);
+
+    const handleDrop = useCallback((item, monitor) => {
+        const point = monitor.getSourceClientOffset();
+        const stage = stageRef.current;
+
+        if (point && stage) {
+            const dropX = (point.x - stage.x()) / scaleRef.current;
+            const dropY = (point.y - stage.y()) / scaleRef.current;
+            
+            setComponents(prev => [
+                ...prev,
+                {
+                    id: `${item.name}-${uuidv4()}`,
+                    name: item.name,
+                    x: dropX,
+                    y: dropY
+                }
+            ]);
+        }
+    }, []);
+
+    const handleDragEnd = useCallback((e) => {
+        setPosition(e.currentTarget.position());
+    }, []);
 
     const [{ isOver }, drop] = useDrop(() => ({
         accept: 'COMPONENT',
-        drop: (item, monitor) => {
-            const point = monitor.getSourceClientOffset();
-            const objHeight = 100; // this is the rectangles height for now 
-            const newId = `${item.name} - ${uuidv4()}`;
-            setComponents(prevComponents => {
-                console.log(newId)
-                return [...prevComponents, { id: newId , name: item.name, x: point.x, y: point.y - objHeight}];
-            });
-        },
+        drop: handleDrop,
         collect: (monitor) => ({
-            isOver: monitor.isOver,
+            isOver: monitor.isOver(),
         }),
-    }));
+    }), [handleDrop]);
 
     return (
         <div className="flex-grow" ref={drop}>
             <Stage
                 ref={stageRef}
-                className="border-2 border-dashed border-black"
                 width={stageWidth}
                 height={stageHeight}
-                scale={{ x: scale, y: scale }}
                 x={position.x}
                 y={position.y}
+                scale={{ x: scale, y: scale }}
                 onWheel={handleWheel}
                 draggable
+                onDragEnd={handleDragEnd}
             >
                 <Layer>
-                    <Text text="Editable Area" fontSize={15} x={10} y={10} />
                     {components.map((component) => (
                         <Rect
                             key={component.id}
@@ -88,7 +127,7 @@ const Editor = () => {
                             y={component.y}
                             width={100}
                             height={100}
-                            fill="blue"
+                            fill="black"
                             draggable
                         />
                     ))}
