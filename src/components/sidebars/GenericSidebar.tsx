@@ -32,7 +32,6 @@ const DraggableComponent = ({ component }: { component: ComponentTile }) => {
             className={`flex flex-col items-center bg-white rounded-lg shadow-sm p-2 ${isDragging ? 'opacity-50' : ''}`}
         >
             <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2">
-                <span className="text-xs text-center truncate mr-1">{component.name}</span>
             </div>
             <div className="flex items-center justify-center w-full">
                 <span className="text-xs text-center truncate mr-1">{component.name}</span>

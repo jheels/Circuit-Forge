@@ -37,7 +37,6 @@ function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (
         localStorage.setItem('highContrast', highContrast.toString());
         localStorage.setItem('voiceOver', voiceOver.toString());
         onOpenChange(false);
-        console.log('Settings saved', { highContrast, voiceOver });
     };
 
     return (

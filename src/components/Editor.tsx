@@ -1,24 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useDrop } from 'react-dnd';
+import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { Stage, Layer, Rect } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { useSidebar } from '@/context/SidebarContext';
+import { ComponentTile, Component } from '@/types';
+import Konva from 'konva';
+
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 3;
-const SCALE_BY = 1.05;
+const SCALE_BY = 1.1;
 
-const Editor = () => {
+const Editor: React.FC = () => {
     const { isOpen } = useSidebar();
-    const [stageWidth, setStageWidth] = useState(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
-    const [stageHeight, setStageHeight] = useState(window.innerHeight - 100);
-    const [scale, setScale] = useState(1);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [components, setComponents] = useState([]);
-    
-    const stageRef = useRef(null);
-    const positionRef = useRef(position);
-    const scaleRef = useRef(scale);
+    const [stageWidth, setStageWidth] = useState<number>(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
+    const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
+    const [scale, setScale] = useState<number>(1);
+    const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [components, setComponents] = useState<Component[]>([]);
+
+    const stageRef = useRef<Konva.Stage>(null);
+    const positionRef = useRef<{ x: number; y: number }>(position);
+    const scaleRef = useRef<number>(scale);
 
     // Update refs when state changes
     useEffect(() => {
@@ -38,8 +41,9 @@ const Editor = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [handleResize]);
 
-    const wheelTimeoutRef = useRef(null);
-    const handleWheel = useCallback((e) => {
+    const wheelTimeoutRef = useRef<number | null>(null);
+
+    const handleWheel = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
 
         if (wheelTimeoutRef.current) {
@@ -48,9 +52,10 @@ const Editor = () => {
 
         wheelTimeoutRef.current = requestAnimationFrame(() => {
             const stage = e.target.getStage();
+            if (!stage) return;
             const oldScale = stage.scaleX();
             const pointer = stage.getPointerPosition();
-
+            if (!pointer) return;
             const mousePointTo = {
                 x: pointer.x / oldScale - stage.x() / oldScale,
                 y: pointer.y / oldScale - stage.y() / oldScale,
@@ -74,36 +79,33 @@ const Editor = () => {
         });
     }, []);
 
-    const handleDrop = useCallback((item, monitor) => {
+    const handleDrop = useCallback((item: ComponentTile, monitor: DropTargetMonitor) => {
         const point = monitor.getSourceClientOffset();
         const stage = stageRef.current;
 
-        if (point && stage) {
-            const dropX = (point.x - stage.x()) / scaleRef.current;
-            const dropY = (point.y - stage.y()) / scaleRef.current;
-            
-            setComponents(prev => [
-                ...prev,
-                {
-                    id: `${item.name}-${uuidv4()}`,
-                    name: item.name,
-                    x: dropX,
-                    y: dropY
-                }
-            ]);
-        }
+        if (!point || !stage) return;
+
+        const dropX = (point.x - stage.x()) / scaleRef.current;
+        const dropY = (point.y - stage.y()) / scaleRef.current;
+
+        setComponents(prev => [
+            ...prev,
+            {
+                id: `${item.name}-${uuidv4()}`,
+                name: item.name,
+                x: dropX,
+                y: dropY
+            }
+        ]);
     }, []);
 
-    const handleDragEnd = useCallback((e) => {
+    const handleDragEnd = useCallback((e : Konva.KonvaEventObject<DragEvent>) => {
         setPosition(e.currentTarget.position());
     }, []);
 
-    const [{ isOver }, drop] = useDrop(() => ({
+    const [, drop] = useDrop(() => ({
         accept: 'COMPONENT',
         drop: handleDrop,
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-        }),
     }), [handleDrop]);
 
     return (
