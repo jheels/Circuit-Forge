@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-import { Stage, Layer, Rect } from 'react-konva';
+import { Stage, Layer, Rect, Text } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { useSidebar } from '@/context/SidebarContext';
 import { ComponentTile, Component } from '@/types';
@@ -122,6 +122,15 @@ const Editor: React.FC = () => {
                 onDragEnd={handleDragEnd}
             >
                 <Layer>
+                    {components.length === 0 && (
+                        <Text
+                            text="Drop Components Here "
+                            fontSize={24} 
+                            fill="gray"
+                            x={stageWidth / 2 - 100}
+                            y={stageHeight / 2 - 12}
+                        />
+                    )}
                     {components.map((component) => (
                         <Rect
                             key={component.id}
