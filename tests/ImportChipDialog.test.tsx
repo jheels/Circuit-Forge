@@ -1,8 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
+
+
+const selectFile = (file: File) => {
+    const fileInputLabel = screen.getByText('Select a file...');
+    expect(fileInputLabel).toBeInTheDocument();
+    const fileInputContainer = fileInputLabel.parentElement;
+    expect(fileInputContainer).not.toBeNull();
+    const fileInput = fileInputContainer!.querySelector('input[type="file"]');
+    expect(fileInput).not.toBeNull();
+    fireEvent.change(fileInput!, { target: { files: [file] } });
+};
 
 describe('ImportChipDialog', () => {
     beforeEach(() => {
@@ -40,9 +51,7 @@ describe('ImportChipDialog', () => {
             />
         );
 
-        const fileInput = screen.getByText('Select a file...').parentElement.querySelector('input[type="file"]');
-        fireEvent.change(fileInput, { target: { files: [file] } });
-
+        selectFile(file);
         expect(onFileChange).toHaveBeenCalledWith(file);
     });
 
@@ -61,9 +70,7 @@ describe('ImportChipDialog', () => {
             />
         );
 
-        const fileInput = screen.getByText('Select a file...').parentElement.querySelector('input[type="file"]');
-        fireEvent.change(fileInput, { target: { files: [file] } });
-
+        selectFile(file);
         expect(onFileChange).toHaveBeenCalledWith(null);
         expect(alertMock).toHaveBeenCalledWith('Please select a valid .chip file');
         alertMock.mockRestore();
@@ -116,7 +123,7 @@ describe('ImportChipDialog', () => {
         );
 
         const importButton = screen.getByText('Import').closest('button');
-        fireEvent.click(importButton);
+        fireEvent.click(importButton!); // will not be null
 
         expect(onImport).toHaveBeenCalled();
     });
@@ -135,7 +142,7 @@ describe('ImportChipDialog', () => {
         );
 
         const closeButton = screen.getByText('Close').closest('button');
-        fireEvent.click(closeButton);
+        fireEvent.click(closeButton!); // will not be null
 
         expect(onOpenChange).toHaveBeenCalled();
     });
@@ -194,7 +201,7 @@ describe('ImportChipDialog', () => {
         );
 
         const closeButton = screen.getByText('Close').closest('button');
-        fireEvent.click(closeButton);
+        fireEvent.click(closeButton!); // will not be null
 
         expect(onOpenChange).toHaveBeenCalled();
     });

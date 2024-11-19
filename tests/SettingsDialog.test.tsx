@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SettingsDialog from '@/components/dialogs/SettingsDialog';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
@@ -87,7 +87,7 @@ describe('SettingsDialog', () => {
         );
 
         const closeButton = screen.getByText('Close').closest('button');
-        fireEvent.click(closeButton);
+        fireEvent.click(closeButton!); // will not be null
 
         expect(onOpenChange).toHaveBeenCalledWith(false);
     });

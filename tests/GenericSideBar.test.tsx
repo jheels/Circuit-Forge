@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import GenericSideBar from '@/components/sidebars/GenericSideBar';
 import { SidebarProvider } from '@/context/SidebarContext';
+import { DndProviderWrapper } from '@/context/DndContext';
+import GenericSideBar from '@/components/sidebars/GenericSideBar';
+import { ReactNode } from 'react';
 
 const mockComponents = [
     { id: '1', name: 'Component 1', description: 'Description 1' },
@@ -11,8 +13,12 @@ const mockComponents = [
 ];
 
 describe('GenericSideBar', () => {
-    const renderWithContext = (component) => {
-        return render(<SidebarProvider>{component}</SidebarProvider>);
+    const renderWithContext = (component : ReactNode) => {
+        return render(
+            <DndProviderWrapper>
+                <SidebarProvider>{component}</SidebarProvider>
+            </DndProviderWrapper>
+        );
     };
 
     it('should render with search input, visibility toggle, and import button.', () => {
