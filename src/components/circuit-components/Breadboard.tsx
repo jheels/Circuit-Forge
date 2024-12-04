@@ -1,7 +1,17 @@
-import React from 'react';
-import { Rect, Group, Text } from 'react-konva';
+/**
+ * TODO:
+ * - Remove magic numbers
+ * - centralise configuration values
+ * - add documentation
+ * - add hover for strips when choosing a pin!!
+ * - add wire on click of pin
+ * - fix e-j for regular rails
+ */
 
+import React, { useState } from 'react';
+import { Rect, Group, Text } from 'react-konva';
 // Constants for breadboard dimensions and styling
+
 const PIN_SIZE = 4;
 const PIN_SPACING = 6; // Space between two pins is 6-4=2
 const PINS_PER_STRIP = 5;
@@ -23,6 +33,7 @@ interface PinProps {
   stripId: string;
   pinPosition: PinPosition;
   onPinClick?: (stripId: string, pinPosition: PinPosition) => void;
+  isStripHovered: boolean;
 }
 
 interface StripProps {
@@ -45,19 +56,26 @@ const Pin: React.FC<PinProps> = ({
   isOccupied,
   stripId,
   pinPosition,
-  onPinClick
+  onPinClick,
+  isStripHovered
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const outerColor = isOccupied ? '#808080' : type === 'power' ? '#ff9999' : type === 'ground' ? '#99ccff' : '#e0e0e0';
   const innerColor = isOccupied ? '#707070' : type === 'power' ? '#dd7777' : type === 'ground' ? '#77aadd' : '#c0c0c0';
 
   return (
-    <Group>
+    <Group
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Rect
         x={position.x}
         y={position.y}
         width={PIN_SIZE}
         height={PIN_SIZE}
         fill={outerColor}
+        stroke={isStripHovered ? isHovered ? 'red' : 'yellow' : 'transparent'}
+        strokeWidth={isHovered ? 1 : 0.5}
         onClick={() => onPinClick?.(stripId, pinPosition)}
       />
       <Rect
@@ -74,7 +92,7 @@ const Pin: React.FC<PinProps> = ({
 
 // Horizontal Strip Component - Creates a row of 5 electrically connected pins
 const Strip: React.FC<StripProps> = ({ stripId, startPoint, onPinClick }) => {
-  // Define the pin positions in order
+  const [isHovered, setIsHovered] = useState(false);
   const pinPositions: PinPosition[] = ['a', 'b', 'c', 'd', 'e'];
 
   // Create array of 5 pins that share the same stripId
@@ -83,6 +101,7 @@ const Strip: React.FC<StripProps> = ({ stripId, startPoint, onPinClick }) => {
       x: startPoint.x + (index * PIN_SPACING),
       y: startPoint.y
     };
+  
 
     return (
       <Pin
@@ -93,12 +112,16 @@ const Strip: React.FC<StripProps> = ({ stripId, startPoint, onPinClick }) => {
         stripId={stripId}
         pinPosition={position}
         onPinClick={onPinClick}
+        isStripHovered={isHovered}
       />
     );
   });
 
   return (
-    <Group>
+    <Group
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {pins}
     </Group>
   );
@@ -311,17 +334,22 @@ const BreadboardRegularSections: React.FC<{
 };
 
 const Breadboard: React.FC<{}> = () => {
+
+  function onPinClick(stripId: string, pinPosition: PinPosition) {
+    console.log(`Pin ${pinPosition} on strip ${stripId} clicked`);
+  }
+
   const powerRailWidth = SECTION_SPACING + 2;
   const BreadboardRegularSectionWidth = 2 * PINS_PER_STRIP * PIN_SPACING + SECTION_SPACING + 2;
   return (
     <Group draggable>
-      <PowerRail railId="left" startPoint={{ x: 0, y: 0 }} />
-      <BreadboardRegularSections xOffset={powerRailWidth} />
-      <PowerRail railId="centre-left" startPoint={{ x: BreadboardRegularSectionWidth + powerRailWidth, y: 0 }} />
-      <BreadboardRegularSections xOffset={BreadboardRegularSectionWidth + 2 * powerRailWidth} />
-      <PowerRail railId="centre-right" startPoint={{ x: 2 * BreadboardRegularSectionWidth + 2 * powerRailWidth, y: 0 }} />
-      <BreadboardRegularSections xOffset={2 * BreadboardRegularSectionWidth + 3 * powerRailWidth} />
-      <PowerRail railId="right" startPoint={{ x: 3 * BreadboardRegularSectionWidth + 3 * powerRailWidth, y: 0 }} />
+      <PowerRail railId="left" startPoint={{ x: 0, y: 0 }} onPinClick={onPinClick} />
+      <BreadboardRegularSections xOffset={powerRailWidth} onPinClick={onPinClick} />
+      <PowerRail railId="centre-left" startPoint={{ x: BreadboardRegularSectionWidth + powerRailWidth, y: 0 }} onPinClick={onPinClick} />
+      <BreadboardRegularSections xOffset={BreadboardRegularSectionWidth + 2 * powerRailWidth} onPinClick={onPinClick} />
+      <PowerRail railId="centre-right" startPoint={{ x: 2 * BreadboardRegularSectionWidth + 2 * powerRailWidth, y: 0 }} onPinClick={onPinClick} />
+      <BreadboardRegularSections xOffset={2 * BreadboardRegularSectionWidth + 3 * powerRailWidth} onPinClick={onPinClick} />
+      <PowerRail railId="right" startPoint={{ x: 3 * BreadboardRegularSectionWidth + 3 * powerRailWidth, y: 0 }} onPinClick={onPinClick} />
     </Group>
   );
 }
