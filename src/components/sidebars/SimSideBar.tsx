@@ -1,15 +1,13 @@
 import GenericSideBar from './GenericSideBar';
 import { ComponentTile } from '@/types'; // Adjust the import path as needed
-import BreadboardSVG from '@/components/svgs/BreadboardSVG'; // Adjust the import path as needed
+import Breadboard from '@/components/circuit-components/Breadboard'; // Adjust the import path as needed
 
 const dummyComponents: ComponentTile[] = [
     {
         id: 'breadboard',
         name: 'Breadboard',
         description: 'A breadboard is a construction base for prototyping of electronics.',
-        svg : <BreadboardSVG />,
-        width: 390,
-        height: 480,
+        component : <Breadboard />,
     },
     {
         id: 'resistor',

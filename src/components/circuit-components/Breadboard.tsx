@@ -333,7 +333,12 @@ const BreadboardRegularSections: React.FC<{
   );
 };
 
-const Breadboard: React.FC<{}> = () => {
+interface BreadboardProps {
+  x: number;
+  y: number;
+}
+
+const Breadboard: React.FC<BreadboardProps> = ({ x, y }) => {
 
   function onPinClick(stripId: string, pinPosition: PinPosition) {
     console.log(`Pin ${pinPosition} on strip ${stripId} clicked`);
@@ -342,7 +347,7 @@ const Breadboard: React.FC<{}> = () => {
   const powerRailWidth = SECTION_SPACING + 2;
   const BreadboardRegularSectionWidth = 2 * PINS_PER_STRIP * PIN_SPACING + SECTION_SPACING + 2;
   return (
-    <Group draggable>
+    <Group x={x} y={y} draggable>
       <PowerRail railId="left" startPoint={{ x: 0, y: 0 }} onPinClick={onPinClick} />
       <BreadboardRegularSections xOffset={powerRailWidth} onPinClick={onPinClick} />
       <PowerRail railId="centre-left" startPoint={{ x: BreadboardRegularSectionWidth + powerRailWidth, y: 0 }} onPinClick={onPinClick} />

@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-import { Stage, Layer, Rect, Text } from 'react-konva';
+import { Stage, Layer, Text } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { useSidebar } from '@/context/SidebarContext';
 import { ComponentTile, Component } from '@/types';
 import Konva from 'konva';
-
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 3;
@@ -23,12 +22,10 @@ const Editor: React.FC = () => {
     const positionRef = useRef<{ x: number; y: number }>(position);
     const scaleRef = useRef<number>(scale);
 
-    // Update refs when state changes
     useEffect(() => {
         positionRef.current = position;
         scaleRef.current = scale;
     }, [position, scale]);
-
 
     const handleResize = useCallback(() => {
         setStageWidth(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
@@ -87,19 +84,17 @@ const Editor: React.FC = () => {
 
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
+        const newComponent = {
+            editorId: `${item.name}-${uuidv4()}`,
+            info: item,
+            x: dropX,
+            y: dropY,
+        };
 
-        setComponents(prev => [
-            ...prev,
-            {
-                id: `${item.name}-${uuidv4()}`,
-                name: item.name,
-                x: dropX,
-                y: dropY
-            }
-        ]);
+            setComponents(prev => [...prev, newComponent]);
     }, []);
 
-    const handleDragEnd = useCallback((e : Konva.KonvaEventObject<DragEvent>) => {
+    const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
         setPosition(e.currentTarget.position());
     }, []);
 
@@ -125,23 +120,15 @@ const Editor: React.FC = () => {
                     {components.length === 0 && (
                         <Text
                             text="Drop Components Here "
-                            fontSize={24} 
+                            fontSize={24}
                             fill="gray"
                             x={stageWidth / 2 - 100}
                             y={stageHeight / 2 - 12}
                         />
                     )}
-                    {components.map((component) => (
-                        <Rect
-                            key={component.id}
-                            x={component.x}
-                            y={component.y}
-                            width={100}
-                            height={100}
-                            fill="black"
-                            draggable
-                        />
-                    ))}
+                        {components.map((component) => {
+                            return React.cloneElement(component.info.component, {x: component.x, y: component.y});
+                    })}
                 </Layer>
             </Stage>
         </div>
