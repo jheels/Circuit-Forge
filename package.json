@@ -30,6 +30,7 @@
     "react-konva": "^18.2.10",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "use-image": "^1.1.1",
     "uuid": "^11.0.3"
   },
   "devDependencies": {

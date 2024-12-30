@@ -5,12 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
 import { useSidebar } from '@/context/SidebarContext';
-
-interface ComponentTile {
-    id: string;
-    name: string;
-    description: string;
-}
+import { ComponentTile } from '@/types';
 
 interface GenericSideBarProps {
     components: ComponentTile[];
@@ -20,7 +15,7 @@ interface GenericSideBarProps {
 const DraggableComponent = ({ component }: { component: ComponentTile }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'COMPONENT',
-        item: { id: component.id, name: component.name },
+        item: { id: component.id, name: component.name, description: component.description, component: component.component },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
@@ -31,10 +26,20 @@ const DraggableComponent = ({ component }: { component: ComponentTile }) => {
             ref={drag}
             className={`flex flex-col items-center bg-white rounded-lg shadow-sm p-2 ${isDragging ? 'opacity-50' : ''}`}
         >
-            <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2">
-            </div>
+            {component.svg ? (
+                component.svg
+            ) : (
+            <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2"></div>
+                )}
+
             <div className="flex items-center justify-center w-full">
                 <span className="text-xs text-center truncate mr-1">{component.name}</span>
+            </div>
+        </div>
+    );
+};
+
+/*
                 <Button
                     variant="ghost"
                     size="sm"
@@ -43,10 +48,7 @@ const DraggableComponent = ({ component }: { component: ComponentTile }) => {
                 >
                     <Info className="h-3 w-3" />
                 </Button>
-            </div>
-        </div>
-    );
-};
+*/
 
 
 export default function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
@@ -105,7 +107,7 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
                     </div>
 
                     <div className="p-4 h-[calc(100vh-10rem)] overflow-y-scroll">
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 gap-2">
                             {filteredComponents.map((component) => (
                                 <DraggableComponent key={component.id} component={component} />
                             ))}

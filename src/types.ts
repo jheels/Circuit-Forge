@@ -2,11 +2,12 @@ export interface ComponentTile {
     id: string;
     name: string;
     description: string;
+    component?: JSX.Element;
 }
 
 export interface Component {
-    id: string;
-    name: string;
+    editorId: string;
     x: number;
     y: number;
+    info: ComponentTile;
 }

@@ -3,9 +3,7 @@
  * - Remove magic numbers
  * - centralise configuration values
  * - add documentation
- * - add hover for strips when choosing a pin!!
  * - add wire on click of pin
- * - fix e-j for regular rails
  */
 
 import React, { useState } from 'react';

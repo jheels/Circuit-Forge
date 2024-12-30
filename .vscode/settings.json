@@ -4,7 +4,9 @@
         "dialog",
         "konva",
         "Lucide",
+        "svgs",
         "tailwindcss",
         "uuidv"
-    ]
+    ],
+    "svg.preview.background": "dark-transparent"
 }
