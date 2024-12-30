@@ -1,3 +1,8 @@
+export type Point = {
+    x: number;
+    y: number;
+}
+
 export interface ComponentTile {
     id: string;
     name: string;
@@ -9,5 +14,26 @@ export interface Component {
     editorId: string;
     x: number;
     y: number;
-    info: ComponentTile;
+    info: any; // need to replace
+}
+
+export interface Wire {
+    editorId: string;
+    start: Point;
+    end: Point;
+}
+
+export interface SimulatorContextType {
+    projectName: string;
+    saveStatus: {isSaved: boolean; lastSaved: Date | null },
+    components: Record<string, Component>;
+    wires: Record<string, Wire>;
+    selectedComponent: string | null;
+    setProjectName: (name: string) => void;
+    setSaveStatus: (status: {isSaved: boolean; lastSaved: Date | null }) => void;
+    addComponent: (component: Component) => void;
+    removeComponent: (editorId: string) => void;
+    addWire: (wire: Wire) => void;
+    removeWire: (editorId: string) => void;
+    setSelectedComponent: (editorId: string | null) => void;
 }
