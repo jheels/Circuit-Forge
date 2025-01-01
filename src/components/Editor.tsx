@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { Stage, Layer, Text } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
-import { useSidebar } from '@/context/SidebarContext';
+import { useUIContext } from '@/context/UIContext';
 import { ComponentTile, Component } from '@/types';
 import Konva from 'konva';
 
@@ -11,8 +11,8 @@ const MAX_SCALE = 3;
 const SCALE_BY = 1.1;
 
 const Editor: React.FC = () => {
-    const { isOpen } = useSidebar();
-    const [stageWidth, setStageWidth] = useState<number>(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
+    const { isSideBarOpen } = useUIContext();
+    const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
     const [scale, setScale] = useState<number>(1);
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -28,9 +28,9 @@ const Editor: React.FC = () => {
     }, [position, scale]);
 
     const handleResize = useCallback(() => {
-        setStageWidth(isOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
+        setStageWidth(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
         setStageHeight(window.innerHeight - 100);
-    }, [isOpen]);
+    }, [isSideBarOpen]);
 
     useEffect(() => {
         window.addEventListener('resize', handleResize);
@@ -91,7 +91,7 @@ const Editor: React.FC = () => {
             y: dropY,
         };
 
-            setComponents(prev => [...prev, newComponent]);
+        setComponents(prev => [...prev, newComponent]);
     }, []);
 
     const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
@@ -126,8 +126,8 @@ const Editor: React.FC = () => {
                             y={stageHeight / 2 - 12}
                         />
                     )}
-                        {components.map((component) => {
-                            return React.cloneElement(component.info.component, {x: component.x, y: component.y});
+                    {components.map((component) => {
+                        return React.cloneElement(component.info.component, { x: component.x, y: component.y });
                     })}
                 </Layer>
             </Stage>

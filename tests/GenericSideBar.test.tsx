@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { SidebarProvider } from '@/context/SidebarContext';
+import { UIProvider } from '@/context/UIContext';
 import { DndProviderWrapper } from '@/context/DndContext';
 import GenericSideBar from '@/components/sidebars/GenericSideBar';
 import { ReactNode } from 'react';
@@ -13,10 +13,10 @@ const mockComponents = [
 ];
 
 describe('GenericSideBar', () => {
-    const renderWithContext = (component : ReactNode) => {
+    const renderWithContext = (component: ReactNode) => {
         return render(
             <DndProviderWrapper>
-                <SidebarProvider>{component}</SidebarProvider>
+                <UIProvider>{component}</UIProvider>
             </DndProviderWrapper>
         );
     };
