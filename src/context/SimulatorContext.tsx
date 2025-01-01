@@ -39,6 +39,17 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         });
     }
 
+    const updateComponentPosition = (editorId: string, position: Point) => {
+        setComponents((prev) => ({
+            ...prev,
+            [editorId]: {
+                ...prev[editorId],
+                x: position.x,
+                y: position.y,
+            }
+        }));
+    }
+
     const addWire = (wire: Wire) => {
         setWires((prev) => ({
             ...prev,
@@ -65,6 +76,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             setSaveStatus,
             addComponent,
             removeComponent,
+            updateComponentPosition,
             addWire,
             removeWire,
             setSelectedComponent

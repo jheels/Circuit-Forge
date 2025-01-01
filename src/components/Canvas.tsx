@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-import { Stage, Layer, Text } from 'react-konva';
+import { Stage, Layer, Text, Rect } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { useUIContext } from '@/context/UIContext';
-import { ComponentTile, Component, Point } from '@/types';
+import { useSimulatorContext } from '@/context/SimulatorContext';
+import { ComponentTile, Point } from '@/types';
 import Konva from 'konva';
 
 const MIN_SCALE = 0.25;
@@ -12,11 +13,11 @@ const SCALE_BY = 1.1;
 
 const Canvas: React.FC = () => {
     const { isSideBarOpen } = useUIContext();
+    const { components, addComponent, updateComponentPosition } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
     const [scale, setScale] = useState<number>(1);
     const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
-    const [components, setComponents] = useState<Component[]>([]);
 
     const stageRef = useRef<Konva.Stage>(null);
     const positionRef = useRef<Point>(position);
@@ -40,7 +41,7 @@ const Canvas: React.FC = () => {
 
     const wheelTimeoutRef = useRef<number | null>(null);
 
-    const handleWheel = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
+    const handleZoom = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
 
         if (wheelTimeoutRef.current) {
@@ -91,17 +92,34 @@ const Canvas: React.FC = () => {
             y: dropY,
         };
 
-        setComponents(prev => [...prev, newComponent]);
-    }, []);
+        addComponent(newComponent);
+    }, [addComponent]);
 
-    const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
-        setPosition(e.currentTarget.position());
-    }, []);
+    const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, componentId: string) => {
+        const newX = e.target.x();
+        const newY = e.target.y();
+        updateComponentPosition(componentId, { x: newX, y: newY });
+    }, [updateComponentPosition]);
 
     const [, drop] = useDrop(() => ({
         accept: 'COMPONENT',
         drop: handleDrop,
     }), [handleDrop]);
+
+    const renderedComponents = useMemo(() => {
+        return Object.values(components).map((component) => (
+            <Rect
+                key={component.editorId}
+                x={component.x}
+                y={component.y}
+                width={50}
+                height={50}
+                fill="black"
+                draggable
+                onDragEnd={(e) => handleDragEnd(e, component.editorId)}
+            />
+        ));
+    }, [components, handleDragEnd]);
 
     return (
         <div className="flex-grow" ref={drop}>
@@ -112,12 +130,12 @@ const Canvas: React.FC = () => {
                 x={position.x}
                 y={position.y}
                 scale={{ x: scale, y: scale }}
-                onWheel={handleWheel}
+                onWheel={handleZoom}
                 draggable
-                onDragEnd={handleDragEnd}
+                onDragEnd={(e) => setPosition(e.currentTarget.position())}
             >
                 <Layer>
-                    {components.length === 0 && (
+                    {renderedComponents.length === 0 && (
                         <Text
                             text="Drop Components Here "
                             fontSize={24}
@@ -126,9 +144,7 @@ const Canvas: React.FC = () => {
                             y={stageHeight / 2 - 12}
                         />
                     )}
-                    {components.map((component) => {
-                        return React.cloneElement(component.info.component, { x: component.x, y: component.y });
-                    })}
+                    {renderedComponents}
                 </Layer>
             </Stage>
         </div>
