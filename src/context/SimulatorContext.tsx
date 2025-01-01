@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { Wire, Component, SimulatorContextType } from '@/types';
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
@@ -12,12 +12,18 @@ export const useSimulatorContext = () => {
 }
 
 export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ children }) => {
-    const [projectName, setProjectName] = useState<string>('Untitled Project');
+    const [projectName, setProjectName] = useState<string>(() => {
+        return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
+    });
     const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null }); // might have to export to a type
     const [components, setComponents] = useState<Record<string, Component>>({});
     const [wires, setWires] = useState<Record<string, Wire>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
     
+    useEffect(() => {
+        localStorage.setItem('simulatorProjectName', projectName);
+    }, [projectName]);
+
     const addComponent = (component: Component) => {
         setComponents((prev) => ({
             ...prev,

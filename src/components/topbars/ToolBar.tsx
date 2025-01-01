@@ -10,6 +10,7 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
+import { useSimulatorContext } from "@/context/SimulatorContext"
 
 interface DropdownItem {
     label?: string
@@ -20,11 +21,6 @@ interface DropdownItem {
 interface ToolbarDropdownProps {
     label: string
     items: DropdownItem[]
-}
-
-interface ToolbarProps {
-    projectKey: string;
-    defaultName: string;
 }
 
 function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
@@ -47,10 +43,8 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
     )
 }
 
-function Toolbar({ projectKey, defaultName }: ToolbarProps) {
-    const [projectName, setProjectName] = useState(() => {
-        return localStorage.getItem(projectKey) || defaultName;
-    });
+function Toolbar() {
+    const { projectName, setProjectName } = useSimulatorContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -61,10 +55,6 @@ function Toolbar({ projectKey, defaultName }: ToolbarProps) {
             inputRef.current.focus()
         }
     }, [isEditingName])
-
-    useEffect(() => {
-        localStorage.setItem(projectKey, projectName);
-    }, [projectName, projectKey]);
 
     const handleProjectNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setProjectName(e.target.value)
@@ -88,7 +78,6 @@ function Toolbar({ projectKey, defaultName }: ToolbarProps) {
     const clipText = (text: string, maxLength: number) => {
         return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }
-
 
     const menuItems = [
         {
