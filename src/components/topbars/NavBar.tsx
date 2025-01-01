@@ -2,15 +2,12 @@ import { useState } from 'react';
 import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useUIContext } from '@/context/UIContext';
 import TooltipButton from '../ToolTipButton';
 import SettingsDialog from '../dialogs/SettingsDialog';
 
-interface NavbarProps {
-    selectedTool: 'simulator' | 'ic-editor';
-    setSelectedTool: (tool: 'simulator' | 'ic-editor') => void;
-}
-
-export function Navbar({ selectedTool, setSelectedTool }: NavbarProps) {
+export function Navbar() {
+    const { selectedTool, setSelectedTool } = useUIContext();
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
