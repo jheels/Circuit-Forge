@@ -85,6 +85,14 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }
 
+    const onDocumentationClick = () => {
+        window.open("https://circuit-forge.gitbook.io/circuit-forge", "_blank")
+    }
+
+    const onAboutClick = () => {
+        window.open("https://github.com/jheels/Circuit-Forge", "_blank")
+    }
+
     const menuItems = [
         {
             label: "File",
@@ -120,8 +128,8 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         {
             label: "Help",
             items: [
-                { label: "Documentation", shortcut: "F1" },
-                { label: "About" },
+                { label: "Documentation", shortcut: "F1", onClick: onDocumentationClick },
+                { label: "About" , onClick: onAboutClick },
             ],
         },
     ]
