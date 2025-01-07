@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { Wire, Component, SimulatorContextType, Point } from '@/types';
+import { Wire, Component, SimulatorContextType } from '@/types';
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
@@ -39,13 +39,12 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         });
     }
 
-    const updateComponentPosition = (editorId: string, position: Point) => {
+    const updateComponent = (editorId: string, updates: Partial<Component>) => {
         setComponents((prev) => ({
             ...prev,
             [editorId]: {
                 ...prev[editorId],
-                x: position.x,
-                y: position.y,
+                ...updates,
             }
         }));
     }
@@ -76,7 +75,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             setSaveStatus,
             addComponent,
             removeComponent,
-            updateComponentPosition,
+            updateComponent,
             addWire,
             removeWire,
             setSelectedComponent

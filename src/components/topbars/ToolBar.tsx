@@ -23,6 +23,12 @@ interface ToolbarDropdownProps {
     items: DropdownItem[]
 }
 
+interface ToolbarProps {
+    onZoomIn: () => void;
+    onZoomOut: () => void;
+    onZoomReset: () => void;
+}
+
 function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
     return (
         <MenubarMenu>
@@ -32,7 +38,7 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
                     item.isSeparator ? (
                         <MenubarSeparator key={index} />
                     ) : (
-                        <MenubarItem key={index}>
+                        <MenubarItem key={index} onSelect={item.onClick}>
                             {item.label}
                             {item.shortcut && <MenubarShortcut>{item.shortcut}</MenubarShortcut>}
                         </MenubarItem>
@@ -43,7 +49,7 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
     )
 }
 
-function Toolbar() {
+function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
     const { projectName, setProjectName } = useSimulatorContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
@@ -105,10 +111,10 @@ function Toolbar() {
         {
             label: "View",
             items: [
-                { label: "Zoom In", shortcut: "⌘+" },
-                { label: "Zoom Out", shortcut: "⌘-" },
+                { label: "Zoom In", shortcut: "⌘+", onClick: onZoomIn },
+                { label: "Zoom Out", shortcut: "⌘-", onClick: onZoomOut },
                 { isSeparator: true },
-                { label: "Reset Zoom", shortcut: "⌘0" },
+                { label: "Reset Zoom", shortcut: "⌘0", onClick: onZoomReset },
             ],
         },
         {

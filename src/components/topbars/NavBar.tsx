@@ -3,7 +3,7 @@ import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard } from 'lucide-reac
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useUIContext } from '@/context/UIContext';
-import TooltipButton from '../ToolTipButton';
+import TooltipButton from '@/components/ui/ToolTipButton';
 import SettingsDialog from '../dialogs/SettingsDialog';
 
 export function Navbar() {

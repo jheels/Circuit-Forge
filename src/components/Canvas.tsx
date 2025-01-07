@@ -7,19 +7,20 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { ComponentTile, Point } from '@/types';
 import Konva from 'konva';
 
-const MIN_SCALE = 0.25;
-const MAX_SCALE = 3;
-const SCALE_BY = 1.1;
+interface CanvasProps {
+    scale: number;
+    position: { x: number; y: number };
+    setPosition: (position: { x: number; y: number }) => void;
+    handleZoom: (e: Konva.KonvaEventObject<WheelEvent>) => void;
+    stageRef: React.RefObject<Konva.Stage>;
+}
 
-const Canvas: React.FC = () => {
+const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoom, stageRef }) => {
     const { isSideBarOpen } = useUIContext();
-    const { components, addComponent, updateComponentPosition, selectedComponent, setSelectedComponent, removeComponent } = useSimulatorContext();
+    const { components, addComponent, updateComponent, selectedComponent, setSelectedComponent, removeComponent } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
-    const [scale, setScale] = useState<number>(1);
-    const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
 
-    const stageRef = useRef<Konva.Stage>(null);
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
 
@@ -39,44 +40,6 @@ const Canvas: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [handleResize]);
 
-    const wheelTimeoutRef = useRef<number | null>(null);
-
-    const handleZoom = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
-        e.evt.preventDefault();
-
-        if (wheelTimeoutRef.current) {
-            cancelAnimationFrame(wheelTimeoutRef.current);
-        }
-
-        wheelTimeoutRef.current = requestAnimationFrame(() => {
-            const stage = e.target.getStage();
-            if (!stage) return;
-            const oldScale = stage.scaleX();
-            const pointer = stage.getPointerPosition();
-            if (!pointer) return;
-            const mousePointTo = {
-                x: pointer.x / oldScale - stage.x() / oldScale,
-                y: pointer.y / oldScale - stage.y() / oldScale,
-            };
-
-            const newScale = Math.min(
-                MAX_SCALE,
-                Math.max(
-                    MIN_SCALE,
-                    e.evt.deltaY > 0 ? oldScale / SCALE_BY : oldScale * SCALE_BY
-                )
-            );
-
-            const newPos = {
-                x: -(mousePointTo.x - pointer.x / newScale) * newScale,
-                y: -(mousePointTo.y - pointer.y / newScale) * newScale,
-            };
-
-            setScale(newScale);
-            setPosition(newPos);
-        });
-    }, []);
-
     const handleDrop = useCallback((item: ComponentTile, monitor: DropTargetMonitor) => {
         const point = monitor.getSourceClientOffset();
         const stage = stageRef.current;
@@ -93,13 +56,13 @@ const Canvas: React.FC = () => {
         };
 
         addComponent(newComponent);
-    }, [addComponent]);
+    }, [addComponent, stageRef]);
 
     const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, componentId: string) => {
         const newX = e.target.x();
         const newY = e.target.y();
-        updateComponentPosition(componentId, { x: newX, y: newY });
-    }, [updateComponentPosition]);
+        updateComponent(componentId, { x: newX, y: newY });
+    }, [updateComponent]);
 
     const handleSelectedComponentClick = useCallback((componentId: string) => {
         setSelectedComponent(prevSelected => prevSelected === componentId ? null : componentId);
@@ -116,7 +79,6 @@ const Canvas: React.FC = () => {
         window.addEventListener('keydown', handleSelectedComponentDelete);
         return () => window.removeEventListener('keydown', handleSelectedComponentDelete);
     }, [handleSelectedComponentDelete]);
-
 
     const [, drop] = useDrop(() => ({
         accept: 'COMPONENT',

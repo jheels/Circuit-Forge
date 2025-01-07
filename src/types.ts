@@ -33,6 +33,7 @@ export interface SimulatorContextType {
     setSaveStatus: (status: {isSaved: boolean; lastSaved: Date | null }) => void;
     addComponent: (component: Component) => void;
     removeComponent: (editorId: string) => void;
+    updateComponent: (editorId: string, updates: Partial<Component>) => void;
     addWire: (wire: Wire) => void;
     removeWire: (editorId: string) => void;
     setSelectedComponent: (editorId: string | null) => void;
