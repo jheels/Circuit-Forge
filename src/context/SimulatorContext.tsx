@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { Wire, Component, SimulatorContextType } from '@/types';
+import { Wire, Component, SimulatorContextType, Point } from '@/types';
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 

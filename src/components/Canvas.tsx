@@ -13,7 +13,7 @@ const SCALE_BY = 1.1;
 
 const Canvas: React.FC = () => {
     const { isSideBarOpen } = useUIContext();
-    const { components, addComponent, updateComponentPosition } = useSimulatorContext();
+    const { components, addComponent, updateComponentPosition, selectedComponent, setSelectedComponent, removeComponent } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
     const [scale, setScale] = useState<number>(1);
@@ -101,6 +101,23 @@ const Canvas: React.FC = () => {
         updateComponentPosition(componentId, { x: newX, y: newY });
     }, [updateComponentPosition]);
 
+    const handleSelectedComponentClick = useCallback((componentId: string) => {
+        setSelectedComponent(componentId);
+    }, [setSelectedComponent]);
+
+    const handleSelectedComponentDelete = useCallback((e: KeyboardEvent) => {
+        if (selectedComponent && e.key === 'Backspace') {
+            removeComponent(selectedComponent);
+            setSelectedComponent(null);
+        }
+    }, [selectedComponent, removeComponent, setSelectedComponent]);
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleSelectedComponentDelete);
+        return () => window.removeEventListener('keydown', handleSelectedComponentDelete);
+    }, [handleSelectedComponentDelete]);
+
+
     const [, drop] = useDrop(() => ({
         accept: 'COMPONENT',
         drop: handleDrop,
@@ -115,8 +132,11 @@ const Canvas: React.FC = () => {
                 width={50}
                 height={50}
                 fill="black"
+                stroke={component.editorId === selectedComponent ? 'blue' : 'black'}
+                strokeWidth={component.editorId === selectedComponent ? 2 : 0}
                 draggable
                 onDragEnd={(e) => handleDragEnd(e, component.editorId)}
+                onClick={() => handleSelectedComponentClick(component.editorId)}
             />
         ));
     }, [components, handleDragEnd]);
@@ -145,6 +165,8 @@ const Canvas: React.FC = () => {
                         />
                     )}
                     {renderedComponents}
+                </Layer>
+                <Layer>
                 </Layer>
             </Stage>
         </div>
