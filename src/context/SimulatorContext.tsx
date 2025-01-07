@@ -64,6 +64,14 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         });
     }
 
+    const resetProject = () => {
+        setProjectName('Untitled Project');
+        setSaveStatus({ isSaved: false, lastSaved: null });
+        setComponents({});
+        setWires({});
+        setSelectedComponent(null);
+    }
+
     return (
         <SimulatorContext.Provider value={{
             projectName,
@@ -78,7 +86,8 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             updateComponent,
             addWire,
             removeWire,
-            setSelectedComponent
+            setSelectedComponent,
+            resetProject
         }}>
             {children}
         </SimulatorContext.Provider>

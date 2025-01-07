@@ -50,7 +50,7 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
 }
 
 function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
-    const { projectName, setProjectName } = useSimulatorContext();
+    const { projectName, setProjectName, resetProject } = useSimulatorContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -93,11 +93,17 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         window.open("https://github.com/jheels/Circuit-Forge", "_blank")
     }
 
+    const handleNewProject = () => {
+        if (window.confirm("Are you sure you want to create a new project? This action is irreversible!")) {
+            resetProject()
+        }
+    }
+
     const menuItems = [
         {
             label: "File",
             items: [
-                { label: "New Project", shortcut: "⌘N" },
+                { label: "New Project", shortcut: "⌘N" , onClick: handleNewProject },
                 { label: "Save", shortcut: "⌘S" },
                 { label: "Save As", shortcut: "⇧⌘S" },
                 { isSeparator: true },
