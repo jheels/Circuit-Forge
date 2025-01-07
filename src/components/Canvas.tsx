@@ -102,7 +102,7 @@ const Canvas: React.FC = () => {
     }, [updateComponentPosition]);
 
     const handleSelectedComponentClick = useCallback((componentId: string) => {
-        setSelectedComponent(componentId);
+        setSelectedComponent(prevSelected => prevSelected === componentId ? null : componentId);
     }, [setSelectedComponent]);
 
     const handleSelectedComponentDelete = useCallback((e: KeyboardEvent) => {
@@ -139,7 +139,7 @@ const Canvas: React.FC = () => {
                 onClick={() => handleSelectedComponentClick(component.editorId)}
             />
         ));
-    }, [components, handleDragEnd]);
+    }, [components, handleDragEnd, handleSelectedComponentClick, selectedComponent]);
 
     return (
         <div className="flex-grow" ref={drop}>
