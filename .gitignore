@@ -75,3 +75,6 @@ dist-ssr
 # Local Vite server cache
 .vite
 *.log
+
+*.png
+*.pdf
