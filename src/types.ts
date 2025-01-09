@@ -37,4 +37,5 @@ export interface SimulatorContextType {
     addWire: (wire: Wire) => void;
     removeWire: (editorId: string) => void;
     setSelectedComponent: (editorId: string | null) => void;
+    resetProject: () => void;
 }
