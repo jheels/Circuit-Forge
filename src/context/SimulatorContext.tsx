@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { Wire, Component, SimulatorContextType } from '@/types';
+import { EditorComponent, SimulatorContextType } from '@/types/general';
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
@@ -16,59 +16,42 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
     });
     const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null }); // might have to export to a type
-    const [components, setComponents] = useState<Record<string, Component>>({});
-    const [wires, setWires] = useState<Record<string, Wire>>({});
+    const [components, setComponents] = useState<Record<string, EditorComponent>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
     
     useEffect(() => {
         localStorage.setItem('simulatorProjectName', projectName);
     }, [projectName]);
 
-    const addComponent = (component: Component) => {
+    const addComponent = (component: EditorComponent) => {
         setComponents((prev) => ({
             ...prev,
-            [component.editorId]: component
+            [component.editorID]: component
         }));
     }
 
-    const removeComponent = (editorId: string) => {
+    const removeComponent = (editorID: string) => {
         setComponents((prev) => {
             const newComponents = { ...prev };
-            delete newComponents[editorId];
+            delete newComponents[editorID];
             return newComponents;
         });
     }
 
-    const updateComponent = (editorId: string, updates: Partial<Component>) => {
+    const updateComponent = (editorID: string, updates: Partial<EditorComponent>) => {
         setComponents((prev) => ({
             ...prev,
-            [editorId]: {
-                ...prev[editorId],
+            [editorID]: {
+                ...prev[editorID],
                 ...updates,
             }
         }));
-    }
-
-    const addWire = (wire: Wire) => {
-        setWires((prev) => ({
-            ...prev,
-            [wire.editorId]: wire
-        }));
-    }
-
-    const removeWire = (editorId: string) => {
-        setWires((prev) => {
-            const newWires = { ...prev };
-            delete newWires[editorId];
-            return newWires;
-        });
     }
 
     const resetProject = () => {
         setProjectName('Untitled Project');
         setSaveStatus({ isSaved: false, lastSaved: null });
         setComponents({});
-        setWires({});
         setSelectedComponent(null);
     }
 
@@ -77,15 +60,12 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             projectName,
             saveStatus,
             components,
-            wires,
             selectedComponent,
             setProjectName,
             setSaveStatus,
             addComponent,
             removeComponent,
             updateComponent,
-            addWire,
-            removeWire,
             setSelectedComponent,
             resetProject
         }}>

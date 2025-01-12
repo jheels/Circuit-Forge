@@ -4,7 +4,9 @@ import { Stage, Layer, Text, Rect } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { ComponentTile, Point } from '@/types';
+import { SidebarComponent, Point, EditorComponent } from '@/types/general';
+import { createLEDComponent } from '@/types/components/led';
+import { createResistorComponent } from '@/types/components/resistor';
 import Konva from 'konva';
 
 interface CanvasProps {
@@ -40,20 +42,36 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
         return () => window.removeEventListener('resize', handleResize);
     }, [handleResize]);
 
-    const handleDrop = useCallback((item: ComponentTile, monitor: DropTargetMonitor) => {
+    const handleDrop = useCallback((item: SidebarComponent, monitor: DropTargetMonitor) => {
         const point = monitor.getSourceClientOffset();
         const stage = stageRef.current;
 
         if (!point || !stage) return;
-
+        // this section may just use switch cases to create the component
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
-        const newComponent = {
-            editorId: `${item.name}-${uuidv4()}`,
-            info: item,
-            x: dropX,
-            y: dropY,
-        };
+
+        let newComponent;
+        switch (item.name) {
+            case 'LED':
+                newComponent = createLEDComponent({ x: dropX, y: dropY });
+                break;
+            case 'Resistor':
+                newComponent = createResistorComponent({ x: dropX, y: dropY });
+                break;
+        default:
+            newComponent = {
+                editorID: `${item.name}-${uuidv4()}`,
+                type: item.name,
+                position: { x: dropX, y: dropY },
+                metadata: { name: item.name, properties: {} },
+
+                connectors: [],
+                isSelected: false,
+                isHovered: false,
+            };
+            break;
+        }
 
         addComponent(newComponent);
     }, [addComponent, stageRef]);
@@ -61,7 +79,7 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, componentId: string) => {
         const newX = e.target.x();
         const newY = e.target.y();
-        updateComponent(componentId, { x: newX, y: newY });
+        updateComponent(componentId, { position: { x: newX, y: newY } });
     }, [updateComponent]);
 
     const handleSelectedComponentClick = useCallback((componentId: string) => {
@@ -88,19 +106,19 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     const renderedComponents = useMemo(() => {
         return Object.values(components).map((component) => (
             <Rect
-                key={component.editorId}
-                x={component.x}
-                y={component.y}
-                width={50}
-                height={50}
-                fill="black"
-                stroke={component.editorId === selectedComponent ? 'blue' : 'black'}
-                strokeWidth={component.editorId === selectedComponent ? 2 : 0}
-                draggable
-                onDragEnd={(e) => handleDragEnd(e, component.editorId)}
-                onClick={() => handleSelectedComponentClick(component.editorId)}
-            />
-        ));
+            key={component.editorID}
+            x={component.position.x}
+            y={component.position.y}
+            width={50}
+            height={50}
+            fill="black"
+            stroke={component.editorID === selectedComponent ? 'blue' : 'black'}
+            strokeWidth={component.editorID === selectedComponent ? 2 : 0}
+            draggable
+            onDragEnd={(e) => handleDragEnd(e, component.editorID)}
+            onClick={() => handleSelectedComponentClick(component.editorID)}
+        />
+    ));
     }, [components, handleDragEnd, handleSelectedComponentClick, selectedComponent]);
 
     return (

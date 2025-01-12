@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { useDrag } from 'react-dnd';
-import { Search, Download, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Download, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
 import { useUIContext } from '@/context/UIContext';
-import { ComponentTile } from '@/types';
+import { SidebarComponent } from '@/types/general';
 
 interface GenericSideBarProps {
-    components: ComponentTile[];
+    components: SidebarComponent[];
     showImportChipDialog: boolean;
 }
 
-const DraggableComponent = ({ component }: { component: ComponentTile }) => {
+const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'COMPONENT',
-        item: { id: component.id, name: component.name, description: component.description, component: component.component },
+        item: { name: component.name },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
@@ -25,15 +25,17 @@ const DraggableComponent = ({ component }: { component: ComponentTile }) => {
         <div
             ref={drag}
             className={`flex flex-col items-center bg-white rounded-lg shadow-sm p-2 ${isDragging ? 'opacity-50' : ''}`}
+            title={component.name}
         >
-            {component.svg ? (
-                component.svg
+            {component.graphic ? (
+                component.graphic
             ) : (
                 <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2"></div>
             )}
 
-            <div className="flex items-center justify-center w-full">
-                <span className="text-xs text-center truncate mr-1">{component.name}</span>
+            <div className="flex items-center justify-between w-full">
+                <span className="text-xs text-center flex-grow truncate">{component.name}</span>
+                <Info className="h-3.5 w-3.5 text-gray-600 ml-2 flex-shrink-0" />
             </div>
         </div>
     );
@@ -97,8 +99,8 @@ export default function GenericSideBar({ components, showImportChipDialog }: Gen
 
                     <div className="p-4 h-[calc(100vh-10rem)] overflow-y-scroll">
                         <div className="grid grid-cols-3 gap-2">
-                            {filteredComponents.map((component) => (
-                                <DraggableComponent key={component.id} component={component} />
+                            {filteredComponents.map((componentEntry) => (
+                                <DraggableComponent key={componentEntry.sidebarID} component={componentEntry} />
                             ))}
                         </div>
                     </div>
