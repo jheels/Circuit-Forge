@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { Stage, Layer, Text, Rect } from 'react-konva';
-import { v4 as uuidv4 } from 'uuid';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { SidebarComponent, Point, EditorComponent } from '@/types/general';
-import { createLEDComponent } from '@/types/components/led';
-import { createResistorComponent } from '@/types/components/resistor';
 import Konva from 'konva';
 
 interface CanvasProps {
@@ -19,7 +16,15 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoom, stageRef }) => {
     const { isSideBarOpen } = useUIContext();
-    const { components, addComponent, updateComponent, selectedComponent, setSelectedComponent, removeComponent } = useSimulatorContext();
+    const {
+        components,
+        addComponent,
+        updateComponent,
+        selectedComponent,
+        setSelectedComponent,
+        removeComponent,
+        createComponent
+    } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
 
@@ -51,30 +56,9 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
-        let newComponent;
-        switch (item.name) {
-            case 'LED':
-                newComponent = createLEDComponent({ x: dropX, y: dropY });
-                break;
-            case 'Resistor':
-                newComponent = createResistorComponent({ x: dropX, y: dropY });
-                break;
-        default:
-            newComponent = {
-                editorID: `${item.name}-${uuidv4()}`,
-                type: item.name,
-                position: { x: dropX, y: dropY },
-                metadata: { name: item.name, properties: {} },
-
-                connectors: [],
-                isSelected: false,
-                isHovered: false,
-            };
-            break;
-        }
-
+        const newComponent = createComponent(item.name, { x: dropX, y: dropY });
         addComponent(newComponent);
-    }, [addComponent, stageRef]);
+    }, [addComponent, createComponent, stageRef]);
 
     const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, componentId: string) => {
         const newX = e.target.x();

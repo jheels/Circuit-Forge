@@ -1,5 +1,8 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { EditorComponent, SimulatorContextType } from '@/types/general';
+import { EditorComponent, SimulatorContextType, Point } from '@/types/general';
+import { createLEDComponent } from "@/types/components/led";
+import { createResistorComponent } from "@/types/components/resistor";
+import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
@@ -22,6 +25,27 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     useEffect(() => {
         localStorage.setItem('simulatorProjectName', projectName);
     }, [projectName]);
+
+    const createComponent = (type: string, position: Point): EditorComponent => {
+        switch (type) {
+            case 'LED':
+                return createLEDComponent(position);
+            case 'Resistor':
+                return createResistorComponent(position);
+            case 'Power Supply':
+                return createPowerSupplyComponent(position);
+            default:
+                return {
+                    editorID: `${type}-${uuidv4()}`,
+                    type,
+                    position,
+                    metadata: { name: type, properties: {} },
+                    connectors: [],
+                    isSelected: false,
+                    isHovered: false,
+                };
+        }
+    }
 
     const addComponent = (component: EditorComponent) => {
         setComponents((prev) => ({
@@ -63,6 +87,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             selectedComponent,
             setProjectName,
             setSaveStatus,
+            createComponent,
             addComponent,
             removeComponent,
             updateComponent,

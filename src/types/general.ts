@@ -43,6 +43,7 @@ export interface SimulatorContextType {
     selectedComponent: string | null;
     setProjectName: (name: string) => void;
     setSaveStatus: (status: {isSaved: boolean; lastSaved: Date | null }) => void;
+    createComponent: (type: string, position: Point) => EditorComponent;
     addComponent: (component: EditorComponent) => void;
     removeComponent: (editorId: string) => void;
     updateComponent: (editorId: string, updates: Partial<EditorComponent>) => void;
