@@ -11,6 +11,7 @@ import {
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { useSimulatorContext } from "@/context/SimulatorContext"
+import  ConfirmationDialog  from "@/components/dialogs/ConfirmationDialog"
 
 interface DropdownItem {
     label?: string
@@ -53,6 +54,7 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
     const { projectName, setProjectName, resetProject } = useSimulatorContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
+    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
     const MAX_LENGTH = 20
 
@@ -94,16 +96,19 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
     }
 
     const handleNewProject = () => {
-        if (window.confirm("Are you sure you want to create a new project? This action is irreversible!")) {
-            resetProject()
-        }
+        setIsAlertDialogOpen(true)
+    }
+
+    const confirmNewProject = () => {
+        resetProject()
+        setIsAlertDialogOpen(false)
     }
 
     const menuItems = [
         {
             label: "File",
             items: [
-                { label: "New Project", shortcut: "⌘N" , onClick: handleNewProject },
+                { label: "New Project", shortcut: "⌘N" , onClick: handleNewProject},
                 { label: "Save", shortcut: "⌘S" },
                 { label: "Save As", shortcut: "⇧⌘S" },
                 { isSeparator: true },
@@ -168,6 +173,13 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
                     </Button>
                 )}
             </div>
+            <ConfirmationDialog
+                open={isAlertDialogOpen}
+                onOpenChange={setIsAlertDialogOpen}
+                title="New Project"
+                description="Are you sure you want to create a new project? This action cannot be undone."
+                onConfirm={confirmNewProject}
+            />
         </div>
     )
 }
