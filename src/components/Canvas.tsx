@@ -3,8 +3,9 @@ import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { Stage, Layer, Text, Rect } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { SidebarComponent, Point, EditorComponent } from '@/types/general';
+import { SidebarComponent, Point } from '@/types/general';
 import Konva from 'konva';
+import PropertiesPanel from './PropertiesPanel';
 
 interface CanvasProps {
     scale: number;
@@ -52,7 +53,6 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
         const stage = stageRef.current;
 
         if (!point || !stage) return;
-        // this section may just use switch cases to create the component
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
@@ -67,7 +67,7 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     }, [updateComponent]);
 
     const handleSelectedComponentClick = useCallback((componentId: string) => {
-        setSelectedComponent(prevSelected => prevSelected === componentId ? null : componentId);
+        setSelectedComponent((prevSelected: string)=> prevSelected === componentId ? null : componentId);
     }, [setSelectedComponent]);
 
     const handleSelectedComponentDelete = useCallback((e: KeyboardEvent) => {
@@ -106,7 +106,7 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     }, [components, handleDragEnd, handleSelectedComponentClick, selectedComponent]);
 
     return (
-        <div className="flex-grow" ref={drop}>
+        <div className="relative flex-grow" ref={drop}>
             <Stage
                 ref={stageRef}
                 width={stageWidth}
@@ -133,6 +133,9 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
                 <Layer>
                 </Layer>
             </Stage>
+            <div >
+                <PropertiesPanel />
+            </div>
         </div>
     );
 };
