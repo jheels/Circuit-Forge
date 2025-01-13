@@ -13,11 +13,6 @@ export interface Connector {
     connectedTo?: string;
 }
 
-export interface ComponentMetadata {
-    name: string;
-    properties: Record<string, any>; // need to replace
-}
-
 export interface SidebarComponent {
     readonly sidebarID: string;
     name: string;
@@ -29,8 +24,9 @@ export interface EditorComponent {
     readonly editorID: string;
     readonly type: string;
 
+    name: string;
     position: Point;
-    metadata: ComponentMetadata;
+    properties: Record<string, any>;
     connectors: Connector[]; 
     isSelected: boolean;
     isHovered: boolean;

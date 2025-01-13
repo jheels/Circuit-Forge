@@ -1,4 +1,4 @@
-import { EditorComponent, ComponentMetadata, Point } from '../general';
+import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface LEDProperties {
@@ -7,14 +7,10 @@ export interface LEDProperties {
     isIlluminated: boolean;
 }
 
-export interface LEDMetadata extends ComponentMetadata {
-    name: 'LED';
-    properties: LEDProperties;
-}
 
 export interface LEDComponent extends EditorComponent {
     readonly type: 'LED';
-    metadata: LEDMetadata;
+    properties: LEDProperties;
 }
 
 export const DEFAULT_LED_PROPERTIES: LEDProperties = {
@@ -27,11 +23,9 @@ export const createLEDComponent = (position: Point): LEDComponent => {
     return {
         editorID: `LED-${uuidv4()}`,
         type: 'LED',
+        name: 'LED',
         position: position,
-        metadata: {
-            name: 'LED',
-            properties: DEFAULT_LED_PROPERTIES
-        },
+        properties: DEFAULT_LED_PROPERTIES,
         connectors: [
             {
                 id: 'LED-cathode-' + uuidv4(),

@@ -1,4 +1,4 @@
-import { EditorComponent, ComponentMetadata, Point } from "../general";
+import { EditorComponent, Point } from "../general";
 import { v4 as uuidv4 } from "uuid";
 
 export type PowerMode = "AC" | "DC";
@@ -9,14 +9,9 @@ export interface PowerSupplyProperties {
     isEnabled: boolean;
 }
 
-export interface PowerSupplyMetadata extends ComponentMetadata {
-    name: "Power Supply";
-    properties: PowerSupplyProperties;
-}
-
 export interface PowerSupplyComponent extends EditorComponent {
     readonly type: "Power Supply";
-    metadata: PowerSupplyMetadata;
+    properties: PowerSupplyProperties;
 }
 
 export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
@@ -27,13 +22,11 @@ export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
 
 export const createPowerSupplyComponent = (position: Point): PowerSupplyComponent => {
     return {
-        editorID: `PowerSupply-${uuidv4()}`,
+        editorID: `PowerSupply-${uuidv4()}`, // need to make read only
         type: "Power Supply",
+        name: "Power Supply",
+        properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
         position: position,
-        metadata: {
-            name: "Power Supply",
-            properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
-        },
         connectors: [
             {
                 id: "PowerSupply-positive-" + uuidv4(),
