@@ -38,6 +38,7 @@ const PropertiesPanel: React.FC = () => {
                         name="name" 
                         value={component.name} 
                         onChange={handleChange} 
+                        onKeyDown={(e) => e.stopPropagation()}
                     />
                 </div>
                 {/* Add more properties here as needed */}

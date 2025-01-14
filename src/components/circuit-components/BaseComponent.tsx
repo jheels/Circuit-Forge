@@ -1,3 +1,15 @@
+/**
+ * To do:
+ * - Implement wire creation and logic on clicking connectors
+ * - Implement wire deletion
+ * - Implement wire highlighting on hover
+ * - Implement wire dragging
+ * - Implement wire snapping to connectors
+ * - Implement wire snapping to grid
+ * - Implementing component snapping to grid (breadboard)
+ * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
+ */
+
 import React, { useCallback, useState } from 'react';
 import { Group, Rect } from 'react-konva';
 import { EditorComponent } from '@/types/general';
@@ -63,7 +75,8 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
         setHoveredConnector(null);
     }, [connectors, position, dimensions]);
 
-    const handleSelection = useCallback(() => {
+    const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
+        e.cancelBubble = true;
         setSelectedComponent((prevSelectedComponent: string | null) => 
             prevSelectedComponent === componentID ? null : componentID
         );
@@ -95,8 +108,7 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
                         fill="red"
                         stroke="black"
                         strokeWidth={1}
-                        onClick={(e) => {
-                            e.stopPropagation();
+                        onClick={() => {
                             onConnectorClick?.(connector.id);
                         }}
                     />

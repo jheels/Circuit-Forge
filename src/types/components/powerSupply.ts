@@ -10,7 +10,7 @@ export interface PowerSupplyProperties {
 }
 
 export interface PowerSupplyComponent extends EditorComponent {
-    readonly type: "Power Supply";
+    readonly type: "POWER SUPPLY";
     properties: PowerSupplyProperties;
 }
 
@@ -23,7 +23,7 @@ export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     return {
         editorID: `PowerSupply-${uuidv4()}`, // need to make read only
-        type: "Power Supply",
+        type: "POWER SUPPLY",
         name: name,
         properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
         position: position,

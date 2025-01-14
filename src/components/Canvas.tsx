@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-import { Stage, Layer, Text, Rect } from 'react-konva';
+import { Stage, Layer, Text } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { SidebarComponent, Point } from '@/types/general';
 import Konva from 'konva';
 import PropertiesPanel from './PropertiesPanel';
+import LED from './circuit-components/LED';
+import Resistor from './circuit-components/Resistor';
 
 interface CanvasProps {
     scale: number;
@@ -20,11 +22,10 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     const {
         components,
         addComponent,
-        updateComponent,
-        selectedComponent,
-        setSelectedComponent,
+        createComponent,
         removeComponent,
-        createComponent
+        selectedComponent,
+        setSelectedComponent
     } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
@@ -60,27 +61,17 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
         addComponent(newComponent);
     }, [addComponent, createComponent, stageRef]);
 
-    const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, componentId: string) => {
-        const newX = e.target.x();
-        const newY = e.target.y();
-        updateComponent(componentId, { position: { x: newX, y: newY } });
-    }, [updateComponent]);
-
-    const handleSelectedComponentClick = useCallback((componentId: string) => {
-        setSelectedComponent((prevSelected: string)=> prevSelected === componentId ? null : componentId);
-    }, [setSelectedComponent]);
-
-    const handleSelectedComponentDelete = useCallback((e: KeyboardEvent) => {
-        if (selectedComponent && e.key === 'Backspace') {
+    const handleComponentDeletion = useCallback((e : KeyboardEvent) => {
+        if (e.key === 'Backspace' && selectedComponent) {
             removeComponent(selectedComponent);
             setSelectedComponent(null);
         }
-    }, [selectedComponent, removeComponent, setSelectedComponent]);
+    } , [removeComponent, selectedComponent, setSelectedComponent]);
 
     useEffect(() => {
-        window.addEventListener('keydown', handleSelectedComponentDelete);
-        return () => window.removeEventListener('keydown', handleSelectedComponentDelete);
-    }, [handleSelectedComponentDelete]);
+        window.addEventListener('keydown', handleComponentDeletion);
+        return () => window.removeEventListener('keydown', handleComponentDeletion);
+    }, [handleComponentDeletion]);
 
     const [, drop] = useDrop(() => ({
         accept: 'COMPONENT',
@@ -88,22 +79,23 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
     }), [handleDrop]);
 
     const renderedComponents = useMemo(() => {
-        return Object.values(components).map((component) => (
-            <Rect
-            key={component.editorID}
-            x={component.position.x}
-            y={component.position.y}
-            width={50}
-            height={50}
-            fill="black"
-            stroke={component.editorID === selectedComponent ? 'blue' : 'black'}
-            strokeWidth={component.editorID === selectedComponent ? 2 : 0}
-            draggable
-            onDragEnd={(e) => handleDragEnd(e, component.editorID)}
-            onClick={() => handleSelectedComponentClick(component.editorID)}
-        />
-    ));
-    }, [components, handleDragEnd, handleSelectedComponentClick, selectedComponent]);
+        return Object.values(components).map((component) => {
+            switch (component.type) {
+                case 'LED':
+                    return (
+                        <LED key={component.editorID} componentID={component.editorID} />
+                    );
+                case 'RESISTOR':
+                    return (
+                        <Resistor key={component.editorID} componentID={component.editorID}/>
+                    );
+                default:
+                    console.error(`Component type ${component.type} not found.`);
+                    return null;
+            }
+        }
+    );
+    }, [components]);
 
     return (
         <div className="relative flex-grow" ref={drop}>
@@ -115,8 +107,9 @@ const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoo
                 y={position.y}
                 scale={{ x: scale, y: scale }}
                 onWheel={handleZoom}
-                draggable
                 onDragEnd={(e) => setPosition(e.currentTarget.position())}
+                onClick={() => setSelectedComponent(null)}
+                draggable
             >
                 <Layer>
                     {renderedComponents.length === 0 && (

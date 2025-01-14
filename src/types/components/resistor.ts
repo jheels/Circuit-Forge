@@ -1,5 +1,6 @@
 import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
+import { createConnector } from '../connector';
 
 export type ResistanceUnit = 'Ω' | 'kΩ' | 'MΩ';
 
@@ -9,7 +10,7 @@ export interface ResistorProperties {
 }
 
 export interface ResistorComponent extends EditorComponent {
-    readonly type: 'Resistor';
+    readonly type: 'RESISTOR';
     properties: ResistorProperties;
 }
 
@@ -19,31 +20,18 @@ export const DEFAULT_RESISTOR_PROPERTIES: ResistorProperties = {
 }
 
 export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
+    const editorID = `Resistor-${uuidv4()}`;
+
     return {
-        editorID: `Resistor-${uuidv4()}`,
-        type: 'Resistor',
+        editorID: editorID,
+        type: 'RESISTOR',
         name: name,
+        dimensions: { width: 60, height: 30 },
         position: position,
         properties: DEFAULT_RESISTOR_PROPERTIES,
         connectors: [
-            {
-                id: 'Resistor-connector-1-' + uuidv4(),
-                position: {
-                    x: position.x + 5,
-                    y: position.y + 50,
-                },
-                type: 'ground',
-                isConnected: false
-            },
-            {
-                id: 'Resistor-connector-2-' + uuidv4(),
-                position: {
-                    x: position.x + 35,
-                    y: position.y + 50,
-                },
-                type: 'power',
-                isConnected: false
-            }
+            createConnector(editorID, 'bi-directional', { x: -0.2, y: 0.5 }), // might have to fiddle around with offsets
+            createConnector(editorID, 'bi-directional', { x: 1.2, y: 0.5 }),
         ],
         isSelected: false,
         isHovered: false
