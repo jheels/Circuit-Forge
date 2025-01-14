@@ -3,16 +3,6 @@ export type Point = {
     y: number;
 }
 
-export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'ground' | 'power';
-
-export interface Connector {
-    id: string;
-    position: Point;
-    type: ConnectorType;
-    isConnected: boolean;
-    connectedTo?: string;
-}
-
 export interface SidebarComponent {
     readonly sidebarID: string;
     name: string;
@@ -25,6 +15,7 @@ export interface EditorComponent {
     readonly type: string;
 
     name: string;
+    dimensions: { width: number; height: number };
     position: Point;
     properties: Record<string, any>;
     connectors: Connector[]; 
@@ -37,6 +28,7 @@ export interface SimulatorContextType {
     saveStatus: {isSaved: boolean; lastSaved: Date | null },
     components: Record<string, EditorComponent>;
     selectedComponent: string | null;
+    hoveredConnector: Connector | null;
     setProjectName: (name: string) => void;
     setSaveStatus: (status: {isSaved: boolean; lastSaved: Date | null }) => void;
     createComponent: (type: string, position: Point) => EditorComponent;
@@ -44,5 +36,6 @@ export interface SimulatorContextType {
     removeComponent: (editorId: string) => void;
     updateComponent: (editorId: string, updates: Partial<EditorComponent>) => void;
     setSelectedComponent: (editorId: string | null) => void;
+    startWireCreation: (connector: Connector) => void;
     resetProject: () => void;
 }

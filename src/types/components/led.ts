@@ -1,12 +1,12 @@
 import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
+import { createConnector } from '../connector';
 
 export interface LEDProperties {
     color: string;
     intensity: number;
     isIlluminated: boolean;
 }
-
 
 export interface LEDComponent extends EditorComponent {
     readonly type: 'LED';
@@ -20,31 +20,18 @@ export const DEFAULT_LED_PROPERTIES: LEDProperties = {
 }
 
 export const createLEDComponent = (position: Point): LEDComponent => {
+    const editorID = `LED-${uuidv4()}`;
+
     return {
-        editorID: `LED-${uuidv4()}`,
+        editorID: editorID,
         type: 'LED',
         name: 'LED',
+        dimensions: { width: 30, height: 50 },
         position: position,
         properties: DEFAULT_LED_PROPERTIES,
         connectors: [
-            {
-                id: 'LED-cathode-' + uuidv4(),
-                position: {
-                    x: position.x + 5,
-                    y: position.y + 50,
-                },
-                type: 'ground',
-                isConnected: false
-            },
-            {
-                id: 'LED-anode-' + uuidv4(),
-                position: {
-                    x: position.x + 35,
-                    y: position.y + 50,
-                },
-                type: 'power',
-                isConnected: false
-            }
+            createConnector(editorID, 'power', { x: 0.25, y: 1 }),
+            createConnector(editorID, 'ground', { x: 0.95, y: 1 }),
         ],
         isSelected: false,
         isHovered: false
