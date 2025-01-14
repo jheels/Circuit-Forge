@@ -20,11 +20,11 @@ export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
     isEnabled: false,
 };
 
-export const createPowerSupplyComponent = (position: Point): PowerSupplyComponent => {
+export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     return {
         editorID: `PowerSupply-${uuidv4()}`, // need to make read only
         type: "Power Supply",
-        name: "Power Supply",
+        name: name,
         properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
         position: position,
         connectors: [

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Point } from './general';
 
 export interface ConnectorOffset {
     x: number; // normalised offset between 0 and 1 relative to the components dimensions
@@ -28,13 +29,13 @@ export interface Connector {
 }
 
 export const createConnector = (
-    componentId: string,
+    componentID: string,
     type: ConnectorType,
     offset: ConnectorOffset,
     hitAreaSize: number = 10
 ): Connector => ({
     id: uuidv4(),
-    componentId,
+    componentID,
     type,
     offset,
     isConnected: false,

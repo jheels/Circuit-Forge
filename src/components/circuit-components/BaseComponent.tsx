@@ -3,7 +3,7 @@ import { Group, Rect } from 'react-konva';
 import { EditorComponent } from '@/types/general';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector } from '@/types/connector';
-
+import Konva from 'konva';
 
 interface BaseComponentProps {
     componentID: string,
@@ -21,7 +21,7 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
     const [hoveredConnector, setHoveredConnector] = useState<string | null>(null);
     const { position, connectors, dimensions } = component;
 
-    const updateComponentPosition = useCallback((e: KonvaEventObject<DragEvent>) => {
+    const updateComponentPosition = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
         const newPosition = {
             x: e.target.x(),
             y: e.target.y()
@@ -29,7 +29,7 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
         updateComponent(componentID, { position: newPosition });
     }, [componentID, updateComponent]);
 
-    const displayNearestConnector = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    const displayNearestConnector = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         const stage = e.target.getStage();
         if (!stage) return;
 
@@ -64,7 +64,7 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
     }, [connectors, position, dimensions]);
 
     const handleSelection = useCallback(() => {
-        setSelectedComponent(prevSelectedComponent => 
+        setSelectedComponent((prevSelectedComponent: string | null) => 
             prevSelectedComponent === componentID ? null : componentID
         );
     }, [setSelectedComponent, componentID]);

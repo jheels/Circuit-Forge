@@ -19,19 +19,19 @@ export const DEFAULT_LED_PROPERTIES: LEDProperties = {
     isIlluminated: false,
 }
 
-export const createLEDComponent = (position: Point): LEDComponent => {
+export const createLEDComponent = (position: Point, name: string): LEDComponent => {
     const editorID = `LED-${uuidv4()}`;
 
     return {
         editorID: editorID,
         type: 'LED',
-        name: 'LED',
+        name: name,
         dimensions: { width: 30, height: 50 },
         position: position,
         properties: DEFAULT_LED_PROPERTIES,
         connectors: [
             createConnector(editorID, 'power', { x: 0.25, y: 1 }),
-            createConnector(editorID, 'ground', { x: 0.95, y: 1 }),
+            createConnector(editorID, 'ground', { x: 0.95, y: 1 },),
         ],
         isSelected: false,
         isHovered: false

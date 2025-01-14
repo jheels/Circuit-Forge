@@ -18,11 +18,11 @@ export const DEFAULT_RESISTOR_PROPERTIES: ResistorProperties = {
     unit: 'Ω',
 }
 
-export const createResistorComponent = (position: Point): ResistorComponent => {
+export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
     return {
         editorID: `Resistor-${uuidv4()}`,
         type: 'Resistor',
-        name: 'Resistor',
+        name: name,
         position: position,
         properties: DEFAULT_RESISTOR_PROPERTIES,
         connectors: [

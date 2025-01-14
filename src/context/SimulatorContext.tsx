@@ -20,6 +20,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     });
     const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null }); // might have to export to a type
     const [components, setComponents] = useState<Record<string, EditorComponent>>({});
+    const [componentCounts, setComponentCounts] = useState<Record<string, number>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
     
     useEffect(() => {
@@ -27,13 +28,19 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     }, [projectName]);
 
     const createComponent = (type: string, position: Point): EditorComponent => {
+        const newCount = (componentCounts[type] || 0) + 1;
+        setComponentCounts((prev) => ({
+            ...prev,
+            [type]: newCount
+        }));
+        const name = `${type} ${newCount}`;
         switch (type) {
             case 'LED':
-                return createLEDComponent(position);
+                return createLEDComponent(position, name);
             case 'Resistor':
-                return createResistorComponent(position);
+                return createResistorComponent(position, name);
             case 'Power Supply':
-                return createPowerSupplyComponent(position);
+                return createPowerSupplyComponent(position, name);
             default:
                 return {
                     editorID: `${type}-${uuidv4()}`,
