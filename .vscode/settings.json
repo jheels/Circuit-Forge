@@ -8,5 +8,6 @@
         "tailwindcss",
         "uuidv"
     ],
-    "svg.preview.background": "dark-transparent"
+    "svg.preview.background": "dark-transparent",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
