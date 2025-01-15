@@ -1,8 +1,32 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { EditorComponent, SimulatorContextType, Point } from '@/types/general';
+import { EditorComponent, Point, Wire } from '@/types/general';
 import { createLEDComponent } from "@/types/components/led";
 import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
+
+interface SimulatorContextType {
+    projectName: string;
+    saveStatus: { isSaved: boolean; lastSaved: Date | null };
+    components: Record<string, EditorComponent>;
+    componentCounts: Record<string, number>;
+    selectedComponent: string | null;
+    wires: Record<string, Wire>;
+    creatingWire: Wire | null;
+    hoveredConnectorID: string | null;
+    setProjectName: (name: string) => void;
+    setSaveStatus: (status: { isSaved: boolean; lastSaved: Date | null }) => void;
+    createComponent: (type: string, position: Point) => EditorComponent;
+    addComponent: (component: EditorComponent) => void;
+    removeComponent: (editorID: string) => void;
+    updateComponent: (editorID: string, updates: Partial<EditorComponent>) => void;
+    addWire: (wire: Wire) => void;
+    removeWire: (wireID: string) => void;
+    updateWire: (wireID: string, updates: Partial<Wire>) => void;
+    setCreatingWire: (wire: Wire | null) => void;
+    setHoveredConnectorID: (id: string | null) => void;
+    setSelectedComponent: (id: string | null) => void;
+    resetProject: () => void;
+}
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
@@ -22,6 +46,9 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [components, setComponents] = useState<Record<string, EditorComponent>>({});
     const [componentCounts, setComponentCounts] = useState<Record<string, number>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
+    const [wires, setWires] = useState<Record<string, Wire>>({});
+    const [creatingWire, setCreatingWire] = useState<Wire | null>(null);
+    const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
     
     useEffect(() => {
         localStorage.setItem('simulatorProjectName', projectName);
@@ -42,15 +69,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             case 'Power Supply':
                 return createPowerSupplyComponent(position, name);
             default:
-                return {
-                    editorID: `${type}-${uuidv4()}`,
-                    type,
-                    position,
-                    metadata: { name: type, properties: {} },
-                    connectors: [],
-                    isSelected: false,
-                    isHovered: false,
-                };
+                return null;
         }
     }
 
@@ -79,11 +98,40 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         }));
     }
 
+    const addWire = (wire: Wire) => {
+        setWires((prev) => ({
+            ...prev,
+            [wire.id]: wire
+        }));
+    }
+
+    const removeWire = (wireID: string) => {
+        setWires((prev) => {
+            const newWires = { ...prev };
+            delete newWires[wireID];
+            return newWires;
+        });
+    }
+
+    const updateWire = (wireID: string, updates: Partial<Wire>) => {
+        setWires((prev) => ({
+            ...prev,
+            [wireID]: {
+                ...prev[wireID],
+                ...updates,
+            }
+        }));
+    }
+
     const resetProject = () => {
         setProjectName('Untitled Project');
         setSaveStatus({ isSaved: false, lastSaved: null });
         setComponents({});
         setSelectedComponent(null);
+        setComponentCounts({});
+        setWires({});
+        setCreatingWire(null);
+        setHoveredConnectorID(null);
     }
 
     return (
@@ -91,13 +139,22 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             projectName,
             saveStatus,
             components,
+            componentCounts,
             selectedComponent,
+            wires,
+            creatingWire,
+            hoveredConnectorID,
             setProjectName,
             setSaveStatus,
             createComponent,
             addComponent,
             removeComponent,
             updateComponent,
+            addWire,
+            removeWire,
+            updateWire,
+            setCreatingWire,
+            setHoveredConnectorID,
             setSelectedComponent,
             resetProject
         }}>

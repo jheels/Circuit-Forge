@@ -10,27 +10,36 @@
  * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Group, Rect } from 'react-konva';
 import { EditorComponent } from '@/types/general';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { isPointInConnector } from '@/types/connector';
+import { getConnectorPosition } from '@/types/connector';
+import { v4 as uuidv4 } from 'uuid';
+import { Connector } from '@/types/connector';
 import Konva from 'konva';
 
 interface BaseComponentProps {
     componentID: string,
     children: React.ReactNode,
-    onConnectorClick?: (connectorID: string) => void;
 }
 
-const BaseComponent: React.FC<BaseComponentProps> = ({
+export const BaseComponent: React.FC<BaseComponentProps> = ({
     componentID,
     children,
-    onConnectorClick
 }) => {
-    const { components, updateComponent, setSelectedComponent } = useSimulatorContext();
+    const {
+        components,
+        updateComponent,
+        setSelectedComponent,
+        creatingWire,
+        setCreatingWire,
+        addWire,
+        updateWire,
+        removeWire,
+        hoveredConnectorID
+    } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
-    const [hoveredConnector, setHoveredConnector] = useState<string | null>(null);
     const { position, connectors, dimensions } = component;
 
     const updateComponentPosition = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
@@ -41,81 +50,80 @@ const BaseComponent: React.FC<BaseComponentProps> = ({
         updateComponent(componentID, { position: newPosition });
     }, [componentID, updateComponent]);
 
-    const displayNearestConnector = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
-        const stage = e.target.getStage();
-        if (!stage) return;
-
-        const point = stage.getPointerPosition();
-        if (!point) return;
-
-        const transform = stage.getAbsoluteTransform().copy().invert();
-        const transformedPoint = transform.point(point);
-
-        const nearConnector = connectors.some(connector => {
-            const region = connector.getInteractionRegion(position, dimensions);
-            const padding = 10;
-            return transformedPoint.x >= region.x - padding &&
-                   transformedPoint.x <= region.x + region.width + padding &&
-                   transformedPoint.y >= region.y - padding &&
-                   transformedPoint.y <= region.y + region.height + padding;
-        });
-
-        if (!nearConnector) {
-            setHoveredConnector(null);
-            return;
-        }
-
-        for (const connector of connectors) {
-            if (isPointInConnector(transformedPoint, connector, position, dimensions)) {
-                setHoveredConnector(connector.id);
-                return;
-            }
-        }
-        
-        setHoveredConnector(null);
-    }, [connectors, position, dimensions]);
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
-        setSelectedComponent((prevSelectedComponent: string | null) => 
+        setSelectedComponent((prevSelectedComponent: string | null) =>
             prevSelectedComponent === componentID ? null : componentID
         );
     }, [setSelectedComponent, componentID]);
 
+    const handleConnectorClick = useCallback((connectorID: string) => {
+        const connector = connectors.find(connector => connector.id === connectorID) as Connector;
+        const connectorPosition = getConnectorPosition(connector, position, dimensions);
+
+        if (creatingWire) {
+            updateWire(creatingWire.id, { endConnectorID: connectorID, points: [...creatingWire.points, connectorPosition] });
+            setCreatingWire(null);
+        } else {
+            const newWire = {
+                id: `wire-${uuidv4()}`,
+                startConnectorID: connectorID,
+                endConnectorID: null,
+                points: [connectorPosition],
+            };
+            setCreatingWire(newWire);
+            addWire(newWire);
+        }
+    }, [connectors, position, dimensions, creatingWire, updateWire, setCreatingWire, addWire]);
+
+    const handleWireEscape = useCallback((e: KeyboardEvent) => {
+        if (e.key === 'Escape' && creatingWire) {
+            removeWire(creatingWire.id);
+            setCreatingWire(null);
+        }
+    }, [creatingWire, removeWire, setCreatingWire]);
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleWireEscape);
+        return () => window.removeEventListener('keydown', handleWireEscape);
+    }, [handleWireEscape]);
+
+    const renderedConnectors = useMemo(() => {
+        return connectors.map((connector) => {
+            if (connector.id !== hoveredConnectorID) return null;
+
+            const region = connector.getInteractionRegion({ x: 0, y: 0 }, dimensions);
+
+            return (
+                <Rect
+                    key={connector.id}
+                    x={region.x}
+                    y={region.y}
+                    width={region.width}
+                    height={region.height}
+                    fill="red"
+                    stroke="black"
+                    strokeWidth={0.5}
+                    onClick={(e) => {
+                        e.cancelBubble = true; // Prevent the event from propagating to the stage
+                        handleConnectorClick(connector.id);
+                    }}
+                />
+            );
+        });
+    }, [connectors, hoveredConnectorID, dimensions, handleConnectorClick]);
+
     return (
         <Group
             draggable
-            onDragStart={() => setHoveredConnector(null)}
             onDragEnd={updateComponentPosition}
-            onMouseMove={displayNearestConnector}
-            onMouseLeave={() => setHoveredConnector(null)}
             onClick={handleSelection}
             x={position.x}
             y={position.y}
         >
             {children}
-            {hoveredConnector && connectors.map((connector) => {
-                if (connector.id !== hoveredConnector) return null;
-
-                const region = connector.getInteractionRegion({ x: 0, y: 0 }, dimensions);
-                return (
-                    <Rect
-                        key={connector.id}
-                        x={region.x}
-                        y={region.y}
-                        width={region.width}
-                        height={region.height}
-                        fill="red"
-                        stroke="black"
-                        strokeWidth={1}
-                        onClick={() => {
-                            onConnectorClick?.(connector.id);
-                        }}
-                    />
-                );
-            })}
+            {renderedConnectors}
         </Group>
     )
 }
-
-export default BaseComponent;
