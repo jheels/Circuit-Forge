@@ -8,7 +8,7 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 3;
 const SCALE_BY = 1.05;
 
-const Editor: React.FC = () => {
+export const Editor: React.FC = () => {
     const [scale, setScale] = useState<number>(1);
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -67,5 +67,3 @@ const Editor: React.FC = () => {
         </div>
     );
 };
-
-export default Editor;

@@ -1,6 +1,6 @@
-import NavBar from '@/components/topbars/NavBar';
-import Simulator from './pages/Simulator';
-import ICEditor from './pages/ICEditor';
+import { NavBar } from '@/components/topbars/NavBar';
+import { Simulator } from './pages/Simulator';
+import { ICEditor } from './pages/ICEditor';
 import { UIProvider, useUIContext } from '@/context/UIContext';
 
 const AppContent: React.FC = () => {

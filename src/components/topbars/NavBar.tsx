@@ -6,7 +6,7 @@ import { useUIContext } from '@/context/UIContext';
 import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
 import { TooltipButton } from '@/components/ui/ToolTipButton';
 
-export function Navbar() {
+export function NavBar() {
     const { selectedTool, setSelectedTool } = useUIContext();
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
