@@ -11,7 +11,7 @@ interface ImportChipDialogProps {
     onImport: () => void;
 }
 
-const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOpenChange, selectedFile, onFileChange, onImport }) => {
+export const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOpenChange, selectedFile, onFileChange, onImport }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,5 +59,3 @@ const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOpenChang
         </Dialog>
     );
 };
-
-export default ImportChipDialog;

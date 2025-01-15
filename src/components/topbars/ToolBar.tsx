@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useSimulatorContext } from "@/context/SimulatorContext"
+import { ConfirmationDialog } from "@/components/dialogs/ConfirmationDialog"
 import {
     Menubar,
     MenubarContent,
@@ -10,27 +12,26 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
-import { useSimulatorContext } from "@/context/SimulatorContext"
-import  ConfirmationDialog  from "@/components/dialogs/ConfirmationDialog"
 
 interface DropdownItem {
     label?: string
     shortcut?: string
     isSeparator?: boolean
+    onClick?: () => void
 }
 
-interface ToolbarDropdownProps {
+interface ToolBarDropdownProps {
     label: string
     items: DropdownItem[]
 }
 
-interface ToolbarProps {
+interface ToolBarProps {
     onZoomIn: () => void;
     onZoomOut: () => void;
     onZoomReset: () => void;
 }
 
-function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
+function ToolBarDropdown({ label, items }: ToolBarDropdownProps) {
     return (
         <MenubarMenu>
             <MenubarTrigger className="px-3 py-1.5">{label}</MenubarTrigger>
@@ -50,7 +51,7 @@ function ToolbarDropdown({ label, items }: ToolbarDropdownProps) {
     )
 }
 
-function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
+export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     const { projectName, setProjectName, resetProject } = useSimulatorContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
@@ -108,7 +109,7 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         {
             label: "File",
             items: [
-                { label: "New Project", shortcut: "⌘N" , onClick: handleNewProject},
+                { label: "New Project", shortcut: "⌘N", onClick: handleNewProject },
                 { label: "Save", shortcut: "⌘S" },
                 { label: "Save As", shortcut: "⇧⌘S" },
                 { isSeparator: true },
@@ -140,7 +141,7 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
             label: "Help",
             items: [
                 { label: "Documentation", shortcut: "F1", onClick: onDocumentationClick },
-                { label: "About" , onClick: onAboutClick },
+                { label: "About", onClick: onAboutClick },
             ],
         },
     ]
@@ -149,7 +150,7 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         <div className="bg-white text-foreground flex justify-between items-center shadow-md z-10">
             <Menubar className="border-none shadow-none">
                 {menuItems.map((menu, index) => (
-                    <ToolbarDropdown key={index} label={menu.label} items={menu.items} />
+                    <ToolBarDropdown key={index} label={menu.label} items={menu.items} />
                 ))}
             </Menubar>
             <div className="flex items-center space-x-4 pr-3">
@@ -183,5 +184,3 @@ function Toolbar({ onZoomIn, onZoomOut, onZoomReset }: ToolbarProps) {
         </div>
     )
 }
-
-export default Toolbar

@@ -10,7 +10,7 @@ import {
     DialogDescription
 } from '@/components/ui/dialog'
 
-function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+export function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
     const [highContrast, setHighContrast] = useState(false)
     const [voiceOver, setVoiceOver] = useState(false)
 
@@ -76,5 +76,3 @@ function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (
         </Dialog>
     )
 }
-
-export default SettingsDialog;

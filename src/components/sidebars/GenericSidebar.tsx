@@ -3,7 +3,7 @@ import { useDrag } from 'react-dnd';
 import { Search, Download, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import ImportChipDialog from '@/components/dialogs/ImportChipDialog';
+import { ImportChipDialog } from '@/components/dialogs/ImportChipDialog';
 import { useUIContext } from '@/context/UIContext';
 import { SidebarComponent } from '@/types/general';
 
@@ -42,7 +42,7 @@ const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
 };
 
 
-export default function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
+export function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
     const { isSideBarOpen, toggleSidebar } = useUIContext();
     const [searchTerm, setSearchTerm] = useState('');
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);

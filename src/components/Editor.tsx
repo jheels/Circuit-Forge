@@ -1,7 +1,8 @@
-import Toolbar from '@/components/topbars/ToolBar';
-import SimSideBar from '@/components/sidebars/SimSideBar';
-import Canvas from '@/components/Canvas';
+import { ToolBar } from '@/components/topbars/ToolBar';
+import { SimSideBar } from '@/components/sidebars/SimSideBar';
+import { Canvas } from '@/components/Canvas';
 import { useState, useCallback, useRef } from 'react';
+import Konva from 'konva';
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 3;
@@ -58,7 +59,7 @@ const Editor: React.FC = () => {
 
     return (
         <div className="flex flex-col flex-grow overflow-hidden">
-            <Toolbar onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onZoomReset={handleZoomReset} />
+            <ToolBar onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onZoomReset={handleZoomReset} />
             <div className="flex flex-grow overflow-hidden">
                 <Canvas scale={scale} position={position} setPosition={setPosition} handleZoom={handleZoom} stageRef={stageRef} />
                 <SimSideBar />

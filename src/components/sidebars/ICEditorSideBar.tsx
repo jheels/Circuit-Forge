@@ -1,4 +1,4 @@
-import GenericSideBar from './GenericSideBar';
+import { GenericSideBar } from './GenericSideBar';
 
 const dummyComponents = Array(1).fill(null).map((_, i) => ({
     id: `component-${i + 1}`,
@@ -6,6 +6,6 @@ const dummyComponents = Array(1).fill(null).map((_, i) => ({
     description: `Description for IC Component ${i + 1}`
 }));
 
-export default function ICEditorSideBar() {
+export function ICEditorSideBar() {
     return <GenericSideBar components={dummyComponents} showImportChipDialog={false} />;
 }

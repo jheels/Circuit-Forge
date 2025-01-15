@@ -1,7 +1,7 @@
-import GenericSideBar from './GenericSideBar';
+import { GenericSideBar } from './GenericSideBar';
 import { SidebarComponent } from '@/types/general'; // Adjust the import path as needed
 
-const dummyComponents: SidebarComponent[] = [
+const simulatorComponents: SidebarComponent[] = [
     {
         sidebarID: 'breadboard',
         name: 'Breadboard',
@@ -26,6 +26,6 @@ const dummyComponents: SidebarComponent[] = [
     }
 ];
 
-export default function SimSideBar() {
-    return <GenericSideBar components={dummyComponents} showImportChipDialog={true} />;
+export function SimSideBar() {
+    return <GenericSideBar components={simulatorComponents} showImportChipDialog={true} />;
 }

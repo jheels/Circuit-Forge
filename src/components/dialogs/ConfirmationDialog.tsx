@@ -10,7 +10,7 @@ interface ConfirmationDialogProps {
     onCancel?: () => void;
 }
 
-const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onOpenChange, title, description, onConfirm, onCancel }) => {
+export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onOpenChange, title, description, onConfirm, onCancel }) => {
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
@@ -28,5 +28,3 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onOpenCha
         </AlertDialog>
     );
 };
-
-export default ConfirmationDialog;

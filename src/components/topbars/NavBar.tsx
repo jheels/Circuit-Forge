@@ -3,8 +3,8 @@ import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard } from 'lucide-reac
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useUIContext } from '@/context/UIContext';
-import TooltipButton from '@/components/ui/ToolTipButton';
-import SettingsDialog from '../dialogs/SettingsDialog';
+import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
+import { TooltipButton } from '@/components/ui/ToolTipButton';
 
 export function Navbar() {
     const { selectedTool, setSelectedTool } = useUIContext();
@@ -40,5 +40,3 @@ export function Navbar() {
         </>
     );
 }
-
-export default Navbar;

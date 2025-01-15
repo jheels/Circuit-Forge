@@ -8,16 +8,14 @@ import React from 'react';
 import { Rect, Line } from 'react-konva';
 import { ResistorComponent } from '@/types/components/resistor';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import BaseComponent from './BaseComponent';
+import { BaseComponent } from './BaseComponent';
 
 interface ResistorProps {
     componentID: string;
-    onConnectorClick?: (connectorId: string) => void;
 }
 
-const Resistor: React.FC<ResistorProps> = ({
+export const Resistor: React.FC<ResistorProps> = ({
     componentID,
-    onConnectorClick
 }) => {
     const { components } = useSimulatorContext();
     const component = components[componentID] as ResistorComponent;
@@ -32,7 +30,6 @@ const Resistor: React.FC<ResistorProps> = ({
     return (
         <BaseComponent
             componentID={componentID}
-            onConnectorClick={onConnectorClick}
         >
             {/* Resistor Body */}
             <Rect
@@ -63,5 +60,3 @@ const Resistor: React.FC<ResistorProps> = ({
         </BaseComponent>
     );
 };
-
-export default Resistor;

@@ -14,7 +14,7 @@ interface TooltipButtonProps {
     onClick?: () => void
 }
 
-function TooltipButton({ icon: Icon, tooltip, isSelected, onClick }: TooltipButtonProps) {
+export function TooltipButton({ icon: Icon, tooltip, isSelected, onClick }: TooltipButtonProps) {
     return (
         <TooltipProvider>
             <Tooltip>
@@ -30,5 +30,3 @@ function TooltipButton({ icon: Icon, tooltip, isSelected, onClick }: TooltipButt
         </TooltipProvider>
     )
 }
-
-export default TooltipButton;

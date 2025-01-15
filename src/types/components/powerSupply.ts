@@ -1,9 +1,8 @@
 import { EditorComponent, Point } from "../general";
 import { v4 as uuidv4 } from "uuid";
 
-export type PowerMode = "AC" | "DC";
-
-export interface PowerSupplyProperties {
+type PowerMode = "AC" | "DC";
+interface PowerSupplyProperties {
     voltage: number;
     mode: PowerMode;
     isEnabled: boolean;
@@ -30,6 +29,7 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
         connectors: [
             {
                 id: "PowerSupply-positive-" + uuidv4(),
+
                 position: {
                     x: position.x + 5,
                     y: position.y + 50,
@@ -47,7 +47,5 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
                 isConnected: false,
             },
         ],
-        isSelected: false,
-        isHovered: false,
     };
 };
