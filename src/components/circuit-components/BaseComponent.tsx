@@ -1,11 +1,10 @@
 /**
  * To do:
- * - Implement wire creation and logic on clicking connectors
- * - Implement wire deletion
- * - Implement wire highlighting on hover
+ * - Implement wire creation and logic on clicking connectors - DONE
+ * - Implement wire deletion on backspace - DONE
+ * - Implement wire highlighting on hover - DONE
  * - Implement wire dragging
- * - Implement wire snapping to connectors
- * - Implement wire snapping to grid
+ * - Implement wire snapping to connectors - DONE
  * - Implementing component snapping to grid (breadboard)
  * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
  */
@@ -34,10 +33,12 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         setSelectedComponent,
         creatingWire,
         setCreatingWire,
+        wires,
         addWire,
         updateWire,
         removeWire,
-        hoveredConnectorID
+        hoveredConnectorID,
+        setSelectedWire,
     } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
     const { position, connectors, dimensions } = component;
@@ -48,20 +49,32 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             y: e.target.y()
         };
         updateComponent(componentID, { position: newPosition });
-    }, [componentID, updateComponent]);
-
+        // below is quite inefficient consider 2000+ connectors and is not in real time
+        connectors.forEach((connector) => {
+            const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
+            Object.values(wires).forEach((wire) => {
+                if (wire.startConnectorID === connector.id) {
+                    updateWire(wire.id, { points: [connectorPosition, ...wire.points.slice(1)] });
+                }
+                if (wire.endConnectorID === connector.id) {
+                    updateWire(wire.id, { points: [...wire.points.slice(0,-1), connectorPosition] });
+                }
+            });
+        });
+        }, [componentID, connectors, dimensions, updateComponent, updateWire, wires]);
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
+        setSelectedWire(null);
         setSelectedComponent((prevSelectedComponent: string | null) =>
             prevSelectedComponent === componentID ? null : componentID
         );
-    }, [setSelectedComponent, componentID]);
+    }, [setSelectedComponent, componentID, setSelectedWire]);
 
     const handleConnectorClick = useCallback((connectorID: string) => {
         const connector = connectors.find(connector => connector.id === connectorID) as Connector;
         const connectorPosition = getConnectorPosition(connector, position, dimensions);
-
+        setSelectedWire(null);
         if (creatingWire) {
             updateWire(creatingWire.id, { endConnectorID: connectorID, points: [...creatingWire.points, connectorPosition] });
             setCreatingWire(null);
@@ -75,7 +88,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             setCreatingWire(newWire);
             addWire(newWire);
         }
-    }, [connectors, position, dimensions, creatingWire, updateWire, setCreatingWire, addWire]);
+    }, [connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, setCreatingWire, addWire]);
 
     const handleWireEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape' && creatingWire) {
@@ -117,7 +130,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     return (
         <Group
             draggable
-            onDragEnd={updateComponentPosition}
+            onDragMove={updateComponentPosition} // This may be very inefficient with many connectors and rechecks
             onClick={handleSelection}
             x={position.x}
             y={position.y}

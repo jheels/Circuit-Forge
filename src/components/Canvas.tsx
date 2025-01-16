@@ -4,11 +4,12 @@ import { Stage, Layer, Text, Line } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { SidebarComponent, Point } from '@/types/general';
-import Konva from 'konva';
 import { PropertiesPanel } from './PropertiesPanel';
 import { LED } from './circuit-components/LED';
 import { Resistor } from './circuit-components/Resistor';
 import { isPointInConnector } from '@/types/connector';
+import { Wire } from './circuit-components/Wire';
+import Konva from 'konva';
 
 interface CanvasProps {
     scale: number;
@@ -31,6 +32,8 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         creatingWire,
         updateWire,
         setHoveredConnectorID,
+        selectedWire,
+        setSelectedWire,
     } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
@@ -38,7 +41,12 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
 
-    const handleMouseMove = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
+    const deSelectItems = useCallback(() => {
+        setSelectedComponent(null);
+        setSelectedWire(null);
+    }, [setSelectedComponent, setSelectedWire]);
+
+    const handleConnectionPreview = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         const stage = e.target.getStage();
         if (!stage) return;
 
@@ -139,16 +147,17 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
 
     const renderedWires = useMemo(() => {
         return Object.values(wires).map((wire) => {
+            if (wire.id === selectedWire) return null;
             return (
-                <Line
-                    key={wire.id}
-                    points={wire.points.flatMap((point) => [point.x, point.y])}
-                    stroke="blue"
-                    strokeWidth={2}
-                />
-            );
+                <Wire key={wire.id} wireID={wire.id} />
+            )
         });
-    }, [wires]);
+    }, [wires, selectedWire]);
+
+    const selectedWireComponent = useMemo(() => {
+        if (!selectedWire) return null;
+        return <Wire key={selectedWire} wireID={selectedWire} />;
+    }, [selectedWire]);
 
     const wirePreview = creatingWire && (
         <Line
@@ -169,9 +178,9 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 scale={{ x: scale, y: scale }}
                 onWheel={handleZoom}
                 onDragEnd={(e) => setPosition(e.currentTarget.position())}
-                onClick={() => setSelectedComponent(null)}
+                onMouseMove={handleConnectionPreview}
+                onClick={deSelectItems}
                 draggable
-                onMouseMove={handleMouseMove}
             >
                 <Layer>
                     {renderedComponents.length === 0 && (
@@ -189,6 +198,9 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 <Layer listening={!creatingWire}>
                     {wirePreview}
                     {renderedWires}
+                </Layer>
+                <Layer>
+                    {selectedWireComponent}
                 </Layer>
             </Stage>
             <div>

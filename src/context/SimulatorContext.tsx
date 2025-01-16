@@ -1,8 +1,9 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { EditorComponent, Point, Wire } from '@/types/general';
+import { EditorComponent, Point } from '@/types/general';
 import { createLEDComponent } from "@/types/components/led";
 import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
+import { Wire } from "@/types/general";
 
 interface SimulatorContextType {
     projectName: string;
@@ -10,6 +11,7 @@ interface SimulatorContextType {
     components: Record<string, EditorComponent>;
     componentCounts: Record<string, number>;
     selectedComponent: string | null;
+    selectedWire: string | null;
     wires: Record<string, Wire>;
     creatingWire: Wire | null;
     hoveredConnectorID: string | null;
@@ -25,6 +27,7 @@ interface SimulatorContextType {
     setCreatingWire: (wire: Wire | null) => void;
     setHoveredConnectorID: (id: string | null) => void;
     setSelectedComponent: (id: string | null) => void;
+    setSelectedWire: (id: string | null) => void;
     resetProject: () => void;
 }
 
@@ -42,10 +45,11 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [projectName, setProjectName] = useState<string>(() => {
         return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
     });
-    const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null }); // might have to export to a type
+    const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null });
     const [components, setComponents] = useState<Record<string, EditorComponent>>({});
     const [componentCounts, setComponentCounts] = useState<Record<string, number>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
+    const [selectedWire, setSelectedWire] = useState<string | null>(null);
     const [wires, setWires] = useState<Record<string, Wire>>({});
     const [creatingWire, setCreatingWire] = useState<Wire | null>(null);
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
@@ -128,6 +132,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         setSaveStatus({ isSaved: false, lastSaved: null });
         setComponents({});
         setSelectedComponent(null);
+        setSelectedWire(null);
         setComponentCounts({});
         setWires({});
         setCreatingWire(null);
@@ -141,6 +146,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             components,
             componentCounts,
             selectedComponent,
+            selectedWire,
             wires,
             creatingWire,
             hoveredConnectorID,
@@ -156,6 +162,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             setCreatingWire,
             setHoveredConnectorID,
             setSelectedComponent,
+            setSelectedWire,
             resetProject
         }}>
             {children}
