@@ -19,7 +19,7 @@ export interface EditorComponent {
     dimensions: { width: number; height: number };
     position: Point;
     properties: Record<string, any>;
-    connectors: Connector[]; 
+    connectors: Record<string, Connector>;
 }
 
 export interface Wire {

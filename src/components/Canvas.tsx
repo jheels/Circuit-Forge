@@ -60,7 +60,8 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         for (const component of Object.values(components)) {
             const { position, dimensions, connectors } = component;
 
-            for (const connector of connectors) {
+            for (const connectorKey in connectors) {
+                const connector = connectors[connectorKey];
                 if (isPointInConnector(transformedPoint, connector, position, dimensions)) {
                     setHoveredConnectorID(connector.id);
                     foundConnector = true;
@@ -193,7 +194,6 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                         />
                     )}
                     {renderedComponents}
-
                 </Layer>
                 <Layer listening={!creatingWire}>
                     {wirePreview}

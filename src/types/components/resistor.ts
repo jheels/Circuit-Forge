@@ -20,6 +20,8 @@ export const DEFAULT_RESISTOR_PROPERTIES: ResistorProperties = {
 
 export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
     const editorID = `Resistor-${uuidv4()}`;
+    const leftConnector = createConnector(editorID, 'bidirectional', { x: -1/6, y: 0.5 });
+    const rightConnector = createConnector(editorID, 'bidirectional', { x: 1+1/6, y: 0.5 });
 
     return {
         editorID: editorID,
@@ -28,9 +30,9 @@ export const createResistorComponent = (position: Point, name: string): Resistor
         dimensions: { width: 60, height: 30 },
         position: position,
         properties: DEFAULT_RESISTOR_PROPERTIES,
-        connectors: [
-            createConnector(editorID, 'bidirectional', { x: -1/6, y: 0.5 }), // might have to fiddle around with offsets
-            createConnector(editorID, 'bidirectional', { x: 1+1/6, y: 0.5 }),
-        ]
+        connectors: {
+            [leftConnector.id]: leftConnector,
+            [rightConnector.id]: rightConnector,
+        }
     }
 }

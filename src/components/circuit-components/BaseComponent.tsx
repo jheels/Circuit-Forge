@@ -40,7 +40,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         hoveredConnectorID,
         setSelectedWire,
         connectorWireMap,
-        addWireToConnector, // try not to call this explicitly see if you can add it to addWire or updateWire
+        addWireToConnector,
     } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
     const { position, connectors, dimensions } = component;
@@ -51,19 +51,18 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             y: e.target.y()
         };
         updateComponent(componentID, { position: newPosition });
-        connectors.forEach((connector) => {
+        Object.values(connectors).forEach((connector) => {
             const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
             const wireConnections = connectorWireMap[connector.id] || [];
             wireConnections.forEach(({ wireID, isStart }) => {
-                const wire = wires[wireID] 
-                    const updatedPoints = isStart
-                        ? [connectorPosition, ...wire.points.slice(1)]
-                        : [...wire.points.slice(0, -1), connectorPosition];
-                    updateWire(wireID, { points: updatedPoints });
-
+                const wire = wires[wireID];
+                const updatedPoints = isStart
+                    ? [connectorPosition, ...wire.points.slice(1)]
+                    : [...wire.points.slice(0, -1), connectorPosition];
+                updateWire(wireID, { points: updatedPoints });
             });
         });
-        }, [componentID, connectorWireMap, connectors, dimensions, updateComponent, updateWire, wires]);
+    }, [componentID, connectorWireMap, connectors, dimensions, updateComponent, updateWire, wires]);
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
@@ -74,7 +73,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     }, [setSelectedComponent, componentID, setSelectedWire]);
 
     const handleConnectorClick = useCallback((connectorID: string) => {
-        const connector = connectors.find(connector => connector.id === connectorID) as Connector;
+        const connector = connectors[connectorID] as Connector;
         const connectorPosition = getConnectorPosition(connector, position, dimensions);
         setSelectedWire(null);
         if (creatingWire) {
@@ -91,7 +90,6 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             setCreatingWire(newWire);
             addWire(newWire);
             addWireToConnector(connectorID, newWire.id, true);
-            
         }
     }, [connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, addWireToConnector, setCreatingWire, addWire]);
 
@@ -108,34 +106,34 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     }, [handleWireEscape]);
 
     const renderedConnectors = useMemo(() => {
-        return connectors.map((connector) => {
-            if (connector.id !== hoveredConnectorID) return null;
+        if (!hoveredConnectorID) return null;
+        const hoveredConnector = connectors[hoveredConnectorID];
+        if (!hoveredConnector) return null;
 
-            const region = connector.getInteractionRegion({ x: 0, y: 0 }, dimensions);
+        const region = hoveredConnector.getInteractionRegion({ x: 0, y: 0 }, dimensions);
 
-            return (
-                <Rect
-                    key={connector.id}
-                    x={region.x}
-                    y={region.y}
-                    width={region.width}
-                    height={region.height}
-                    fill="red"
-                    stroke="black"
-                    strokeWidth={0.5}
-                    onClick={(e) => {
-                        e.cancelBubble = true; // Prevent the event from propagating to the stage
-                        handleConnectorClick(connector.id);
-                    }}
-                />
-            );
-        });
-    }, [connectors, hoveredConnectorID, dimensions, handleConnectorClick]);
+        return (
+            <Rect
+                key={hoveredConnectorID}
+                x={region.x}
+                y={region.y}
+                width={region.width}
+                height={region.height}
+                fill="red"
+                stroke="black"
+                strokeWidth={0.5}
+                onClick={(e) => {
+                    e.cancelBubble = true;
+                    handleConnectorClick(hoveredConnectorID);
+                }}
+            />
+        );
+    }, [hoveredConnectorID, connectors, dimensions, handleConnectorClick]);
 
     return (
         <Group
             draggable
-            onDragMove={updateComponentPosition} // This may be very inefficient with many connectors and rechecks
+            onDragMove={updateComponentPosition}
             onClick={handleSelection}
             x={position.x}
             y={position.y}
@@ -143,5 +141,5 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             {children}
             {renderedConnectors}
         </Group>
-    )
-}
+    );
+};

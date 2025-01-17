@@ -86,13 +86,13 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const cleanUpComponentWires = (editorID: string) => {
         const component = components[editorID];
         if (!component) return;
-        component.connectors.forEach(({ id }) => {
-            const wires = connectorWireMap[id] || [];
+        for (const connectorID in component.connectors){
+            const wires = connectorWireMap[connectorID] || [];
             wires.forEach(({ wireID }) => {
                 removeWire(wireID);
-                removeWireFromConnector(id, wireID);
+                removeWireFromConnector(connectorID, wireID);
             });
-        });
+        }
     }
 
     const createComponent = (type: string, position: Point): EditorComponent => {

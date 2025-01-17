@@ -11,7 +11,6 @@ import { BaseComponent } from './BaseComponent';
 
 interface LEDProps {
     componentID: string;
-    onConnectorClick?: (connectorId: string) => void;
 }
 
 export const LED: React.FC<LEDProps> = ({

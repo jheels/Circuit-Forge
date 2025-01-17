@@ -21,6 +21,8 @@ const DEFAULT_LED_PROPERTIES: LEDProperties = {
 
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
     const editorID = `LED-${uuidv4()}`;
+    const powerConnector = createConnector(editorID, 'power', { x: 0.4, y: 53/60 });
+    const groundConnector = createConnector(editorID, 'ground', { x: 2/3, y: 53/60 });
 
     return {
         editorID: editorID,
@@ -29,10 +31,10 @@ export const createLEDComponent = (position: Point, name: string): LEDComponent 
         dimensions: { width: 30, height: 50 },
         position: position,
         properties: DEFAULT_LED_PROPERTIES,
-        connectors: [
-            createConnector(editorID, 'power', { x: 0.4, y: 53/60 }),
-            createConnector(editorID, 'ground', { x: 2/3, y: 53/60 },),
-        ],
+        connectors: {
+            [powerConnector.id]: powerConnector,
+            [groundConnector.id]: groundConnector,
+        }
     }
 }
 
