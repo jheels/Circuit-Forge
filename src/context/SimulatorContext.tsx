@@ -27,6 +27,8 @@ interface SimulatorContextType {
     addWire: (wire: Wire) => void;
     removeWire: (wireID: string) => void;
     updateWire: (wireID: string, updates: Partial<Wire>) => void;
+    addWireToConnector: (connectorID: string, wireID: string, isStart: boolean) => void;
+    removeWireFromConnector: (connectorID: string, wireID: string) => void;
     setCreatingWire: (wire: Wire | null) => void;
     setHoveredConnectorID: (id: string | null) => void;
     setSelectedComponent: (id: string | null) => void;

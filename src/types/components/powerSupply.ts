@@ -1,5 +1,6 @@
 import { EditorComponent, Point } from "../general";
 import { v4 as uuidv4 } from "uuid";
+import { createConnector } from "../connector";
 
 type PowerMode = "AC" | "DC";
 interface PowerSupplyProperties {
@@ -20,32 +21,20 @@ export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
 };
 
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
+    const editorID = `PowerSupply-${uuidv4()}`;
+    const positiveConnector = createConnector(editorID, 'power', { x: 5 / 40, y: 50 / 60 });
+    const groundConnector = createConnector(editorID, 'ground', { x: 35 / 40, y: 50 / 60 });
+
     return {
-        editorID: `PowerSupply-${uuidv4()}`, // need to make read only
+        editorID: editorID,
         type: "POWER SUPPLY",
         name: name,
         properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
         position: position,
-        connectors: [
-            {
-                id: "PowerSupply-positive-" + uuidv4(),
-
-                position: {
-                    x: position.x + 5,
-                    y: position.y + 50,
-                },
-                type: "power",
-                isConnected: false,
-            },
-            {
-                id: "PowerSupply-ground-" + uuidv4(),
-                position: {
-                    x: position.x + 35,
-                    y: position.y + 50,
-                },
-                type: "ground",
-                isConnected: false,
-            },
-        ],
+        dimensions: { width: 40, height: 60 },
+        connectors: {
+            [positiveConnector.id]: positiveConnector,
+            [groundConnector.id]: groundConnector,
+        },
     };
 };

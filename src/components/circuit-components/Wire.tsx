@@ -4,6 +4,8 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector, getConnectorPosition } from '@/types/connector';
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
+import Konva from 'konva';
+
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
     const { wires, components, updateWire, addWireToConnector, removeWireFromConnector, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID} = useSimulatorContext();

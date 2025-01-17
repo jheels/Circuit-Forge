@@ -5,7 +5,7 @@ import { useState, useCallback, useRef } from 'react';
 import Konva from 'konva';
 
 const MIN_SCALE = 0.25;
-const MAX_SCALE = 3;
+const MAX_SCALE = 5;
 const SCALE_BY = 1.05;
 
 export const Editor: React.FC = () => {
