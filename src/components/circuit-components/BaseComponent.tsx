@@ -33,12 +33,14 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         setSelectedComponent,
         creatingWire,
         setCreatingWire,
-        wires,
         addWire,
         updateWire,
         removeWire,
+        wires,
         hoveredConnectorID,
         setSelectedWire,
+        connectorWireMap,
+        addWireToConnector, // try not to call this explicitly see if you can add it to addWire or updateWire
     } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
     const { position, connectors, dimensions } = component;
@@ -49,19 +51,19 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             y: e.target.y()
         };
         updateComponent(componentID, { position: newPosition });
-        // below is quite inefficient consider 2000+ connectors and is not in real time
         connectors.forEach((connector) => {
             const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
-            Object.values(wires).forEach((wire) => {
-                if (wire.startConnectorID === connector.id) {
-                    updateWire(wire.id, { points: [connectorPosition, ...wire.points.slice(1)] });
-                }
-                if (wire.endConnectorID === connector.id) {
-                    updateWire(wire.id, { points: [...wire.points.slice(0,-1), connectorPosition] });
-                }
+            const wireConnections = connectorWireMap[connector.id] || [];
+            wireConnections.forEach(({ wireID, isStart }) => {
+                const wire = wires[wireID] 
+                    const updatedPoints = isStart
+                        ? [connectorPosition, ...wire.points.slice(1)]
+                        : [...wire.points.slice(0, -1), connectorPosition];
+                    updateWire(wireID, { points: updatedPoints });
+
             });
         });
-        }, [componentID, connectors, dimensions, updateComponent, updateWire, wires]);
+        }, [componentID, connectorWireMap, connectors, dimensions, updateComponent, updateWire, wires]);
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
@@ -77,6 +79,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         setSelectedWire(null);
         if (creatingWire) {
             updateWire(creatingWire.id, { endConnectorID: connectorID, points: [...creatingWire.points, connectorPosition] });
+            addWireToConnector(connectorID, creatingWire.id, false);
             setCreatingWire(null);
         } else {
             const newWire = {
@@ -87,8 +90,10 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             };
             setCreatingWire(newWire);
             addWire(newWire);
+            addWireToConnector(connectorID, newWire.id, true);
+            
         }
-    }, [connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, setCreatingWire, addWire]);
+    }, [connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, addWireToConnector, setCreatingWire, addWire]);
 
     const handleWireEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape' && creatingWire) {

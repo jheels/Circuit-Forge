@@ -5,6 +5,8 @@ import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 import { Wire } from "@/types/general";
 
+type ConnectorWireMap = Record<string, { wireID: string, isStart: boolean }[]>;
+
 interface SimulatorContextType {
     projectName: string;
     saveStatus: { isSaved: boolean; lastSaved: Date | null };
@@ -15,6 +17,7 @@ interface SimulatorContextType {
     wires: Record<string, Wire>;
     creatingWire: Wire | null;
     hoveredConnectorID: string | null;
+    connectorWireMap: ConnectorWireMap;
     setProjectName: (name: string) => void;
     setSaveStatus: (status: { isSaved: boolean; lastSaved: Date | null }) => void;
     createComponent: (type: string, position: Point) => EditorComponent;
@@ -53,10 +56,44 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [wires, setWires] = useState<Record<string, Wire>>({});
     const [creatingWire, setCreatingWire] = useState<Wire | null>(null);
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
+    const [connectorWireMap, setConnectorWireMap] = useState<ConnectorWireMap>({});
     
     useEffect(() => {
         localStorage.setItem('simulatorProjectName', projectName);
     }, [projectName]);
+
+    const addWireToConnector = (connectorID: string, wireID: string, isStart: boolean) => {
+        setConnectorWireMap((prev) => ({
+            ...prev,
+            [connectorID]: [...(prev[connectorID] || []), { wireID, isStart }]
+        }));
+    }
+
+    const removeWireFromConnector = (connectorID: string, wireID: string) => {
+        setConnectorWireMap((prev) => {
+            const updatedConnectorWires = (prev[connectorID] || []).filter(({ wireID: id }) => id !== wireID);
+            if (updatedConnectorWires.length === 0) {
+                const { [connectorID]: _, ...rest } = prev;
+                return rest;
+            }
+            return {
+                ...prev,
+                [connectorID]: updatedConnectorWires
+            };
+        });
+    }
+
+    const cleanUpComponentWires = (editorID: string) => {
+        const component = components[editorID];
+        if (!component) return;
+        component.connectors.forEach(({ id }) => {
+            const wires = connectorWireMap[id] || [];
+            wires.forEach(({ wireID }) => {
+                removeWire(wireID);
+                removeWireFromConnector(id, wireID);
+            });
+        });
+    }
 
     const createComponent = (type: string, position: Point): EditorComponent => {
         const newCount = (componentCounts[type] || 0) + 1;
@@ -85,6 +122,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     }
 
     const removeComponent = (editorID: string) => {
+        cleanUpComponentWires(editorID);
         setComponents((prev) => {
             const newComponents = { ...prev };
             delete newComponents[editorID];
@@ -109,7 +147,13 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         }));
     }
 
-    const removeWire = (wireID: string) => {
+    const removeWire = (wireID: string) => {    
+        const wire = wires[wireID];
+        if (!wire) return;
+        removeWireFromConnector(wire.startConnectorID, wireID);
+        if (wire.endConnectorID) {
+            removeWireFromConnector(wire.endConnectorID, wireID);
+        }
         setWires((prev) => {
             const newWires = { ...prev };
             delete newWires[wireID];
@@ -137,6 +181,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         setWires({});
         setCreatingWire(null);
         setHoveredConnectorID(null);
+        setConnectorWireMap({});
     }
 
     return (
@@ -150,12 +195,16 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             wires,
             creatingWire,
             hoveredConnectorID,
+            connectorWireMap,
             setProjectName,
             setSaveStatus,
             createComponent,
             addComponent,
             removeComponent,
             updateComponent,
+            addWireToConnector,
+            removeWireFromConnector,
+            cleanUpComponentWires,
             addWire,
             removeWire,
             updateWire,
