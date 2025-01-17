@@ -7,8 +7,8 @@ import { SidebarComponent, Point } from '@/types/general';
 import { PropertiesPanel } from './PropertiesPanel';
 import { LED } from './circuit-components/LED';
 import { Resistor } from './circuit-components/Resistor';
-import { isPointInConnector } from '@/types/connector';
 import { Wire } from './circuit-components/Wire';
+import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 
 interface CanvasProps {
@@ -55,26 +55,9 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
 
         const transform = stage.getAbsoluteTransform().copy().invert();
         const transformedPoint = transform.point(point);
-
-        let foundConnector = false;
-        for (const component of Object.values(components)) {
-            const { position, dimensions, connectors } = component;
-
-            for (const connectorKey in connectors) {
-                const connector = connectors[connectorKey];
-                if (isPointInConnector(transformedPoint, connector, position, dimensions)) {
-                    setHoveredConnectorID(connector.id);
-                    foundConnector = true;
-                    break;
-                }
-            }
-
-            if (foundConnector) break;
-        }
-
-        if (!foundConnector) {
-            setHoveredConnectorID(null);
-        }
+        
+        const connectorID = findConnectorIDAtPoint(transformedPoint, components);
+        setHoveredConnectorID(connectorID);
 
         if (creatingWire) {
             updateWire(creatingWire.id, { points: [...creatingWire.points, transformedPoint] });
