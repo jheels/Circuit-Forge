@@ -22,8 +22,8 @@ export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
 
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     const editorID = `PowerSupply-${uuidv4()}`;
-    const positiveConnector = createConnector(editorID, 'power', { x: 5 / 40, y: 50 / 60 });
-    const groundConnector = createConnector(editorID, 'ground', { x: 35 / 40, y: 50 / 60 });
+    const positiveConnector = createConnector(editorID, 'power', { x: 1/3, y: 6/5 });
+    const groundConnector = createConnector(editorID, 'ground', { x: 2/3, y: 6/5 });
 
     return {
         editorID: editorID,
@@ -31,7 +31,7 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
         name: name,
         properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
         position: position,
-        dimensions: { width: 40, height: 60 },
+        dimensions: { width: 60, height: 50 },
         connectors: {
             [positiveConnector.id]: positiveConnector,
             [groundConnector.id]: groundConnector,

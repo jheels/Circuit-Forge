@@ -7,6 +7,7 @@ import { SidebarComponent, Point } from '@/types/general';
 import { PropertiesPanel } from './PropertiesPanel';
 import { LED } from './circuit-components/LED';
 import { Resistor } from './circuit-components/Resistor';
+import { PowerSupply } from './circuit-components/PowerSupply';
 import { Wire } from './circuit-components/Wire';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
@@ -120,6 +121,10 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 case 'RESISTOR':
                     return (
                         <Resistor key={component.editorID} componentID={component.editorID} />
+                    );
+                case 'POWER SUPPLY':
+                    return (
+                        <PowerSupply key={component.editorID} componentID={component.editorID} />
                     );
                 default:
                     console.error(`Component type ${component.type} not found.`);
