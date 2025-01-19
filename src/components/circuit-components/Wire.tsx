@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Line, Circle } from 'react-konva';
+import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector, getConnectorPosition } from '@/types/connector';
 import { Point } from '@/types/general';
@@ -8,7 +8,7 @@ import Konva from 'konva';
 
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
-    const { wires, components, updateWire, addWireToConnector, removeWireFromConnector, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID} = useSimulatorContext();
+    const { wires, components, updateWire, addWireToConnector, removeWireFromConnector, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID } = useSimulatorContext();
     const wire = wires[wireID];
     const [isHovered, setIsHovered] = useState(false);
     const [draggingEnd, setDraggingEnd] = useState<null | { index: 0 | 1; oldPoint: Point }>(null);
@@ -43,13 +43,13 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
 
     const handlePointDragStart = useCallback((index: 0 | 1) => {
         setDraggingEnd({ index, oldPoint: wire.points[index] });
-    }, [ wire.points]);
+    }, [wire.points]);
 
     const handlePointDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>, index: 0 | 1) => {
         const newPoints = [...wire.points];
         newPoints[index] = { x: e.target.x(), y: e.target.y() };
         updateWire(wireID, { points: newPoints });
-        
+
         const connectorID = findConnectorIDAtPoint(newPoints[index], components);
         setHoveredConnectorID(connectorID);
     }, [components, wire.points, updateWire, wireID, setHoveredConnectorID]);
@@ -66,25 +66,25 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
             if (foundConnector) break;
             const { connectors, position, dimensions } = component;
             for (const connectorKey in connectors) {
-            const conn = connectors[connectorKey];
-            if (!isPointInConnector(dropPoint, conn, position, dimensions)) continue;
+                const conn = connectors[connectorKey];
+                if (!isPointInConnector(dropPoint, conn, position, dimensions)) continue;
 
-            const newPos = getConnectorPosition(conn, position, dimensions);
+                const newPos = getConnectorPosition(conn, position, dimensions);
 
-            if (index === 0) removeWireFromConnector(wire.startConnectorID, wireID);
-            else if (wire.endConnectorID) removeWireFromConnector(wire.endConnectorID, wireID);
+                if (index === 0) removeWireFromConnector(wire.startConnectorID, wireID);
+                else if (wire.endConnectorID) removeWireFromConnector(wire.endConnectorID, wireID);
 
-            addWireToConnector(conn.id, wireID, index === 0);
+                addWireToConnector(conn.id, wireID, index === 0);
 
-            const newPoints = [...wire.points];
-            newPoints[index] = newPos;
-            if (index === 0) {
-                updateWire(wireID, { startConnectorID: conn.id, points: newPoints });
-            } else {
-                updateWire(wireID, { endConnectorID: conn.id, points: newPoints });
-            }
-            foundConnector = true;
-            break;
+                const newPoints = [...wire.points];
+                newPoints[index] = newPos;
+                if (index === 0) {
+                    updateWire(wireID, { startConnectorID: conn.id, points: newPoints });
+                } else {
+                    updateWire(wireID, { endConnectorID: conn.id, points: newPoints });
+                }
+                foundConnector = true;
+                break;
             }
         }
 
@@ -98,6 +98,12 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
 
     return (
         <>
+            <Group
+                key={wireID}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleClick}
+            >
             {(isHovered || selectedWire == wireID) && (
                 <Line
                     key={`${wireID}-hover`}
@@ -108,16 +114,19 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     opacity={0.5}
                 />
             )}
-            <Line
-                key={wireID}
-                points={wire.points.flatMap((point) => [point.x, point.y])}
-                stroke={"black"}
-                strokeWidth={2}
-                lineCap="round"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                onClick={handleClick}
-            />
+                <Line
+                    points={wire.points.flatMap((point) => [point.x, point.y])}
+                    stroke={"black"}
+                    strokeWidth={2.25}
+                    lineCap="round"
+                />
+                <Line
+                    points={wire.points.flatMap((point) => [point.x, point.y])}
+                    stroke={"gray"}
+                    strokeWidth={2}
+                    lineCap="round"
+                />
+            </Group>
             {selectedWire === wireID && wire.points.map((point, index) => (
                 <Circle
                     key={`${wireID}-point-${index}`}
