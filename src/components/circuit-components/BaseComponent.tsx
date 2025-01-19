@@ -91,9 +91,9 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             } else {
                 e.target.x(snappedPosition.x);
                 e.target.y(snappedPosition.y);
-                updateComponent(componentID, { position: snappedPosition });
             }
         } 
+        updateComponent(componentID, { position: snappedPosition });
     
         // Update wire positions
         Object.values(connectors).forEach((connector) => {
