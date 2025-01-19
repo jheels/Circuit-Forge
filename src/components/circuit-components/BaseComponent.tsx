@@ -15,7 +15,7 @@ import { EditorComponent } from '@/types/general';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { getConnectorPosition } from '@/types/connector';
 import { v4 as uuidv4 } from 'uuid';
-import { Connector } from '@/types/connector';
+import { Connector, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD } from '@/types/connector';
 import Konva from 'konva';
 
 interface BaseComponentProps {
@@ -37,6 +37,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         updateWire,
         removeWire,
         wires,
+        setHoveredConnectorID,
         hoveredConnectorID,
         setSelectedWire,
         connectorWireMap,
@@ -50,9 +51,53 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             x: e.target.x(),
             y: e.target.y()
         };
-        updateComponent(componentID, { position: newPosition });
+    
+        let snappedPosition = { ...newPosition };
+        let snapped = false;
+        setHoveredConnectorID(null);
+
+        Object.values(components).forEach((otherComponent) => {
+            if (otherComponent.editorID === componentID) return;
+    
+            Object.values(otherComponent.connectors).forEach((otherConnector) => {
+                Object.values(connectors).forEach((connector) => {
+                    const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
+                    const otherConnectorPosition = getConnectorPosition(otherConnector, otherComponent.position, otherComponent.dimensions);
+    
+                    const distance = Math.sqrt(
+                        Math.pow(connectorPosition.x - otherConnectorPosition.x, 2) +
+                        Math.pow(connectorPosition.y - otherConnectorPosition.y, 2)
+                    );
+    
+                    if (distance < SNAPPING_THRESHOLD) {
+                        snappedPosition = {
+                            x: otherConnectorPosition.x - (connectorPosition.x - newPosition.x),
+                            y: otherConnectorPosition.y - (connectorPosition.y - newPosition.y)
+                        };
+                        snapped = true;
+                        setHoveredConnectorID(otherConnector.id)
+                    }
+                });
+            });
+        });
+    
+        if (snapped) {
+            const distance = Math.sqrt(
+                Math.pow(newPosition.x - snappedPosition.x, 2) +
+                Math.pow(newPosition.y - snappedPosition.y, 2)
+            );
+            if (distance > BREAKAWAY_THRESHOLD) {
+                snapped = false;
+            } else {
+                e.target.x(snappedPosition.x);
+                e.target.y(snappedPosition.y);
+                updateComponent(componentID, { position: snappedPosition });
+            }
+        } 
+    
+        // Update wire positions
         Object.values(connectors).forEach((connector) => {
-            const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
+            const connectorPosition = getConnectorPosition(connector, snappedPosition, dimensions);
             const wireConnections = connectorWireMap[connector.id] || [];
             wireConnections.forEach(({ wireID, isStart }) => {
                 const wire = wires[wireID];
@@ -62,7 +107,8 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 updateWire(wireID, { points: updatedPoints });
             });
         });
-    }, [componentID, connectorWireMap, connectors, dimensions, updateComponent, updateWire, wires]);
+    }, [componentID, components, connectorWireMap, connectors, dimensions, setHoveredConnectorID, updateComponent, updateWire, wires]);
+        
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;

@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Point } from './general';
 
+export const SNAPPING_THRESHOLD = 5;
+export const BREAKAWAY_THRESHOLD = 20;
+
 interface ConnectorOffset {
     x: number; // normalised offset between 0 and 1 relative to the components dimensions
     y: number;
