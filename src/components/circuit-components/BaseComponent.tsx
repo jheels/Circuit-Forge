@@ -51,24 +51,24 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             x: e.target.x(),
             y: e.target.y()
         };
-    
+
         let snappedPosition = { ...newPosition };
         let snapped = false;
         setHoveredConnectorID(null);
 
         Object.values(components).forEach((otherComponent) => {
             if (otherComponent.editorID === componentID) return;
-    
+
             Object.values(otherComponent.connectors).forEach((otherConnector) => {
                 Object.values(connectors).forEach((connector) => {
                     const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
                     const otherConnectorPosition = getConnectorPosition(otherConnector, otherComponent.position, otherComponent.dimensions);
-    
+
                     const distance = Math.sqrt(
                         Math.pow(connectorPosition.x - otherConnectorPosition.x, 2) +
                         Math.pow(connectorPosition.y - otherConnectorPosition.y, 2)
                     );
-    
+
                     if (distance < SNAPPING_THRESHOLD) {
                         snappedPosition = {
                             x: otherConnectorPosition.x - (connectorPosition.x - newPosition.x),
@@ -80,7 +80,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 });
             });
         });
-    
+
         if (snapped) {
             const distance = Math.sqrt(
                 Math.pow(newPosition.x - snappedPosition.x, 2) +
@@ -92,23 +92,31 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 e.target.x(snappedPosition.x);
                 e.target.y(snappedPosition.y);
             }
-        } 
+        }
         updateComponent(componentID, { position: snappedPosition });
-    
-        // Update wire positions
+
+        const wireUpdates: Record<string, { points: { x: number, y: number }[] }> = {};
+
         Object.values(connectors).forEach((connector) => {
             const connectorPosition = getConnectorPosition(connector, snappedPosition, dimensions);
             const wireConnections = connectorWireMap[connector.id] || [];
             wireConnections.forEach(({ wireID, isStart }) => {
-                const wire = wires[wireID];
-                const updatedPoints = isStart
-                    ? [connectorPosition, ...wire.points.slice(1)]
-                    : [...wire.points.slice(0, -1), connectorPosition];
-                updateWire(wireID, { points: updatedPoints });
+                if (!wireUpdates[wireID]) {
+                    wireUpdates[wireID] = { points: [...wires[wireID].points] };
+                }
+                if (isStart) {
+                    wireUpdates[wireID].points[0] = connectorPosition;
+                } else {
+                    wireUpdates[wireID].points[1] = connectorPosition; // Only supports 2 point wires for now
+                }
             });
         });
+
+        Object.entries(wireUpdates).forEach(([wireID, { points }]) => {
+            updateWire(wireID, { points });
+        });
     }, [componentID, components, connectorWireMap, connectors, dimensions, setHoveredConnectorID, updateComponent, updateWire, wires]);
-        
+
 
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
