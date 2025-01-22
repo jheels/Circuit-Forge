@@ -1,4 +1,5 @@
 import { Connector } from "./connector";
+import { PropertyValue } from "./properties";
 
 export type Point = {
     x: number;
@@ -15,10 +16,9 @@ export interface SidebarComponent {
 export interface EditorComponent {
     readonly editorID: string;
     readonly type: string;
-    name: string;
     dimensions: { width: number; height: number };
     position: Point;
-    properties: Record<string, any>;
+    properties: Record<string, PropertyValue>;
     connectors: Record<string, Connector>;
 }
 

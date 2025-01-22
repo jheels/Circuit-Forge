@@ -1,22 +1,10 @@
 import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
 import { createConnector } from '../connector';
-
-interface LEDProperties {
-    color: string;
-    intensity: number;
-    isIlluminated: boolean;
-}
+import { createDefaultProperties } from '../properties';
 
 export interface LEDComponent extends EditorComponent {
     readonly type: 'LED';
-    properties: LEDProperties;
-}
-
-const DEFAULT_LED_PROPERTIES: LEDProperties = {
-    color: 'red',
-    intensity: 0,
-    isIlluminated: false,
 }
 
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
@@ -27,14 +15,13 @@ export const createLEDComponent = (position: Point, name: string): LEDComponent 
     return {
         editorID: editorID,
         type: 'LED',
-        name: name,
         dimensions: { width: 30, height: 50 },
         position: position,
-        properties: DEFAULT_LED_PROPERTIES,
+        properties: createDefaultProperties('LED', name),
         connectors: {
             [powerConnector.id]: powerConnector,
             [groundConnector.id]: groundConnector,
         }
     }
-}
+}   
 

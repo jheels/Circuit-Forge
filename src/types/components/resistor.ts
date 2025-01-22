@@ -1,21 +1,10 @@
 import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
 import { createConnector } from '../connector';
-
-type ResistanceUnit = 'Ω' | 'kΩ' | 'MΩ';
-interface ResistorProperties {
-    value: number;
-    unit: ResistanceUnit;
-}
+import { createDefaultProperties } from '../properties';
 
 export interface ResistorComponent extends EditorComponent {
     readonly type: 'RESISTOR';
-    properties: ResistorProperties;
-}
-
-export const DEFAULT_RESISTOR_PROPERTIES: ResistorProperties = {
-    value: 0,
-    unit: 'Ω',
 }
 
 export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
@@ -26,10 +15,9 @@ export const createResistorComponent = (position: Point, name: string): Resistor
     return {
         editorID: editorID,
         type: 'RESISTOR',
-        name: name,
         dimensions: { width: 60, height: 30 },
         position: position,
-        properties: DEFAULT_RESISTOR_PROPERTIES,
+        properties: createDefaultProperties('RESISTOR', name),
         connectors: {
             [leftConnector.id]: leftConnector,
             [rightConnector.id]: rightConnector,

@@ -1,24 +1,12 @@
 import { EditorComponent, Point } from "../general";
 import { v4 as uuidv4 } from "uuid";
 import { createConnector } from "../connector";
+import { createDefaultProperties } from '../properties';
 
-type PowerMode = "AC" | "DC";
-interface PowerSupplyProperties {
-    voltage: number;
-    mode: PowerMode;
-    isEnabled: boolean;
-}
 
 export interface PowerSupplyComponent extends EditorComponent {
     readonly type: "POWER SUPPLY";
-    properties: PowerSupplyProperties;
 }
-
-export const DEFAULT_POWER_SUPPLY_PROPERTIES: PowerSupplyProperties = {
-    voltage: 5,
-    mode: "DC",
-    isEnabled: false,
-};
 
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     const editorID = `PowerSupply-${uuidv4()}`;
@@ -28,8 +16,7 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
     return {
         editorID: editorID,
         type: "POWER SUPPLY",
-        name: name,
-        properties: DEFAULT_POWER_SUPPLY_PROPERTIES,
+        properties: createDefaultProperties("POWER SUPPLY", name),
         position: position,
         dimensions: { width: 60, height: 50 },
         connectors: {

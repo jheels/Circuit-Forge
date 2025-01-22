@@ -1,11 +1,7 @@
 /**
  * To do:
- * - Implement wire creation and logic on clicking connectors - DONE
- * - Implement wire deletion on backspace - DONE
- * - Implement wire highlighting on hover - DONE
- * - Implement wire dragging
- * - Implement wire snapping to connectors - DONE
- * - Implementing component snapping to grid (breadboard)
+ * - Implementing component snapping to grid - PARTIALLY DONE 
+ * - Implement updating circuit series on connections, deletions etc.
  * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
  */
 
@@ -29,18 +25,18 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
 }) => {
     const {
         components,
+        wires,
+        connectorWireMap,
+        hoveredConnectorID,
+        creatingWire,
         updateComponent,
         setSelectedComponent,
-        creatingWire,
+        setHoveredConnectorID,
+        setSelectedWire,
         setCreatingWire,
         addWire,
         updateWire,
         removeWire,
-        wires,
-        setHoveredConnectorID,
-        hoveredConnectorID,
-        setSelectedWire,
-        connectorWireMap,
         addWireToConnector,
     } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
