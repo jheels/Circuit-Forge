@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import SettingsDialog from '@/components/dialogs/SettingsDialog';
+import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
@@ -14,7 +14,7 @@ describe('SettingsDialog', () => {
         render(
             <SettingsDialog
                 open={true}
-                onOpenChange={() => {}}
+                onOpenChange={() => { }}
             />
         );
 
@@ -28,7 +28,7 @@ describe('SettingsDialog', () => {
         render(
             <SettingsDialog
                 open={true}
-                onOpenChange={() => {}}
+                onOpenChange={() => { }}
             />
         );
 
@@ -46,7 +46,7 @@ describe('SettingsDialog', () => {
         render(
             <SettingsDialog
                 open={true}
-                onOpenChange={() => {}}
+                onOpenChange={() => { }}
             />
         );
 
@@ -117,13 +117,13 @@ describe('SettingsDialog', () => {
                 onOpenChange={onOpenChange}
             />
         );
-        
+
         const backdrop = screen.getByTestId('dialog-overlay')
-    
+
         // Simulate clicking on the backdrop
-        await user.click(backdrop)    
+        await user.click(backdrop)
         expect(onOpenChange).toHaveBeenCalled();
-            
+
     });
 
     it('should save and retrieve settings correctly', async () => {

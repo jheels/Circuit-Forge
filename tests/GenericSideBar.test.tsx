@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { UIProvider } from '@/context/UIContext';
 import { DndProviderWrapper } from '@/context/DndContext';
-import GenericSideBar from '@/components/sidebars/GenericSideBar';
+import { GenericSideBar } from '@/components/sidebars/GenericSideBar';
 import { ReactNode } from 'react';
 
 const mockComponents = [
