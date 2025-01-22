@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ImportChipDialog } from '@/components/dialogs/ImportChipDialog';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
+import {ImportChipDialog } from '@/components/dialogs/ImportChipDialog';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 

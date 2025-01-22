@@ -7,9 +7,9 @@ import { GenericSideBar } from '@/components/sidebars/GenericSideBar';
 import { ReactNode } from 'react';
 
 const mockComponents = [
-    { id: '1', name: 'Component 1', description: 'Description 1' },
-    { id: '2', name: 'Component 2', description: 'Description 2' },
-    { id: '3', name: 'Component 3', description: 'Description 3' },
+    { sidebarID: '1', name: 'Component 1', description: 'Description 1' },
+    { sidebarID: '2', name: 'Component 2', description: 'Description 2' },
+    { sidebarID: '3', name: 'Component 3', description: 'Description 3' },
 ];
 
 describe('GenericSideBar', () => {
