@@ -1,10 +1,8 @@
 import '@testing-library/jest-dom';
-import { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { NavBar } from '@/components/topbars/NavBar';
 import { UIProvider } from '@/context/UIContext';
-
 
 describe('NavBar', () => {
     const renderWithContext = (component: ReactNode) => {
