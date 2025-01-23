@@ -28,15 +28,16 @@ export function NavBar() {
                             checked={isDarkMode}
                             onCheckedChange={setIsDarkMode}
                             className="data-[state=checked]:bg-gray-700 data-[state=unchecked]:bg-gray-200"
+                            data-testid="dark-mode-switch"
                         />
-                        {isDarkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                        <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
+                        {isDarkMode ? <Moon data-testid='moon-icon' className="h-4 w-4" /> : <Sun data-testid='sun-icon' className="h-4 w-4" />}
+                        <Button data-testid='settings-switch' variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
                             <Settings className="h-6 w-6" />
                         </Button>
                     </div>
                 </div>
             </nav>
-            <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+            <SettingsDialog data-testid='settings-dialog' open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
         </>
     );
 }

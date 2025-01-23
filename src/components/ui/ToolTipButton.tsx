@@ -19,7 +19,7 @@ export function TooltipButton({ icon: Icon, tooltip, isSelected, onClick }: Tool
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className={isSelected ? "bg-white text-black" : ""} onClick={onClick}>
+                    <Button data-testid={tooltip} variant="ghost" size="icon" className={isSelected ? "bg-white text-black" : ""} onClick={onClick}>
                         <Icon className="h-7 w-7" />
                     </Button>
                 </TooltipTrigger>
