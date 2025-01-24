@@ -1,9 +1,9 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { EditorComponent, Point } from '@/types/general';
+import { EditorComponent, Point, Wire } from '@/types/general';
 import { createLEDComponent } from "@/types/components/led";
 import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
-import { Wire } from "@/types/general";
+import { Connector } from "@/types/connector";
 
 type ConnectorWireMap = Record<string, { wireID: string, isStart: boolean }[]>;
 
@@ -58,6 +58,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [wires, setWires] = useState<Record<string, Wire>>({});
     const [creatingWire, setCreatingWire] = useState<Wire | null>(null);
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
+    const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connectorWireMap, setConnectorWireMap] = useState<ConnectorWireMap>({});
     
     useEffect(() => {
@@ -197,6 +198,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             wires,
             creatingWire,
             hoveredConnectorID,
+            clickedConnector,
             connectorWireMap,
             setProjectName,
             setSaveStatus,
@@ -212,6 +214,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             updateWire,
             setCreatingWire,
             setHoveredConnectorID,
+            setClickedConnector,
             setSelectedComponent,
             setSelectedWire,
             resetProject

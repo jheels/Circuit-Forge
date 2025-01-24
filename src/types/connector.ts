@@ -1,3 +1,8 @@
+/**
+ * TODO:
+ * - Verify the connection rules
+ */
+
 import { v4 as uuidv4 } from 'uuid';
 import { Point } from './general';
 
@@ -5,11 +10,11 @@ export const SNAPPING_THRESHOLD = 5;
 export const BREAKAWAY_THRESHOLD = 20;
 
 interface ConnectorOffset {
-    x: number; // normalised offset between 0 and 1 relative to the components dimensions
+    x: number;
     y: number;
 }
 
-export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'ground' | 'power';
+export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'positive' | 'negative' | 'cathode' | 'anode';
 
 export interface ConnectorRegion {
     x: number;
@@ -21,7 +26,7 @@ export interface ConnectorRegion {
 export interface Connector {
     readonly id: string;
     readonly componentID: string;
-    readonly type: ConnectorType;
+    readonly type: ConnectorType;   
 
     offset: ConnectorOffset;
     
@@ -80,3 +85,17 @@ export const getConnectorPosition = (
         y: region.y + region.height / 2
     };
 };
+
+export const validateConnection = (connector1: Connector, connector2: Connector): boolean => {
+    const connectionRules: Record<ConnectorType, ConnectorType[]> = {
+        'input': ['output', 'bidirectional'],
+        'output': ['input', 'bidirectional'],
+        'bidirectional': ['bidirectional', 'positive', 'negative', 'cathode', 'anode', 'input', 'output'], // for now they can connect to anything
+        'positive': ['anode', 'bidirectional', 'negative'], // possibly has more but need to check
+        'negative': ['cathode', 'bidirectional', 'positive'], // possibly has more but need to check
+        'cathode': ['negative', 'bidirectional', 'anode'], // possibly has more but need to check
+        'anode': ['positive', 'bidirectional', 'cathode'], // possibly has more but need to check
+    }
+
+    return connectionRules[connector1.type].includes(connector2.type);
+}

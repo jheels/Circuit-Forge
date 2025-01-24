@@ -1,3 +1,8 @@
+/**
+ * To do:
+ * - Implement connection validation when modifying wire endpoints.
+ */
+
 import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';

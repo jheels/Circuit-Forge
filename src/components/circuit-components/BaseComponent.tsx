@@ -1,6 +1,7 @@
 /**
  * To do:
  * - Implementing component snapping to grid - PARTIALLY DONE 
+ * - Checking connector validations on snapping connectors directly
  * - Implement updating circuit series on connections, deletions etc.
  * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
  */
@@ -11,7 +12,7 @@ import { EditorComponent } from '@/types/general';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { getConnectorPosition } from '@/types/connector';
 import { v4 as uuidv4 } from 'uuid';
-import { Connector, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD } from '@/types/connector';
+import { Connector, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/types/connector';
 import Konva from 'konva';
 
 interface BaseComponentProps {
@@ -38,6 +39,8 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         updateWire,
         removeWire,
         addWireToConnector,
+        clickedConnector,
+        setClickedConnector
     } = useSimulatorContext();
     const component = components[componentID] as EditorComponent;
     const { position, connectors, dimensions } = component;
@@ -127,9 +130,15 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         const connectorPosition = getConnectorPosition(connector, position, dimensions);
         setSelectedWire(null);
         if (creatingWire) {
-            updateWire(creatingWire.id, { endConnectorID: connectorID, points: [...creatingWire.points, connectorPosition] });
-            addWireToConnector(connectorID, creatingWire.id, false);
-            setCreatingWire(null);
+            if (validateConnection(clickedConnector, connector)) {
+                updateWire(creatingWire.id, { endConnectorID: connectorID, points: [...creatingWire.points, connectorPosition] });
+                addWireToConnector(connectorID, creatingWire.id, false);
+                setCreatingWire(null);
+                setClickedConnector(connector);
+            } else {
+                // switch to a toast setting
+                console.log('Invalid connection attempted');
+            }
         } else {
             const newWire = {
                 id: `wire-${uuidv4()}`,
@@ -140,15 +149,17 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             setCreatingWire(newWire);
             addWire(newWire);
             addWireToConnector(connectorID, newWire.id, true);
+            setClickedConnector(connector);
         }
-    }, [connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, addWireToConnector, setCreatingWire, addWire]);
+    }, [connectors, position, dimensions, setSelectedWire, creatingWire, clickedConnector, updateWire, addWireToConnector, setCreatingWire, setClickedConnector, addWire]);
 
     const handleWireEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape' && creatingWire) {
             removeWire(creatingWire.id);
             setCreatingWire(null);
+            setClickedConnector(null);
         }
-    }, [creatingWire, removeWire, setCreatingWire]);
+    }, [creatingWire, removeWire, setClickedConnector, setCreatingWire]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleWireEscape);
