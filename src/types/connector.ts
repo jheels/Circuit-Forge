@@ -1,6 +1,7 @@
 /**
  * TODO:
  * - Verify the connection rules
+ * - Check cathodes
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +15,7 @@ interface ConnectorOffset {
     y: number;
 }
 
-export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'positive' | 'negative' | 'cathode' | 'anode';
+export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'positive' | 'negative' | 'cathode' | 'anode' | 'power' | 'ground';
 
 export interface ConnectorRegion {
     x: number;
@@ -26,10 +27,10 @@ export interface ConnectorRegion {
 export interface Connector {
     readonly id: string;
     readonly componentID: string;
-    readonly type: ConnectorType;   
+    readonly type: ConnectorType;
 
     offset: ConnectorOffset;
-    
+
     isConnected: boolean;
     isHovered: boolean;
     connectedTo?: string;
@@ -51,7 +52,7 @@ export const createConnector = (
     getInteractionRegion: (position: Point, dimensions: { width: number; height: number }): ConnectorRegion => {
         const x = position.x + (offset.x * dimensions.width);
         const y = position.y + (offset.y * dimensions.height);
-        
+
         return {
             x: x - hitAreaSize / 2,
             y: y - hitAreaSize / 2,
@@ -69,9 +70,9 @@ export const isPointInConnector = (
 ): boolean => {
     const region = connector.getInteractionRegion(componentPosition, componentDimensions);
     return point.x >= region.x &&
-           point.x <= region.x + region.width &&
-           point.y >= region.y &&
-           point.y <= region.y + region.height;
+        point.x <= region.x + region.width &&
+        point.y >= region.y &&
+        point.y <= region.y + region.height;
 };
 
 export const getConnectorPosition = (

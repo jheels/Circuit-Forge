@@ -96,6 +96,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
         }
     ],
     'LED': [
+        CommonProperties.name,
         {
             type: 'select',
             id: 'colour',
@@ -124,6 +125,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
         }
     ],
     'POWER SUPPLY': [
+        CommonProperties.name,
         {
             type: 'number',
             id: 'voltage',
@@ -152,6 +154,9 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             defaultValue: false,
             editable: true,
         }
+    ],
+    'BREADBOARD': [
+        CommonProperties.name,
     ]
 };
 

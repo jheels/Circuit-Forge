@@ -3,6 +3,7 @@ import { EditorComponent, Point, Wire } from '@/types/general';
 import { createLEDComponent } from "@/types/components/led";
 import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
+import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
 
 type ConnectorWireMap = Record<string, { wireID: string, isStart: boolean }[]>;
@@ -112,6 +113,8 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
                 return createResistorComponent(position, name);
             case 'Power Supply':
                 return createPowerSupplyComponent(position, name);
+            case 'Breadboard':
+                return createBreadboardComponent(position, name);
             default:
                 return null;
         }

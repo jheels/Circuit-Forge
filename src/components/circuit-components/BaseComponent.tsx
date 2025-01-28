@@ -180,7 +180,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 y={region.y}
                 width={region.width}
                 height={region.height}
-                fill="red"
+                fill="transparent"
                 stroke="black"
                 strokeWidth={0.5}
                 onClick={(e) => {

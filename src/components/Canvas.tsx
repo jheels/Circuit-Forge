@@ -8,6 +8,7 @@ import { PropertiesPanel } from './PropertiesPanel';
 import { LED } from './circuit-components/LED';
 import { Resistor } from './circuit-components/Resistor';
 import { PowerSupply } from './circuit-components/PowerSupply';
+import { Breadboard } from './circuit-components/Breadboard';
 import { Wire } from './circuit-components/Wire';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
@@ -56,7 +57,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
 
         const transform = stage.getAbsoluteTransform().copy().invert();
         const transformedPoint = transform.point(point);
-        
+
         const connectorID = findConnectorIDAtPoint(transformedPoint, components);
         setHoveredConnectorID(connectorID);
 
@@ -125,6 +126,10 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 case 'POWER SUPPLY':
                     return (
                         <PowerSupply key={component.editorID} componentID={component.editorID} />
+                    );
+                case 'BREADBOARD':
+                    return (
+                        <Breadboard key={component.editorID} componentID={component.editorID} />
                     );
                 default:
                     console.error(`Component type ${component.type} not found.`);
