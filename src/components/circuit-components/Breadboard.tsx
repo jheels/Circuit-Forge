@@ -1,8 +1,9 @@
-import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH } from '@/types/components/breadboard';
+import React, { useMemo } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
 import { Rect, Text } from 'react-konva';
-import React, { useMemo } from 'react';
+import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH, BOARD_ROWS } from '@/types/components/breadboard';
+
 
 const CONNECTOR_COLORS = {
     positive: {
@@ -20,10 +21,6 @@ const CONNECTOR_COLORS = {
 };
 
 const REGULAR_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-
-interface BreadboardProps {
-    componentID: string;
-}
 
 const PinHole: React.FC<{
     x: number;
@@ -53,24 +50,26 @@ const PinLabel: React.FC<{
     y: number;
     text: string;
     colour?: string;
-}> = ({ x, y, text, colour = 'black' }) => (
+}> = ({ x, y, text, colour = 'gray' }) => (
     <Text
         x={x}
         y={y}
         text={text}
-        fontSize={3}
+        fontSize={2.5}
         fontFamily="monospace"
         fill={colour}
+        align='center'
+        width={PIN_SPACING}
     />
 );
 
 const generatePowerLabels = () => {
     const labels: JSX.Element[] = [];
     for (let i = 0; i < 4; i++) {
-        const x = i * PIN_SPACING * 2;
+        const x = PIN_SPACING * (16 * i) - 2.5;
         labels.push(
-            <PinLabel key={`power-${i}-`} x={x - 1 + 60 * i + (PIN_SPACING * 2) * i} y={-5} text="-" colour={CONNECTOR_COLORS.negative.outer} />,
-            <PinLabel key={`power-${i}+`} x={x + PIN_SPACING - 1 + 60 * i + (PIN_SPACING * 2) * i} y={-5} text="+" colour={CONNECTOR_COLORS.positive.outer} />
+            <PinLabel key={`power-${i}-`} x={x} y={-PIN_SPACING} text="-" colour={CONNECTOR_COLORS.negative.outer} />,
+            <PinLabel key={`power-${i}+`} x={x + PIN_SPACING} y={-PIN_SPACING} text="+" colour={CONNECTOR_COLORS.positive.outer} />
         );
     }
     return labels;
@@ -81,16 +80,34 @@ const generateRegularLabels = () => {
     for (let section = 0; section < 3; section++) {
         for (let i = 0; i < 6; i++) {
             for (let j = 0; j < 5; j++) {
-                const LETTER_OFFSET = (PIN_SPACING * 3 - 1);
+                const LETTER_OFFSET = (PIN_SPACING * 3 - 2.5);
                 const x = ((7 * i + j) * PIN_SPACING) + LETTER_OFFSET + section * (REGULAR_SECTION_WIDTH + PIN_SPACING * 4);
                 labels.push(
-                    <PinLabel key={`regular-${section}-${i}-${j}`} x={x} y={-5} text={REGULAR_LABELS[j + 5 * i]} colour='gray' />
+                    <PinLabel key={`regular-${section}-${i}-${j}`} x={x} y={-PIN_SPACING} text={REGULAR_LABELS[j + 5 * i]} />
                 );
             }
         }
     }
     return labels;
 };
+
+const generateRowNumbers = () => {
+    const labels: JSX.Element[] = [];
+    for (let section = 0; section < 3; section++) {
+        const x = section * (REGULAR_SECTION_WIDTH + PIN_SPACING * 4) + 1.5 * PIN_SPACING;
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            const y = PIN_SPACING * i - 0.75;
+            labels.push(
+                <PinLabel key={`row-${section}-${i}`} x={x} y={y} text={String(i + 1)} />
+            );
+        }
+    }
+    return labels;
+}
+
+interface BreadboardProps {
+    componentID: string;
+}
 
 export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
     const { components, selectedComponent } = useSimulatorContext();
@@ -117,25 +134,26 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
     const labels = useMemo(() => {
         return [
             ...generatePowerLabels(),
-            ...generateRegularLabels()
+            ...generateRegularLabels(),
+            ...generateRowNumbers()
         ];
     }, []);
 
     return (
         <BaseComponent componentID={componentID}>
             <Rect
-                x={-12.5}
-                y={-7.5}
-                width={component.dimensions.width + 30}
-                height={component.dimensions.height + 10}
+                x={-2.5*PIN_SPACING}
+                y={-1.5*PIN_SPACING}
+                width={component.dimensions.width + 6*PIN_SPACING}
+                height={component.dimensions.height + 2*PIN_SPACING}
                 fill={'lightgrey'}
-                cornerRadius={2}
+                cornerRadius={2.5}
                 stroke={'rgba(143,217,251, 0.5)'}
                 strokeEnabled={selectedComponent === componentID}
             />
             <Rect
                 x={0}
-                y={-2.5}
+                y={-0.5*PIN_SPACING}
                 width={component.dimensions.width}
                 height={component.dimensions.height}
                 fill={'rgba(200, 200, 200)'}
@@ -145,5 +163,3 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
         </BaseComponent>
     );
 };
-
-export default Breadboard;
