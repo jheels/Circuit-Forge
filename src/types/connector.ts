@@ -3,7 +3,6 @@
  * - Verify the connection rules
  * - Check cathodes
  */
-
 import { v4 as uuidv4 } from 'uuid';
 import { Point } from './general';
 
@@ -15,7 +14,7 @@ interface ConnectorOffset {
     y: number;
 }
 
-export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'positive' | 'negative' | 'cathode' | 'anode' | 'power' | 'ground';
+export type ConnectorType = 'input' | 'output' | 'bidirectional' | 'positive' | 'negative' | 'cathode' | 'anode';
 
 export interface ConnectorRegion {
     x: number;
@@ -28,12 +27,10 @@ export interface Connector {
     readonly id: string;
     readonly componentID: string;
     readonly type: ConnectorType;
-
     offset: ConnectorOffset;
 
-    isConnected: boolean;
-    isHovered: boolean;
-    connectedTo?: string;
+    connections: Set<string>; // set of Connection IDs
+
     getInteractionRegion: (componentPosition: Point, dimensions: { width: number; height: number }) => ConnectorRegion;
 }
 
@@ -47,8 +44,7 @@ export const createConnector = (
     componentID,
     type,
     offset,
-    isConnected: false,
-    isHovered: false,
+    connections: new Set<string>(),
     getInteractionRegion: (position: Point, dimensions: { width: number; height: number }): ConnectorRegion => {
         const x = position.x + (offset.x * dimensions.width);
         const y = position.y + (offset.y * dimensions.height);
