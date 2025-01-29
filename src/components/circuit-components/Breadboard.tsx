@@ -27,7 +27,6 @@ const PinHole: React.FC<{
     y: number;
     type: 'positive' | 'negative' | 'bidirectional';
 }> = ({ x, y, type }) => (
-    <>
         <Rect
             x={x - PIN_SPACING / 2}
             y={y - PIN_SPACING / 2}
@@ -36,8 +35,9 @@ const PinHole: React.FC<{
             fill={CONNECTOR_COLORS[type].outer}
             stroke={'gray'}
             strokeWidth={0.25}
+            perfectDrawEnabled={false}
+            listening={false}
         />
-    </>
 );
 
 const PinLabel: React.FC<{

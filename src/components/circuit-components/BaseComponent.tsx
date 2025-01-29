@@ -183,6 +183,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 fill="transparent"
                 stroke="black"
                 strokeWidth={0.5}
+                perfectDrawEnabled={false}
                 onClick={(e) => {
                     e.cancelBubble = true;
                     handleConnectorClick(hoveredConnectorID);
