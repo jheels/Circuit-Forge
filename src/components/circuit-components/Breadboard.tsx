@@ -34,13 +34,8 @@ const PinHole: React.FC<{
             width={PIN_SPACING}
             height={PIN_SPACING}
             fill={CONNECTOR_COLORS[type].outer}
-        />
-        <Rect
-            x={x - (PIN_SPACING / 2 - 1)}
-            y={y - (PIN_SPACING / 2 - 1)}
-            width={PIN_SPACING - 2}
-            height={PIN_SPACING - 2}
-            fill={CONNECTOR_COLORS[type].inner}
+            stroke={'gray'}
+            strokeWidth={0.25}
         />
     </>
 );
