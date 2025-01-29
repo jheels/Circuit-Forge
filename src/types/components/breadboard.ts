@@ -3,12 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { createConnector, ConnectorType } from '../connector';
 import { createDefaultProperties } from '../properties';
 
-const PIN_SPACING = 5;
+export const PIN_SPACING = 5;
 const PINS_PER_STRIP = 5;
 const SECTION_SPACING = PIN_SPACING * 7;
 const BOARD_ROWS = 64;
 
-const REGULAR_SECTION_WIDTH = (PINS_PER_STRIP + 1) * PIN_SPACING * 2;
+export const REGULAR_SECTION_WIDTH = (PINS_PER_STRIP + 1) * PIN_SPACING * 2;
 const POWER_RAIL_WIDTH = PIN_SPACING * 2;
 
 interface Strip {

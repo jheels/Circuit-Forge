@@ -1,18 +1,8 @@
-/**
- * TODO:
- * - Add pin labels
- * - Add strip highlighting
- * - replace magic number
- */
-
-import { BreadboardComponent } from '@/types/components/breadboard';
+import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH } from '@/types/components/breadboard';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
-import { Rect } from 'react-konva';
+import { Rect, Text } from 'react-konva';
 import React, { useMemo } from 'react';
-
-
-const PIN_SIZE = 5;
 
 const CONNECTOR_COLORS = {
     positive: {
@@ -29,6 +19,8 @@ const CONNECTOR_COLORS = {
     }
 };
 
+const REGULAR_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
 interface BreadboardProps {
     componentID: string;
 }
@@ -37,30 +29,73 @@ const PinHole: React.FC<{
     x: number;
     y: number;
     type: 'positive' | 'negative' | 'bidirectional';
-}> = ({ x, y, type }) => {
-    return (
-        <>
-            <Rect
-                x={x - PIN_SIZE / 2}
-                y={y - PIN_SIZE / 2}
-                width={PIN_SIZE}
-                height={PIN_SIZE}
-                fill={CONNECTOR_COLORS[type].outer}
-            />
-            <Rect
-                x={x - (PIN_SIZE / 2 - 1)}
-                y={y - (PIN_SIZE / 2 - 1)}
-                width={PIN_SIZE - 2}
-                height={PIN_SIZE - 2}
-                fill={CONNECTOR_COLORS[type].inner}
-            />
-        </>
-    )
-}
+}> = ({ x, y, type }) => (
+    <>
+        <Rect
+            x={x - PIN_SPACING / 2}
+            y={y - PIN_SPACING / 2}
+            width={PIN_SPACING}
+            height={PIN_SPACING}
+            fill={CONNECTOR_COLORS[type].outer}
+        />
+        <Rect
+            x={x - (PIN_SPACING / 2 - 1)}
+            y={y - (PIN_SPACING / 2 - 1)}
+            width={PIN_SPACING - 2}
+            height={PIN_SPACING - 2}
+            fill={CONNECTOR_COLORS[type].inner}
+        />
+    </>
+);
+
+const PinLabel: React.FC<{
+    x: number;
+    y: number;
+    text: string;
+    colour?: string;
+}> = ({ x, y, text, colour = 'black' }) => (
+    <Text
+        x={x}
+        y={y}
+        text={text}
+        fontSize={3}
+        fontFamily="monospace"
+        fill={colour}
+    />
+);
+
+const generatePowerLabels = () => {
+    const labels: JSX.Element[] = [];
+    for (let i = 0; i < 4; i++) {
+        const x = i * PIN_SPACING * 2;
+        labels.push(
+            <PinLabel key={`power-${i}-`} x={x - 1 + 60 * i + (PIN_SPACING * 2) * i} y={-5} text="-" colour={CONNECTOR_COLORS.negative.outer} />,
+            <PinLabel key={`power-${i}+`} x={x + PIN_SPACING - 1 + 60 * i + (PIN_SPACING * 2) * i} y={-5} text="+" colour={CONNECTOR_COLORS.positive.outer} />
+        );
+    }
+    return labels;
+};
+
+const generateRegularLabels = () => {
+    const labels: JSX.Element[] = [];
+    for (let section = 0; section < 3; section++) {
+        for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 5; j++) {
+                const LETTER_OFFSET = (PIN_SPACING * 3 - 1);
+                const x = ((7 * i + j) * PIN_SPACING) + LETTER_OFFSET + section * (REGULAR_SECTION_WIDTH + PIN_SPACING * 4);
+                labels.push(
+                    <PinLabel key={`regular-${section}-${i}-${j}`} x={x} y={-5} text={REGULAR_LABELS[j + 5 * i]} colour='gray' />
+                );
+            }
+        }
+    }
+    return labels;
+};
 
 export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
     const { components, selectedComponent } = useSimulatorContext();
     const component = components[componentID] as BreadboardComponent;
+
     const connectorPins = useMemo(() => {
         const { connectors, dimensions } = component;
 
@@ -78,6 +113,13 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
             );
         });
     }, [component]);
+
+    const labels = useMemo(() => {
+        return [
+            ...generatePowerLabels(),
+            ...generateRegularLabels()
+        ];
+    }, []);
 
     return (
         <BaseComponent componentID={componentID}>
@@ -98,7 +140,10 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
                 height={component.dimensions.height}
                 fill={'rgba(200, 200, 200)'}
             />
+            {labels}
             {connectorPins}
         </BaseComponent>
-    )
+    );
 };
+
+export default Breadboard;
