@@ -29,8 +29,6 @@ export interface Connector {
     readonly type: ConnectorType;
     offset: ConnectorOffset;
 
-    connections: Set<string>; // set of Connection IDs
-
     getInteractionRegion: (componentPosition: Point, dimensions: { width: number; height: number }) => ConnectorRegion;
 }
 
@@ -44,7 +42,7 @@ export const createConnector = (
     componentID,
     type,
     offset,
-    connections: new Set<string>(),
+
     getInteractionRegion: (position: Point, dimensions: { width: number; height: number }): ConnectorRegion => {
         const x = position.x + (offset.x * dimensions.width);
         const y = position.y + (offset.y * dimensions.height);
@@ -88,8 +86,8 @@ export const validateConnection = (connector1: Connector, connector2: Connector)
         'input': ['output', 'bidirectional'],
         'output': ['input', 'bidirectional'],
         'bidirectional': ['bidirectional', 'positive', 'negative', 'cathode', 'anode', 'input', 'output'], // for now they can connect to anything
-        'positive': ['anode', 'bidirectional', 'negative'], // possibly has more but need to check
-        'negative': ['cathode', 'bidirectional', 'positive'], // possibly has more but need to check
+        'positive': ['positive', 'anode', 'bidirectional'], // possibly has more but need to check
+        'negative': ['negative', 'cathode', 'bidirectional'], // possibly has more but need to check
         'cathode': ['negative', 'bidirectional', 'anode'], // possibly has more but need to check
         'anode': ['positive', 'bidirectional', 'cathode'], // possibly has more but need to check
     }

@@ -7,13 +7,14 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector, getConnectorPosition } from '@/types/connector';
+import { Connection } from '@/types/connection';
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
-    const { wires, components, updateWire, addWireToConnector, removeWireFromConnector, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID } = useSimulatorContext();
+    const { wires, components, updateWire, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID, connections, removeConnection, addConnection } = useSimulatorContext();
     const wire = wires[wireID];
     const [isHovered, setIsHovered] = useState(false);
     const [draggingEnd, setDraggingEnd] = useState<null | { index: 0 | 1; oldPoint: Point }>(null);
@@ -67,6 +68,11 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         const dropPoint = { x: e.target.x(), y: e.target.y() };
         let foundConnector = false;
 
+        const wireConnection = (Object.values(connections) as Connection[]).find(
+            (connection) => connection.type === 'wire' && connection.metadata.wireID === wireID
+        );
+        
+
         for (const component of Object.values(components)) {
             if (foundConnector) break;
             const { connectors, position, dimensions } = component;
@@ -76,17 +82,26 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
 
                 const newPos = getConnectorPosition(conn, position, dimensions);
 
-                if (index === 0) removeWireFromConnector(wire.startConnectorID, wireID);
-                else if (wire.endConnectorID) removeWireFromConnector(wire.endConnectorID, wireID);
-
-                addWireToConnector(conn.id, wireID, index === 0);
-
                 const newPoints = [...wire.points];
                 newPoints[index] = newPos;
                 if (index === 0) {
                     updateWire(wireID, { startConnectorID: conn.id, points: newPoints });
+                    // update connection
+                    if (wireConnection) {
+                        const newConnection = { ...wireConnection, sourceConnectorID: conn.id };
+                        removeConnection(wireConnection.id);
+                        addConnection(newConnection);
+                    }
                 } else {
                     updateWire(wireID, { endConnectorID: conn.id, points: newPoints });
+                    if (wireConnection) {
+                        const updatedConnection = {
+                            ...wireConnection,
+                            targetConnectorID: conn.id
+                        };
+                        removeConnection(wireConnection.id);
+                        addConnection(updatedConnection);
+                    }    
                 }
                 foundConnector = true;
                 break;
@@ -99,7 +114,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
             updateWire(wireID, { points: newPoints });
         }
         setDraggingEnd(null);
-    }, [draggingEnd, components, removeWireFromConnector, wire.startConnectorID, wire.endConnectorID, wire.points, wireID, addWireToConnector, updateWire]);
+    }, [draggingEnd, connections, wireID, components, wire.points, updateWire, removeConnection, addConnection]);
 
     return (
         <>

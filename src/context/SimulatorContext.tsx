@@ -5,8 +5,7 @@ import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
-
-type ConnectorWireMap = Record<string, { wireID: string, isStart: boolean }[]>;
+import { Connection } from "@/types/connection";
 
 interface SimulatorContextType {
     projectName: string;
@@ -18,7 +17,9 @@ interface SimulatorContextType {
     wires: Record<string, Wire>;
     creatingWire: Wire | null;
     hoveredConnectorID: string | null;
-    connectorWireMap: ConnectorWireMap;
+    clickedConnector: Connector | null;
+    connections: Record<string, Connection>;
+    connectorConnections: Record<string, Set<string>>;
     setProjectName: (name: string) => void;
     setSaveStatus: (status: { isSaved: boolean; lastSaved: Date | null }) => void;
     createComponent: (type: string, position: Point) => EditorComponent;
@@ -28,12 +29,14 @@ interface SimulatorContextType {
     addWire: (wire: Wire) => void;
     removeWire: (wireID: string) => void;
     updateWire: (wireID: string, updates: Partial<Wire>) => void;
-    addWireToConnector: (connectorID: string, wireID: string, isStart: boolean) => void;
-    removeWireFromConnector: (connectorID: string, wireID: string) => void;
     setCreatingWire: (wire: Wire | null) => void;
     setHoveredConnectorID: (id: string | null) => void;
     setSelectedComponent: (id: string | null) => void;
     setSelectedWire: (id: string | null) => void;
+    setClickedConnector: (connector: Connector | null) => void;
+    addConnection: (connection: Connection) => void;
+    removeConnection: (connectionID: string) => void;
+    getConnectorConnections: (connectorID: string) => Set<string>;
     resetProject: () => void;
 }
 
@@ -60,43 +63,82 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [creatingWire, setCreatingWire] = useState<Wire | null>(null);
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
-    const [connectorWireMap, setConnectorWireMap] = useState<ConnectorWireMap>({});
-    
+    const [connections, setConnections] = useState<Record<string, Connection>>({});
+    const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
+
     useEffect(() => {
         localStorage.setItem('simulatorProjectName', projectName);
     }, [projectName]);
 
-    const addWireToConnector = (connectorID: string, wireID: string, isStart: boolean) => {
-        setConnectorWireMap((prev) => ({
+    const addConnection = (connection: Connection) => {
+        setConnections((prev) => ({
             ...prev,
-            [connectorID]: [...(prev[connectorID] || []), { wireID, isStart }]
+            [connection.id]: connection
         }));
-    }
-
-    const removeWireFromConnector = (connectorID: string, wireID: string) => {
-        setConnectorWireMap((prev) => {
-            const updatedConnectorWires = (prev[connectorID] || []).filter(({ wireID: id }) => id !== wireID);
-            if (updatedConnectorWires.length === 0) {
-                const { [connectorID]: _, ...rest } = prev;
-                return rest;
-            }
+        setConnectorConnections((prev) => {
+            const startConnections = prev[connection.sourceConnectorID] || new Set();
+            startConnections.add(connection.id);
+            const endConnections = prev[connection.targetConnectorID] || new Set();
+            endConnections.add(connection.id);
             return {
                 ...prev,
-                [connectorID]: updatedConnectorWires
+                [connection.sourceConnectorID]: startConnections,
+                [connection.targetConnectorID]: endConnections
             };
         });
+    }
+
+    const removeConnection = (connectionID: string) => {
+        const connection = connections[connectionID];
+        if (!connection) return;
+        setConnections((prev) => {
+            const newConnections = { ...prev };
+            delete newConnections[connectionID];
+            return newConnections;
+        });
+        setConnectorConnections((prev) => {
+            const startConnections = prev[connection.sourceConnectorID] || new Set();
+            startConnections.delete(connectionID);
+            const endConnections = prev[connection.targetConnectorID] || new Set();
+            endConnections.delete(connectionID);
+
+            const newConnections = { ...prev };
+            if (startConnections.size === 0) {
+                delete newConnections[connection.sourceConnectorID];
+            } else {
+                newConnections[connection.sourceConnectorID] = startConnections;
+            }
+
+            if (endConnections.size === 0) {
+                delete newConnections[connection.targetConnectorID];
+            } else {
+                newConnections[connection.targetConnectorID] = endConnections;
+            }
+
+            return newConnections;
+        });
+    }
+
+    const getConnectorConnections = (connectorID: string) => {
+        return connectorConnections[connectorID] || new Set();
     }
 
     const cleanUpComponentWires = (editorID: string) => {
         const component = components[editorID];
         if (!component) return;
-        for (const connectorID in component.connectors){
-            const wires = connectorWireMap[connectorID] || [];
-            wires.forEach(({ wireID }) => {
-                removeWire(wireID);
-                removeWireFromConnector(connectorID, wireID);
+        // remove all associated wires with the component using connectorConnections
+        const connectors = Object.values(component.connectors);
+        // iterate through each connectors connection and check if its a wire if so remove it
+        connectors.forEach((connector) => {
+            const connectorConnections = getConnectorConnections(connector.id);
+            connectorConnections.forEach((connectionID) => {
+                const connection = connections[connectionID];
+                if (!connection) return;
+                if (connection.type === 'wire' && connection.metadata.wireID) {
+                    removeWire(connection.metadata.wireID);
+                }
             });
-        }
+        });
     }
 
     const createComponent = (type: string, position: Point): EditorComponent => {
@@ -156,10 +198,16 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const removeWire = (wireID: string) => {    
         const wire = wires[wireID];
         if (!wire) return;
-        removeWireFromConnector(wire.startConnectorID, wireID);
-        if (wire.endConnectorID) {
-            removeWireFromConnector(wire.endConnectorID, wireID);
+
+        const connectionID = Object.keys(connections).find((id) => {
+            const connection = connections[id];
+            return connection.type === 'wire' && connection.metadata.wireID === wireID;
+        });
+        
+        if (connectionID) {
+            removeConnection(connectionID);
         }
+                
         setWires((prev) => {
             const newWires = { ...prev };
             delete newWires[wireID];
@@ -187,7 +235,9 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         setWires({});
         setCreatingWire(null);
         setHoveredConnectorID(null);
-        setConnectorWireMap({});
+        setClickedConnector(null);
+        setConnections({});
+        setConnectorConnections({});
     }
 
     return (
@@ -202,15 +252,14 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             creatingWire,
             hoveredConnectorID,
             clickedConnector,
-            connectorWireMap,
+            connections,
+            connectorConnections,
             setProjectName,
             setSaveStatus,
             createComponent,
             addComponent,
             removeComponent,
             updateComponent,
-            addWireToConnector,
-            removeWireFromConnector,
             cleanUpComponentWires,
             addWire,
             removeWire,
@@ -220,7 +269,10 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             setClickedConnector,
             setSelectedComponent,
             setSelectedWire,
-            resetProject
+            resetProject,
+            addConnection,
+            removeConnection,
+            getConnectorConnections,
         }}>
             {children}
         </SimulatorContext.Provider>
