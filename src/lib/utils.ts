@@ -8,9 +8,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const findConnectorIDAtPoint = (point: Point, components: Record<string, EditorComponent>) => {
+    let breadboard = null;
+    
     for (const component of Object.values(components)) {
+        if (component.type === 'breadboard') {
+            breadboard = component;
+            continue;
+        }
         const { position, dimensions, connectors } = component;
 
+        for (const connectorKey in connectors) {
+            const connector = connectors[connectorKey];
+            if (isPointInConnector(point, connector, position, dimensions)) {
+                return connector.id;
+            }
+        }
+    }
+
+    if (breadboard) {
+        const { position, dimensions, connectors } = breadboard;
         for (const connectorKey in connectors) {
             const connector = connectors[connectorKey];
             if (isPointInConnector(point, connector, position, dimensions)) {

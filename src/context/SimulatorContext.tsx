@@ -182,7 +182,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             return newComponents;
         });
 
-        console.log(component.type);
         setComponentCounts((prev) => {
             const newCounts = { ...prev };
             if (newCounts[component.type] > 0) {

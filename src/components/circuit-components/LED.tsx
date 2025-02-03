@@ -77,9 +77,9 @@ export const LED: React.FC<LEDProps> = ({
             />
             <Rect
                 x={-dimensions.width / 4}
-                y={dimensions.height / 4}
+                y={dimensions.height / 4 - 0.1}
                 width={dimensions.width / 2 + 1}
-                height={dimensions.height / 12}
+                height={dimensions.height / 12 + 0.25}
                 fill={properties.colour}
             />
             {/* Cathode (straight leg) */}

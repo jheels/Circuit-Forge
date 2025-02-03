@@ -24,8 +24,6 @@ const createAppropriateConnection = (
 ) => {
     const sourceComponent = components[sourceConnector.componentID];
     const targetComponent = components[targetConnector.componentID];
-    console.log('sourceComponent', sourceComponent);
-    console.log('targetComponent', targetComponent);
     const sourceStripID = getStripID(sourceComponent as BreadboardComponent, sourceConnector);
     const targetStripID = getStripID(targetComponent as BreadboardComponent, targetConnector);
 
