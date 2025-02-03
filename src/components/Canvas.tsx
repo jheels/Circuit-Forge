@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-import { Stage, Layer, Text, Line } from 'react-konva';
+import { Stage, Layer, Line } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { SidebarComponent, Point } from '@/types/general';
@@ -30,6 +30,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         removeComponent,
         selectedComponent,
         setSelectedComponent,
+        componentCounts,
         wires,
         creatingWire,
         updateWire,
@@ -66,7 +67,6 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         }
     }, [components, creatingWire, setHoveredConnectorID, updateWire]);
 
-
     useEffect(() => {
         positionRef.current = position;
         scaleRef.current = scale;
@@ -91,9 +91,14 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
+        if (item.name == 'Breadboard' && componentCounts[item.name] > 0) {
+            console.warn('max 1 breadboard');
+            return;
+        }
+
         const newComponent = createComponent(item.name, { x: dropX, y: dropY });
         addComponent(newComponent);
-    }, [addComponent, createComponent, stageRef]);
+    }, [addComponent, componentCounts, createComponent, stageRef]);
 
     const handleComponentDeletion = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Backspace' && selectedComponent) {

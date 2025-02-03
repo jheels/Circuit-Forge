@@ -3,6 +3,7 @@
  * - Checking connector validations on snapping connectors directly
  * - Implement updating circuit series on connections, deletions etc.
  * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
+ * - Fix bug where moving the connector that you connected to does not remove a connection (only 1 way)
  */
 
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -16,11 +17,13 @@ import Konva from 'konva';
 interface BaseComponentProps {
     componentID: string;
     children: React.ReactNode;
+    draggable?: boolean;
 }
 
 export const BaseComponent: React.FC<BaseComponentProps> = ({
     componentID,
     children,
+    draggable = true,
 }) => {
     const {
         components,
@@ -153,7 +156,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
 
     return (
         <Group
-            draggable
+            draggable={draggable}
             onDragMove={handleDragMove}
             onDragEnd={updateConnectors}
             onClick={handleSelection}

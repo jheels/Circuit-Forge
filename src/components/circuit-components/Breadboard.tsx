@@ -135,7 +135,7 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
     }, []);
 
     return (
-        <BaseComponent componentID={componentID}>
+        <BaseComponent componentID={componentID} draggable={false}>
             <Rect
                 x={-2.5*PIN_SPACING}
                 y={-1.5*PIN_SPACING}
