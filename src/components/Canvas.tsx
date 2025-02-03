@@ -113,30 +113,42 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
     }), [handleDrop]);
 
     const renderedComponents = useMemo(() => {
-        return Object.values(components).map((component) => {
-            switch (component.type) {
-                case 'LED':
-                    return (
-                        <LED key={component.editorID} componentID={component.editorID} />
-                    );
-                case 'RESISTOR':
-                    return (
-                        <Resistor key={component.editorID} componentID={component.editorID} />
-                    );
-                case 'POWER SUPPLY':
-                    return (
-                        <PowerSupply key={component.editorID} componentID={component.editorID} />
-                    );
-                case 'BREADBOARD':
-                    return (
-                        <Breadboard key={component.editorID} componentID={component.editorID} />
-                    );
-                default:
-                    console.error(`Component type ${component.type} not found.`);
-                    return null;
+        const breadboards = [];
+        const otherComponents = [];
+
+        Object.values(components).forEach((component) => {
+            if (component.type === 'BREADBOARD') {
+                breadboards.push(
+                    <Breadboard key={component.editorID} componentID={component.editorID} />
+                );
+            } else {
+                switch (component.type) {
+                    case 'LED':
+                        otherComponents.push(
+                            <LED key={component.editorID} componentID={component.editorID} />
+                        );
+                        break;
+                    case 'RESISTOR':
+                        otherComponents.push(
+                            <Resistor key={component.editorID} componentID={component.editorID} />
+                        );
+                        break;
+                    case 'POWER SUPPLY':
+                        otherComponents.push(
+                            <PowerSupply key={component.editorID} componentID={component.editorID} />
+                        );
+                        break;
+                    default:
+                        console.error(`Component type ${component.type} not found.`);
+                        break;
+                }
             }
+        });
+
+        return {
+            0: breadboards,
+            1: otherComponents,
         }
-        );
     }, [components]);
 
     const renderedWires = useMemo(() => {
@@ -177,16 +189,10 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 draggable
             >
                 <Layer>
-                    {renderedComponents.length === 0 && (
-                        <Text
-                            text="Drop Components Here "
-                            fontSize={24}
-                            fill="gray"
-                            x={stageWidth / 2 - 100}
-                            y={stageHeight / 2 - 12}
-                        />
-                    )}
-                    {renderedComponents}
+                    {renderedComponents[0]}
+                </Layer>
+                <Layer>
+                    {renderedComponents[1]}
                 </Layer>
                 <Layer listening={!creatingWire}>
                     {wirePreview}

@@ -4,12 +4,12 @@ import { Canvas } from '@/components/Canvas';
 import { useState, useCallback, useRef } from 'react';
 import Konva from 'konva';
 
-const MIN_SCALE = 0.25;
-const MAX_SCALE = 5;
+const MIN_SCALE = 1;
+const MAX_SCALE = 10;
 const SCALE_BY = 1.05;
 
 export const Editor: React.FC = () => {
-    const [scale, setScale] = useState<number>(1);
+    const [scale, setScale] = useState<number>(5);
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
     const stageRef = useRef<Konva.Stage>(null);

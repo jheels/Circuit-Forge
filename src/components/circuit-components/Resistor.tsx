@@ -33,10 +33,8 @@ export const Resistor: React.FC<ResistorProps> = ({
         >
             {/* Resistor Body */}
             <Rect
-                x={0}
-                y={dimensions.height / 3}
                 width={dimensions.width}
-                height={dimensions.height / 3}
+                height={dimensions.height}
                 fill="brown"
             />
 
@@ -44,18 +42,18 @@ export const Resistor: React.FC<ResistorProps> = ({
             <Line
                 points={[
                     0, dimensions.height / 2,
-                    -10, dimensions.height / 2
+                    -2.5, dimensions.height / 2
                 ]}
                 stroke="gray"
-                strokeWidth={2}
+                strokeWidth={1}
             />
             <Line
                 points={[
                     dimensions.width, dimensions.height / 2,
-                    dimensions.width + 10, dimensions.height / 2
+                    dimensions.width + 2.5, dimensions.height / 2
                 ]}
                 stroke="gray"
-                strokeWidth={2}
+                strokeWidth={1}
             />
         </BaseComponent>
     );

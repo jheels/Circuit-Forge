@@ -36,7 +36,7 @@ export const createConnector = (
     componentID: string,
     type: ConnectorType,
     offset: ConnectorOffset,
-    hitAreaSize: number = 5
+    hitAreaSize: number = 2.5
 ): Connector => ({
     id: uuidv4(),
     componentID,

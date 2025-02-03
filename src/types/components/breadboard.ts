@@ -63,7 +63,8 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
             {
                 x: x / dimensions.width,
                 y: y / dimensions.height
-            }
+            },
+            5
         );
         connectors[connector.id] = connector;
         return connector.id;

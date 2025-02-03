@@ -15,7 +15,7 @@ export const createResistorComponent = (position: Point, name: string): Resistor
     return {
         editorID: editorID,
         type: 'RESISTOR',
-        dimensions: { width: 60, height: 30 },
+        dimensions: { width: 15, height: 2.5 },
         position: position,
         properties: createDefaultProperties('RESISTOR', name),
         connectors: {

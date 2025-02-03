@@ -129,7 +129,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     key={`${wireID}-hover`}
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"blue"}
-                    strokeWidth={3}
+                    strokeWidth={1.5}
                     lineCap="round"
                     opacity={0.5}
                 />
@@ -137,13 +137,13 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 <Line
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"black"}
-                    strokeWidth={2.25}
+                    strokeWidth={1}
                     lineCap="round"
                 />
                 <Line
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"gray"}
-                    strokeWidth={2}
+                    strokeWidth={0.75}
                     lineCap="round"
                 />
             </Group>
@@ -152,9 +152,9 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     key={`${wireID}-point-${index}`}
                     x={point.x}
                     y={point.y}
-                    radius={1.5}
+                    radius={0.75}
                     stroke='black'
-                    strokeWidth={0.25}
+                    strokeWidth={0.15}
                     fill="red"
                     draggable
                     onDragStart={() => handlePointDragStart(index as 0 | 1)}
