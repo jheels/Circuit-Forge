@@ -139,15 +139,6 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             validationFn: (value) => typeof value === 'number'
         },
         {
-            type: 'select',
-            id: 'mode',
-            label: 'Mode',
-            options: ['AC', 'DC'],
-            defaultValue: 'DC',
-            editable: true,
-            required: true,
-        },
-        {
             type: 'boolean',
             id: 'isEnabled',
             label: 'Enabled',
