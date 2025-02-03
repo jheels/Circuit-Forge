@@ -6,8 +6,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Point } from './general';
 
-export const SNAPPING_THRESHOLD = 5;
-export const BREAKAWAY_THRESHOLD = 20;
+export const SNAPPING_THRESHOLD = 2.5;
+export const BREAKAWAY_THRESHOLD = 2.5;
 
 interface ConnectorOffset {
     x: number;

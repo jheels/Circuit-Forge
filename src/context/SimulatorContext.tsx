@@ -26,6 +26,7 @@ interface SimulatorContextType {
     addComponent: (component: EditorComponent) => void;
     removeComponent: (editorID: string) => void;
     updateComponent: (editorID: string, updates: Partial<EditorComponent>) => void;
+    cleanUpComponentWires: (editorID: string) => void;
     addWire: (wire: Wire) => void;
     removeWire: (wireID: string) => void;
     updateWire: (wireID: string, updates: Partial<Wire>) => void;
@@ -158,7 +159,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             case 'Breadboard':
                 return createBreadboardComponent(position, name);
             default:
-                return null;
+                throw new Error(`Invalid component type: ${type}`);
         }
     }
 
