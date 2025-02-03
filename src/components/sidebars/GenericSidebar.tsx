@@ -15,7 +15,7 @@ interface GenericSideBarProps {
 const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'COMPONENT',
-        item: { name: component.name },
+        item: { name: component.name, sidebarID: component.sidebarID },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),

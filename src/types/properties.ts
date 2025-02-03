@@ -73,7 +73,7 @@ const CommonProperties: Record<string, PropertyDefinition> = {
 };
 
 export const ComponentProperties: Record<string, PropertyDefinition[]> = {
-    'RESISTOR': [
+    'resistor': [
         CommonProperties.name,
         {
             type: 'number',
@@ -95,7 +95,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             required: true,
         }
     ],
-    'LED': [
+    'led': [
         CommonProperties.name,
         {
             type: 'select',
@@ -124,7 +124,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             editable: false,
         }
     ],
-    'POWER SUPPLY': [
+    'power-supply': [
         CommonProperties.name,
         {
             type: 'number',
@@ -146,7 +146,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             editable: true,
         }
     ],
-    'BREADBOARD': [
+    'breadboard': [
         CommonProperties.name,
     ]
 };

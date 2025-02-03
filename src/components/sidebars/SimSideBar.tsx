@@ -11,13 +11,11 @@ const simulatorComponents: SidebarComponent[] = [
         sidebarID: 'resistor',
         name: 'Resistor',
         description: 'A resistor is a passive two-terminal electrical component that implements electrical resistance as a circuit element.',
-
     },
     {
         sidebarID: 'led',
         name: 'LED',
         description: 'A light-emitting diode (LED) is a semiconductor light source that emits light when current flows through it.',
-
     },
     {
         sidebarID: 'power-supply',

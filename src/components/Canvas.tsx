@@ -91,12 +91,12 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
-        if (item.name == 'Breadboard' && componentCounts[item.name] > 0) {
+        if (item.sidebarID == 'breadboard' && componentCounts[item.sidebarID] > 0) {
             console.warn('max 1 breadboard');
             return;
         }
-
-        const newComponent = createComponent(item.name, { x: dropX, y: dropY });
+        const newComponent = createComponent(item.sidebarID, { x: dropX, y: dropY });
+        
         addComponent(newComponent);
     }, [addComponent, componentCounts, createComponent, stageRef]);
 
@@ -122,23 +122,23 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const otherComponents = [];
 
         Object.values(components).forEach((component) => {
-            if (component.type === 'BREADBOARD') {
+            if (component.type === 'breadboard') {
                 breadboards.push(
                     <Breadboard key={component.editorID} componentID={component.editorID} />
                 );
             } else {
                 switch (component.type) {
-                    case 'LED':
+                    case 'led':
                         otherComponents.push(
                             <LED key={component.editorID} componentID={component.editorID} />
                         );
                         break;
-                    case 'RESISTOR':
+                    case 'resistor':
                         otherComponents.push(
                             <Resistor key={component.editorID} componentID={component.editorID} />
                         );
                         break;
-                    case 'POWER SUPPLY':
+                    case 'power-supply':
                         otherComponents.push(
                             <PowerSupply key={component.editorID} componentID={component.editorID} />
                         );
@@ -196,12 +196,12 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 <Layer>
                     {renderedComponents[0]}
                 </Layer>
-                <Layer>
-                    {renderedComponents[1]}
-                </Layer>
                 <Layer listening={!creatingWire}>
                     {wirePreview}
                     {renderedWires}
+                </Layer>
+                <Layer>
+                    {renderedComponents[1]}
                 </Layer>
                 <Layer>
                     {selectedWireComponent}

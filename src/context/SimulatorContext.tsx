@@ -150,13 +150,13 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         }));
         const name = `${type} ${newCount}`;
         switch (type) {
-            case 'LED':
+            case 'led':
                 return createLEDComponent(position, name);
-            case 'Resistor':
+            case 'resistor':
                 return createResistorComponent(position, name);
-            case 'Power Supply':
+            case 'power-supply':
                 return createPowerSupplyComponent(position, name);
-            case 'Breadboard':
+            case 'breadboard':
                 return createBreadboardComponent(position, name);
             default:
                 throw new Error(`Invalid component type: ${type}`);
@@ -171,11 +171,24 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     }
 
     const removeComponent = (editorID: string) => {
+        const component = components[editorID];
+        if (!component) return;
+
         cleanUpComponentWires(editorID);
+
         setComponents((prev) => {
             const newComponents = { ...prev };
             delete newComponents[editorID];
             return newComponents;
+        });
+
+        console.log(component.type);
+        setComponentCounts((prev) => {
+            const newCounts = { ...prev };
+            if (newCounts[component.type] > 0) {
+                newCounts[component.type] -= 1;
+            }
+            return newCounts;
         });
     }
 

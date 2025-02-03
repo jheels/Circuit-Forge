@@ -4,7 +4,7 @@ import { createConnector } from '../connector';
 import { createDefaultProperties } from '../properties';
 
 export interface LEDComponent extends EditorComponent {
-    readonly type: 'LED';
+    readonly type: 'led';
 }
 
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
@@ -14,10 +14,10 @@ export const createLEDComponent = (position: Point, name: string): LEDComponent 
 
     return {
         editorID: editorID,
-        type: 'LED',
+        type: 'led',
         dimensions: { width: 30, height: 50 },
         position: position,
-        properties: createDefaultProperties('LED', name),
+        properties: createDefaultProperties('led', name),
         connectors: {
             [powerConnector.id]: powerConnector,
             [groundConnector.id]: groundConnector,

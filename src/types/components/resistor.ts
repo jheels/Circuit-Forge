@@ -4,7 +4,7 @@ import { createConnector } from '../connector';
 import { createDefaultProperties } from '../properties';
 
 export interface ResistorComponent extends EditorComponent {
-    readonly type: 'RESISTOR';
+    readonly type: 'resistor';
 }
 
 export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
@@ -14,10 +14,10 @@ export const createResistorComponent = (position: Point, name: string): Resistor
 
     return {
         editorID: editorID,
-        type: 'RESISTOR',
+        type: 'resistor',
         dimensions: { width: 15, height: 2.5 },
         position: position,
-        properties: createDefaultProperties('RESISTOR', name),
+        properties: createDefaultProperties('resistor', name),
         connectors: {
             [leftConnector.id]: leftConnector,
             [rightConnector.id]: rightConnector,

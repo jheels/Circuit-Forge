@@ -23,7 +23,7 @@ interface StripMapping {
 }
 
 export interface BreadboardComponent extends EditorComponent {
-    readonly type: 'BREADBOARD';
+    readonly type: 'breadboard';
     readonly stripMapping: StripMapping;
 }
 
@@ -160,10 +160,10 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
 
     return {
         editorID,
-        type: 'BREADBOARD',
+        type: 'breadboard',
         dimensions,
         position,
-        properties: createDefaultProperties('BREADBOARD', name),
+        properties: createDefaultProperties('breadboard', name),
         connectors,
         stripMapping
     };

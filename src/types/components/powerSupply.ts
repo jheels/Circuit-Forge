@@ -5,7 +5,7 @@ import { createDefaultProperties } from '../properties';
 
 
 export interface PowerSupplyComponent extends EditorComponent {
-    readonly type: "POWER SUPPLY";
+    readonly type: "power-supply";
 }
 
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
@@ -15,8 +15,8 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
 
     return {
         editorID: editorID,
-        type: "POWER SUPPLY",
-        properties: createDefaultProperties("POWER SUPPLY", name),
+        type: "power-supply",
+        properties: createDefaultProperties("power-supply", name),
         position: position,
         dimensions: { width: 60, height: 50 },
         connectors: {
