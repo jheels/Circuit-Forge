@@ -9,13 +9,13 @@ export interface LEDComponent extends EditorComponent {
 
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
     const editorID = `LED-${uuidv4()}`;
-    const powerConnector = createConnector(editorID, 'cathode', { x: 0.4, y: 53/60 });
-    const groundConnector = createConnector(editorID, 'anode', { x: 2/3, y: 53/60 });
+    const powerConnector = createConnector(editorID, 'cathode', { x: -0.11111, y: 0.444444 });
+    const groundConnector = createConnector(editorID, 'anode', { x: 0.233333, y: 0.44444 });
 
     return {
         editorID: editorID,
         type: 'led',
-        dimensions: { width: 30, height: 50 },
+        dimensions: { width: 15, height: 25 },
         position: position,
         properties: createDefaultProperties('led', name),
         connectors: {

@@ -7,7 +7,7 @@ import { ConnectorPair, SnapState } from './useSnapManagement';
 import { BreadboardComponent } from '@/types/components/breadboard';
 
 const isBreadboard = (component: EditorComponent): boolean => {
-    return component.type === 'BREADBOARD';
+    return component.type === 'breadboard';
 }
 
 const getStripID = (breadboard: BreadboardComponent, connector: Connector) => {
@@ -24,7 +24,8 @@ const createAppropriateConnection = (
 ) => {
     const sourceComponent = components[sourceConnector.componentID];
     const targetComponent = components[targetConnector.componentID];
-
+    console.log('sourceComponent', sourceComponent);
+    console.log('targetComponent', targetComponent);
     const sourceStripID = getStripID(sourceComponent as BreadboardComponent, sourceConnector);
     const targetStripID = getStripID(targetComponent as BreadboardComponent, targetConnector);
 

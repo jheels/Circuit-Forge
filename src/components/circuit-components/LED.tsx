@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Line, Shape } from 'react-konva';
+import { Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/types/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
@@ -18,64 +18,71 @@ export const LED: React.FC<LEDProps> = ({
 }) => {
     const component = useSimulatorContext().components[componentID] as LEDComponent;
     const { properties, dimensions } = component;
-
     return (
         <BaseComponent
             componentID={componentID}
         >
+            <Line
+                points={[
+                    -dimensions.width / 9,
+                    0.3 * dimensions.height,
+                    -dimensions.width / 9,
+                    0.45 * dimensions.height,
+                ]}
+                stroke="gray"
+                strokeWidth={1}
+                lineCap='round'
+            />
+
+            {/* Anode (bent leg) */}
+            <Line
+                points={[
+                    dimensions.width / 9 + 1,
+                    0.3 * dimensions.height,
+                    dimensions.width / 9 + 1,
+                    0.35 * dimensions.height,
+                    dimensions.width / 6 + 1,
+                    0.4 * dimensions.height,
+                    dimensions.width / 6 + 1,
+                    0.45 * dimensions.height,
+                ]}
+                stroke="gray"
+                strokeWidth={1}
+                lineCap='round'
+            />
             {/* LED Body */}
             <Shape
                 sceneFunc={(context, shape) => {
                     context.beginPath();
                     context.arc(
-                        dimensions.width / 2, // x-coordinate of the semicircle center
-                        dimensions.height / 3, // y-coordinate of the semicircle center
-                        dimensions.width / 4, // radius of the semicircle
+                        0.5,
+                        0,
+                        dimensions.width / 4 + 0.5, // radius of the semicircle
                         Math.PI, // start angle (half-circle starts at Math.PI)
                         0, // end angle (ends at 0)
                         false // counterclockwise drawing
                     );
                     // make a rect
                     context.rect(
-                        dimensions.width / 4, // x-coordinate of the rectangle
-                        dimensions.height / 3, // y-coordinate of the rectangle
-                        dimensions.width / 2, // width of the rectangle
+                        -dimensions.width / 4,
+                        0,
+                        dimensions.width / 2 + 1, // width of the rectangle
                         dimensions.height / 3 // height of the rectangle
                     );
                     context.closePath();
                     context.fillStrokeShape(shape);
                 }}
-                fill={properties.isIlluminated ? properties.color : '#cd5c5c'}
+                fill={properties.colour}
                 opacity={properties.isIlluminated ? 1 : 0.5}
             />
+            <Rect
+                x={-dimensions.width / 4}
+                y={dimensions.height / 4}
+                width={dimensions.width / 2 + 1}
+                height={dimensions.height / 12}
+                fill={properties.colour}
+            />
             {/* Cathode (straight leg) */}
-            <Line
-                points={[
-                    dimensions.width / 2.5,
-                    dimensions.height / 1.5,
-                    dimensions.width / 2 - 3,
-                    dimensions.height - 5
-                ]}
-                stroke="gray"
-                strokeWidth={2}
-                lineJoin='round'
-            />
-
-            {/* Anode (bent leg) */}
-            <Line
-                points={[
-                    dimensions.width - dimensions.width / 2.5,
-                    dimensions.height / 1.5, // initial point
-                    dimensions.width - dimensions.width / 2.5,
-                    dimensions.height - 15,
-                    dimensions.width - dimensions.width / 2.5 + 2,
-                    dimensions.height - 12, // crooked part
-                    dimensions.width - dimensions.width / 2.5 + 2,
-                    dimensions.height - 5 // straight down
-                ]}
-                stroke="gray"
-                strokeWidth={2}
-            />
         </BaseComponent>
     )
 }
