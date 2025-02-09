@@ -27,9 +27,8 @@ export interface Connector {
     readonly id: string;
     readonly componentID: string;
     readonly type: ConnectorType;
+    readonly hitAreaSize: number;
     offset: ConnectorOffset;
-
-    getInteractionRegion: (componentPosition: Point, dimensions: { width: number; height: number }) => ConnectorRegion;
 }
 
 export const createConnector = (
@@ -42,19 +41,25 @@ export const createConnector = (
     componentID,
     type,
     offset,
-
-    getInteractionRegion: (position: Point, dimensions: { width: number; height: number }): ConnectorRegion => {
-        const x = position.x + (offset.x * dimensions.width);
-        const y = position.y + (offset.y * dimensions.height);
-
-        return {
-            x: x - hitAreaSize / 2,
-            y: y - hitAreaSize / 2,
-            width: hitAreaSize,
-            height: hitAreaSize
-        };
-    }
+    hitAreaSize
 });
+
+export const getInteractionRegion = (
+    connector: Connector,
+    componentPosition: Point,
+    dimensions: { width: number; height: number },
+    hitAreaSize: number = 2.5
+): ConnectorRegion => {
+    const x = componentPosition.x + (connector.offset.x * dimensions.width);
+    const y = componentPosition.y + (connector.offset.y * dimensions.height);
+
+    return {
+        x: x - hitAreaSize / 2,
+        y: y - hitAreaSize / 2,
+        width: hitAreaSize,
+        height: hitAreaSize
+    };
+};
 
 export const isPointInConnector = (
     point: Point,
@@ -62,7 +67,7 @@ export const isPointInConnector = (
     componentPosition: Point,
     componentDimensions: { width: number; height: number }
 ): boolean => {
-    const region = connector.getInteractionRegion(componentPosition, componentDimensions);
+    const region = getInteractionRegion(connector, componentPosition, componentDimensions);
     return point.x >= region.x &&
         point.x <= region.x + region.width &&
         point.y >= region.y &&
@@ -74,7 +79,7 @@ export const getConnectorPosition = (
     componentPosition: Point,
     componentDimensions: { width: number; height: number }
 ): Point => {
-    const region = connector.getInteractionRegion(componentPosition, componentDimensions);
+    const region = getInteractionRegion(connector, componentPosition, componentDimensions);
     return {
         x: region.x + region.width / 2,
         y: region.y + region.height / 2

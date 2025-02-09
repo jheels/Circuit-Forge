@@ -12,6 +12,7 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useSnapManagement } from '@/hooks/useSnapManagement';
 import { useWireUpdates } from '@/hooks/useWireUpdates';
 import { useConnectorManagement } from '@/hooks/useConnectorManagement';
+import { getInteractionRegion } from '@/types/connector';
 import Konva from 'konva';
 
 interface BaseComponentProps {
@@ -134,7 +135,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         const hoveredConnector = connectors[hoveredConnectorID];
         if (!hoveredConnector) return null;
 
-        const region = hoveredConnector.getInteractionRegion({ x: 0, y: 0 }, dimensions);
+        const region = getInteractionRegion(hoveredConnector, { x: 0, y: 0 }, dimensions);
 
         return (
             <Rect

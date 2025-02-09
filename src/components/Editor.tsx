@@ -1,18 +1,16 @@
 import { ToolBar } from '@/components/topbars/ToolBar';
 import { SimSideBar } from '@/components/sidebars/SimSideBar';
 import { Canvas } from '@/components/Canvas';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import Konva from 'konva';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 10;
 const SCALE_BY = 1.05;
 
-export const Editor: React.FC = () => {
+export const Editor: React.FC<{stageRef: React.RefObject<Konva.Stage>}> = ({stageRef}) => {
     const [scale, setScale] = useState<number>(5);
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-
-    const stageRef = useRef<Konva.Stage>(null);
 
     const handleZoom = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
@@ -53,7 +51,7 @@ export const Editor: React.FC = () => {
     }, []);
 
     const handleZoomReset = useCallback(() => {
-        setScale(1);
+        setScale(5);
         setPosition({ x: 0, y: 0 });
     }, []);
 

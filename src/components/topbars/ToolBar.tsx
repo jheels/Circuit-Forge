@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useSimulatorContext } from "@/context/SimulatorContext"
+import { useSaveContext } from "@/context/SaveContext"
+import { Clock } from 'lucide-react';
 import { ConfirmationDialog } from "@/components/dialogs/ConfirmationDialog"
 import {
     Menubar,
@@ -17,6 +19,7 @@ interface DropdownItem {
     label?: string
     shortcut?: string
     isSeparator?: boolean
+    disabled?: boolean
     onClick?: () => void
 }
 
@@ -31,6 +34,26 @@ interface ToolBarProps {
     onZoomReset: () => void;
 }
 
+// Save status indicator component
+const SaveIndicator: React.FC = () => {
+    const { hasUnsavedChanges, currentProject } = useSaveContext();
+
+    return (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {hasUnsavedChanges ? (
+                <span className="text-yellow-500 font-semibold">Unsaved changes</span>
+            ) : currentProject?.metadata.lastSaved ? (
+                <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4 text-green-500" strokeWidth={3} />
+                    <span className="text-green-500 font-semibold">
+                        {`Saved ${new Date(currentProject.metadata.lastSaved).toLocaleTimeString()}`}
+                    </span>
+                </div>
+            ) : null}
+        </div>
+    );
+};
+
 function ToolBarDropdown({ label, items }: ToolBarDropdownProps) {
     return (
         <MenubarMenu>
@@ -40,7 +63,7 @@ function ToolBarDropdown({ label, items }: ToolBarDropdownProps) {
                     item.isSeparator ? (
                         <MenubarSeparator key={index} />
                     ) : (
-                        <MenubarItem key={index} onSelect={item.onClick}>
+                        <MenubarItem key={index} onSelect={item.onClick} disabled={item.disabled}>
                             {item.label}
                             {item.shortcut && <MenubarShortcut>{item.shortcut}</MenubarShortcut>}
                         </MenubarItem>
@@ -51,8 +74,26 @@ function ToolBarDropdown({ label, items }: ToolBarDropdownProps) {
     )
 }
 
+const usePreventUnloadWithUnsavedChanges = (hasUnsavedChanges: boolean) => {
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (hasUnsavedChanges) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [hasUnsavedChanges]);
+};
+
 export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     const { projectName, setProjectName, resetProject } = useSimulatorContext();
+    const { saveProject, exportProjectAsImage, loadProject, hasUnsavedChanges, currentFileHandle, setCurrentFileHandle } = useSaveContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
@@ -101,8 +142,31 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     }
 
     const confirmNewProject = () => {
+        setCurrentFileHandle(null);
         resetProject()
         setIsAlertDialogOpen(false)
+    }
+
+    const handleSave = async () => {
+        const result = await saveProject();
+        if (!result.success) {
+            console.error(result.error);
+        }
+    }
+
+    const handleSaveAs = async () => {
+        const result = await saveProject(true);
+        if (!result.success) {
+            console.error(result.error);
+        }
+    }
+
+    const handleExportAsImage = async () => {
+        await exportProjectAsImage();
+    }
+
+    const handleLoadProject = async () => {
+        await loadProject();
     }
 
     const menuItems = [
@@ -110,11 +174,12 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
             label: "File",
             items: [
                 { label: "New Project", shortcut: "⌘N", onClick: handleNewProject },
-                { label: "Save", shortcut: "⌘S" },
-                { label: "Save As", shortcut: "⇧⌘S" },
+                { label: "Load Project", shortcut: "⌘L", onClick: handleLoadProject },
                 { isSeparator: true },
-                { label: "Export", shortcut: "⌘E" },
-                { label: "Import", shortcut: "⌘I" },
+                { label: "Save", shortcut: "⌘S", onClick: handleSave, disabled: !hasUnsavedChanges || !currentFileHandle },
+                { label: "Save As", shortcut: "⌘⇧S", onClick: handleSaveAs },
+                { isSeparator: true },
+                { label: "Export as PNG", shortcut: "", onClick: handleExportAsImage },
             ],
         },
         {
@@ -146,6 +211,8 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         },
     ]
 
+    usePreventUnloadWithUnsavedChanges(hasUnsavedChanges);
+
     return (
         <div className="bg-white text-foreground flex justify-between items-center shadow-md z-10">
             <Menubar className="border-none shadow-none">
@@ -154,6 +221,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                 ))}
             </Menubar>
             <div className="flex items-center space-x-4 pr-3">
+            <SaveIndicator />
                 {isEditingName ? (
                     <Input
                         ref={inputRef}

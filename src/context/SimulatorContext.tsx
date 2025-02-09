@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
 import { EditorComponent, Point, Wire } from '@/types/general';
 import { createLEDComponent } from "@/types/components/led";
 import { createResistorComponent } from "@/types/components/resistor";
@@ -9,7 +9,6 @@ import { Connection } from "@/types/connection";
 
 interface SimulatorContextType {
     projectName: string;
-    saveStatus: { isSaved: boolean; lastSaved: Date | null };
     components: Record<string, EditorComponent>;
     componentCounts: Record<string, number>;
     selectedComponent: string | null;
@@ -21,7 +20,6 @@ interface SimulatorContextType {
     connections: Record<string, Connection>;
     connectorConnections: Record<string, Set<string>>;
     setProjectName: (name: string) => void;
-    setSaveStatus: (status: { isSaved: boolean; lastSaved: Date | null }) => void;
     createComponent: (type: string, position: Point) => EditorComponent;
     addComponent: (component: EditorComponent) => void;
     removeComponent: (editorID: string) => void;
@@ -34,6 +32,7 @@ interface SimulatorContextType {
     setHoveredConnectorID: (id: string | null) => void;
     setSelectedComponent: (id: string | null) => void;
     setSelectedWire: (id: string | null) => void;
+    setComponentCounts: (counts: Record<string, number>) => void;
     setClickedConnector: (connector: Connector | null) => void;
     addConnection: (connection: Connection) => void;
     removeConnection: (connectionID: string) => void;
@@ -55,7 +54,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [projectName, setProjectName] = useState<string>(() => {
         return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
     });
-    const [saveStatus, setSaveStatus] = useState<{ isSaved: boolean; lastSaved: Date | null }>({ isSaved: false, lastSaved: null });
     const [components, setComponents] = useState<Record<string, EditorComponent>>({});
     const [componentCounts, setComponentCounts] = useState<Record<string, number>>({});
     const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
@@ -66,10 +64,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connections, setConnections] = useState<Record<string, Connection>>({});
     const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
-
-    useEffect(() => {
-        localStorage.setItem('simulatorProjectName', projectName);
-    }, [projectName]);
 
     const addConnection = (connection: Connection) => {
         setConnections((prev) => ({
@@ -240,7 +234,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
 
     const resetProject = () => {
         setProjectName('Untitled Project');
-        setSaveStatus({ isSaved: false, lastSaved: null });
         setComponents({});
         setSelectedComponent(null);
         setSelectedWire(null);
@@ -256,7 +249,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     return (
         <SimulatorContext.Provider value={{
             projectName,
-            saveStatus,
             components,
             componentCounts,
             selectedComponent,
@@ -268,7 +260,6 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             connections,
             connectorConnections,
             setProjectName,
-            setSaveStatus,
             createComponent,
             addComponent,
             removeComponent,
@@ -280,6 +271,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             setCreatingWire,
             setHoveredConnectorID,
             setClickedConnector,
+            setComponentCounts,
             setSelectedComponent,
             setSelectedWire,
             resetProject,
