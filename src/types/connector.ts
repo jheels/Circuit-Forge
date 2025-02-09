@@ -48,16 +48,15 @@ export const getInteractionRegion = (
     connector: Connector,
     componentPosition: Point,
     dimensions: { width: number; height: number },
-    hitAreaSize: number = 2.5
 ): ConnectorRegion => {
     const x = componentPosition.x + (connector.offset.x * dimensions.width);
     const y = componentPosition.y + (connector.offset.y * dimensions.height);
 
     return {
-        x: x - hitAreaSize / 2,
-        y: y - hitAreaSize / 2,
-        width: hitAreaSize,
-        height: hitAreaSize
+        x: x - connector.hitAreaSize / 2,
+        y: y - connector.hitAreaSize / 2,
+        width: connector.hitAreaSize,
+        height: connector.hitAreaSize
     };
 };
 

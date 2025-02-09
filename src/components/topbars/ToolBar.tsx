@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useSimulatorContext } from "@/context/SimulatorContext"
@@ -79,7 +79,6 @@ const usePreventUnloadWithUnsavedChanges = (hasUnsavedChanges: boolean) => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (hasUnsavedChanges) {
                 event.preventDefault();
-                event.returnValue = '';
             }
         };
 
@@ -129,17 +128,17 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }
 
-    const onDocumentationClick = () => {
+    const onDocumentationClick = useCallback(() => {
         window.open("https://circuit-forge.gitbook.io/circuit-forge", "_blank")
-    }
+    }, []);
 
     const onAboutClick = () => {
         window.open("https://github.com/jheels/Circuit-Forge", "_blank")
     }
 
-    const handleNewProject = () => {
-        setIsAlertDialogOpen(true)
-    }
+    const handleNewProject = useCallback(() => {
+        setIsAlertDialogOpen(true);
+    }, []);
 
     const confirmNewProject = () => {
         setCurrentFileHandle(null);
@@ -147,46 +146,101 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         setIsAlertDialogOpen(false)
     }
 
-    const handleSave = async () => {
+    const handleSave = useCallback(async () => {
         const result = await saveProject();
         if (!result.success) {
             console.error(result.error);
         }
-    }
+    }, [saveProject]);
 
-    const handleSaveAs = async () => {
+    const handleSaveAs = useCallback(async () => {
         const result = await saveProject(true);
         if (!result.success) {
             console.error(result.error);
         }
-    }
+    }, [saveProject]);
 
-    const handleExportAsImage = async () => {
+    const handleExportAsImage = useCallback(async () => {
         await exportProjectAsImage();
-    }
+    }, [exportProjectAsImage]);
 
-    const handleLoadProject = async () => {
+    const handleLoadProject = useCallback(async () => {
         await loadProject();
-    }
+    }, [loadProject]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'n':
+                        if (e.shiftKey) {
+                        e.preventDefault();
+                        handleNewProject();
+                        }
+                        break;
+                    case 'l':
+                        e.preventDefault();
+                        handleLoadProject();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            handleSaveAs();
+                        } else if (hasUnsavedChanges && currentFileHandle) {
+                            handleSave();
+                        } else {
+                            console.log("You must use 'Save As' first.");
+                        }
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        handleExportAsImage();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        onDocumentationClick();
+                        break;
+                    case '=':
+                        e.preventDefault();
+                        onZoomIn();
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        onZoomOut();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        onZoomReset();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [handleNewProject, handleLoadProject, handleSaveAs, handleSave, handleExportAsImage, onDocumentationClick, onZoomIn, onZoomOut, onZoomReset, hasUnsavedChanges, currentFileHandle]);
 
     const menuItems = [
         {
             label: "File",
             items: [
-                { label: "New Project", shortcut: "⌘N", onClick: handleNewProject },
+                { label: "New Project", shortcut: "⌘⇧N", onClick: handleNewProject },
                 { label: "Load Project", shortcut: "⌘L", onClick: handleLoadProject },
                 { isSeparator: true },
                 { label: "Save", shortcut: "⌘S", onClick: handleSave, disabled: !hasUnsavedChanges || !currentFileHandle },
                 { label: "Save As", shortcut: "⌘⇧S", onClick: handleSaveAs },
                 { isSeparator: true },
-                { label: "Export as PNG", shortcut: "", onClick: handleExportAsImage },
+                { label: "Export as PNG", shortcut: "⌘E", onClick: handleExportAsImage },
             ],
         },
         {
             label: "Edit",
             items: [
                 { label: "Undo", shortcut: "⌘Z" },
-                { label: "Redo", shortcut: "⇧⌘Z" },
+                { label: "Redo", shortcut: "⌘⇧Z" },
                 { isSeparator: true },
                 { label: "Cut", shortcut: "⌘X" },
                 { label: "Copy", shortcut: "⌘C" },
@@ -205,7 +259,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         {
             label: "Help",
             items: [
-                { label: "Documentation", shortcut: "F1", onClick: onDocumentationClick },
+                { label: "Documentation", shortcut: "⌘D", onClick: onDocumentationClick },
                 { label: "About", onClick: onAboutClick },
             ],
         },
@@ -221,7 +275,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                 ))}
             </Menubar>
             <div className="flex items-center space-x-4 pr-3">
-            <SaveIndicator />
+                <SaveIndicator />
                 {isEditingName ? (
                     <Input
                         ref={inputRef}
