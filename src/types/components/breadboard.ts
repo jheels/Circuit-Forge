@@ -162,6 +162,7 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
         editorID,
         type: 'breadboard',
         dimensions,
+        rotation: 0,
         position,
         properties: createDefaultProperties('breadboard', name),
         connectors,

@@ -49,7 +49,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
 
     // Get component details
     const component = components[componentID];
-    const { position, connectors, dimensions } = component;
+    const { position, connectors, dimensions, rotation = 0 } = component;
 
     const updateWirePositions = useWireUpdates(
         connectors,
@@ -57,7 +57,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         getConnectorConnections,
         connections,
         wires,
-        updateWire
+        updateWire,
     );
 
     const {
@@ -129,7 +129,6 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         }));
     }, [snapState, updateConnectionsOnDrop, setSnapState]);
 
-
     const renderedConnectors = useMemo(() => {
         if (!hoveredConnectorID) return null;
         const hoveredConnector = connectors[hoveredConnectorID];
@@ -164,7 +163,9 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             x={position.x}
             y={position.y}
         >
-            {children}
+            <Group rotation={rotation}>
+                {children}
+            </Group>
             {renderedConnectors}
         </Group>
     );

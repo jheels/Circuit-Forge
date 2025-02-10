@@ -44,3 +44,17 @@ export const calculateDistance = (point1: Point, point2: Point): number => {
         Math.pow(point1.y - point2.y, 2)
     );
 };
+
+export const rotatePoint = (point: Point, origin: Point, angle: number): Point => {
+    const radians = (angle * Math.PI) / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    
+    const dx = point.x - origin.x;
+    const dy = point.y - origin.y;
+    
+    return {
+        x: origin.x + (dx * cos - dy * sin),
+        y: origin.y + (dx * sin + dy * cos)
+    };
+};

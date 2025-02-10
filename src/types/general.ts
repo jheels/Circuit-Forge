@@ -17,6 +17,7 @@ export interface EditorComponent {
     readonly editorID: string;
     readonly type: string;
     dimensions: { width: number; height: number };
+    rotation: number;
     position: Point;
     properties: Record<string, PropertyValue>;
     connectors: Record<string, Connector>;

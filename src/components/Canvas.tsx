@@ -33,9 +33,12 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         componentCounts,
         wires,
         creatingWire,
+        removeWire,
         updateWire,
         setHoveredConnectorID,
         selectedWire,
+        setCreatingWire,
+        setClickedConnector,
         setSelectedWire,
     } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
@@ -104,8 +107,13 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         if (e.key === 'Backspace' && selectedComponent) {
             removeComponent(selectedComponent);
             setSelectedComponent(null);
+            if (creatingWire) {
+                removeWire(creatingWire.id);
+                setCreatingWire(null);
+                setClickedConnector(null);
+            }
         }
-    }, [removeComponent, selectedComponent, setSelectedComponent]);
+    }, [creatingWire, removeComponent, removeWire, selectedComponent, setClickedConnector, setCreatingWire, setSelectedComponent]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleComponentDeletion);

@@ -5,6 +5,7 @@ import { useSimulatorContext } from "@/context/SimulatorContext"
 import { useSaveContext } from "@/context/SaveContext"
 import { Clock } from 'lucide-react';
 import { ConfirmationDialog } from "@/components/dialogs/ConfirmationDialog"
+import { RotationControls } from "../RotationControls"
 import {
     Menubar,
     MenubarContent,
@@ -274,6 +275,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                     <ToolBarDropdown key={index} label={menu.label} items={menu.items} />
                 ))}
             </Menubar>
+            <RotationControls />
             <div className="flex items-center space-x-4 pr-3">
                 <SaveIndicator />
                 {isEditingName ? (

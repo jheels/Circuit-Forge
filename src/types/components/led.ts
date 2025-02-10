@@ -16,6 +16,7 @@ export const createLEDComponent = (position: Point, name: string): LEDComponent 
         editorID: editorID,
         type: 'led',
         dimensions: { width: 15, height: 25 },
+        rotation: 0,
         position: position,
         properties: createDefaultProperties('led', name),
         connectors: {

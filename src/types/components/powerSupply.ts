@@ -17,6 +17,7 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
         editorID: editorID,
         type: "power-supply",
         properties: createDefaultProperties("power-supply", name),
+        rotation: 0,
         position: position,
         dimensions: { width: 60, height: 50 },
         connectors: {
