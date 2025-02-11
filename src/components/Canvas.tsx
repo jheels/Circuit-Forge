@@ -94,8 +94,8 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
-        if (item.sidebarID == 'breadboard' && componentCounts[item.sidebarID] > 0) {
-            console.warn('max 1 breadboard');
+        if ((item.sidebarID == 'breadboard' || item.sidebarID == 'power-supply') && componentCounts[item.sidebarID] > 0) {
+            console.warn('max 1 breadboard or power supply');
             return;
         }
         const newComponent = createComponent(item.sidebarID, { x: dropX, y: dropY });

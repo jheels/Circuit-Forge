@@ -74,6 +74,10 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         if (!selectedComponent || !components[selectedComponent]) return;
 
         const componentToCopy = components[selectedComponent];
+        if (componentToCopy.type === 'breadboard' || componentToCopy.type === 'power-supply') {
+            console.log('Cannot copy breadboard or power supply components');
+            return;
+        }
         setClipboardComponent(componentToCopy);
         console.log('Copied component to clipboard:', componentToCopy);
     };
@@ -82,6 +86,10 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         if (!selectedComponent || !components[selectedComponent]) return;
 
         const componentToCut = components[selectedComponent];
+        if (componentToCut.type === 'breadboard' || componentToCut.type === 'power-supply') {
+            console.log('Cannot copy breadboard or power supply components');
+            return;
+        }
         setClipboardComponent(componentToCut);
         removeComponent(selectedComponent);
         setSelectedComponent(null);
@@ -287,6 +295,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         setClickedConnector(null);
         setConnections({});
         setConnectorConnections({});
+        setClipboardComponent(null);
     }
 
     return (
