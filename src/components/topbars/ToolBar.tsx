@@ -93,7 +93,7 @@ const usePreventUnloadWithUnsavedChanges = (hasUnsavedChanges: boolean) => {
 };
 
 export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
-    const { projectName, setProjectName, resetProject } = useSimulatorContext();
+    const { projectName, setProjectName, resetProject, selectedComponent, clipboardComponent, copySelectedComponent, cutSelectedComponent, pasteClipboardComponent } = useSimulatorContext();
     const { saveProject, exportProjectAsImage, loadProject, hasUnsavedChanges, currentFileHandle, setCurrentFileHandle } = useSaveContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
@@ -197,6 +197,18 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                             console.log("You must use 'Save As' first.");
                         }
                         break;
+                    case 'x':
+                        e.preventDefault();
+                        if (selectedComponent) cutSelectedComponent();
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        if (selectedComponent) copySelectedComponent();
+                        break;
+                    case 'v':
+                        e.preventDefault();
+                        if (clipboardComponent) pasteClipboardComponent();
+                        break;
                     case 'e':
                         e.preventDefault();
                         handleExportAsImage();
@@ -226,7 +238,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [handleNewProject, handleLoadProject, handleSaveAs, handleSave, handleExportAsImage, onDocumentationClick, onZoomIn, onZoomOut, onZoomReset, hasUnsavedChanges, currentFileHandle]);
+    }, [handleNewProject, handleLoadProject, handleSaveAs, handleSave, handleExportAsImage, onDocumentationClick, onZoomIn, onZoomOut, onZoomReset, hasUnsavedChanges, currentFileHandle, selectedComponent, cutSelectedComponent, copySelectedComponent, clipboardComponent, pasteClipboardComponent]);
 
     const menuItems = [
         {
@@ -247,9 +259,9 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                 { label: "Undo", shortcut: shortcutSymbol + "Z" },
                 { label: "Redo", shortcut: shortcutSymbol + "⇧Z" },
                 { isSeparator: true },
-                { label: "Cut", shortcut: shortcutSymbol + "X" },
-                { label: "Copy", shortcut: shortcutSymbol + "C" },
-                { label: "Paste", shortcut: shortcutSymbol + "V" },
+                { label: "Cut", shortcut: shortcutSymbol + "X", onClick: cutSelectedComponent, disabled: !selectedComponent },
+                { label: "Copy", shortcut: shortcutSymbol + "C", onClick: copySelectedComponent, disabled: !selectedComponent },
+                { label: "Paste", shortcut: shortcutSymbol + "V", onClick: pasteClipboardComponent, disabled: !clipboardComponent },
             ],
         },
         {

@@ -8,6 +8,7 @@ import { Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/types/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
+import { Group } from 'lucide-react';
 
 interface LEDProps {
     componentID: string;
@@ -16,8 +17,8 @@ interface LEDProps {
 export const LED: React.FC<LEDProps> = ({
     componentID,
 }) => {
-    const component = useSimulatorContext().components[componentID] as LEDComponent;
-    const { properties, dimensions } = component;
+    const { selectedComponent, components } = useSimulatorContext()
+    const { properties, dimensions } = components[componentID] as LEDComponent;
     return (
         <BaseComponent
             componentID={componentID}
@@ -54,6 +55,7 @@ export const LED: React.FC<LEDProps> = ({
             <Shape
                 sceneFunc={(context, shape) => {
                     context.beginPath();
+                    // Draw the arc
                     context.arc(
                         0.5,
                         0,
@@ -62,16 +64,17 @@ export const LED: React.FC<LEDProps> = ({
                         0, // end angle (ends at 0)
                         false // counterclockwise drawing
                     );
-                    // make a rect
-                    context.rect(
-                        -dimensions.width / 4,
-                        0,
-                        dimensions.width / 2 + 1, // width of the rectangle
-                        dimensions.height / 3 // height of the rectangle
-                    );
+                    // Draw the rectangle
+                    context.lineTo(dimensions.width / 4 + 1, 0);
+                    context.lineTo(dimensions.width / 4 + 1, dimensions.height / 3);
+                    context.lineTo(-dimensions.width / 4, dimensions.height / 3);
+                    context.lineTo(-dimensions.width / 4, 0);
                     context.closePath();
                     context.fillStrokeShape(shape);
                 }}
+                stroke={'rgba(143,217,251, 0.5)'}
+                strokeEnabled={selectedComponent === componentID}
+                strokeWidth={0.75}
                 fill={properties.colour}
                 opacity={properties.isIlluminated ? 1 : 0.5}
             />
@@ -82,7 +85,6 @@ export const LED: React.FC<LEDProps> = ({
                 height={dimensions.height / 12 + 0.25}
                 fill={properties.colour}
             />
-            {/* Cathode (straight leg) */}
         </BaseComponent>
     )
 }

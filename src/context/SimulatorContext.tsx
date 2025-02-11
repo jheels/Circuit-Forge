@@ -19,6 +19,10 @@ interface SimulatorContextType {
     clickedConnector: Connector | null;
     connections: Record<string, Connection>;
     connectorConnections: Record<string, Set<string>>;
+    clipboardComponent: EditorComponent | null;
+    copySelectedComponent: () => void;
+    cutSelectedComponent: () => void;
+    pasteClipboardComponent: () => void;
     setProjectName: (name: string) => void;
     createComponent: (type: string, position: Point) => EditorComponent;
     addComponent: (component: EditorComponent) => void;
@@ -64,6 +68,45 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connections, setConnections] = useState<Record<string, Connection>>({});
     const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
+    const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
+
+    const copySelectedComponent = () => {
+        if (!selectedComponent || !components[selectedComponent]) return;
+
+        const componentToCopy = components[selectedComponent];
+        setClipboardComponent(componentToCopy);
+        console.log('Copied component to clipboard:', componentToCopy);
+    };
+
+    const cutSelectedComponent = () => {
+        if (!selectedComponent || !components[selectedComponent]) return;
+
+        const componentToCut = components[selectedComponent];
+        setClipboardComponent(componentToCut);
+        removeComponent(selectedComponent);
+        setSelectedComponent(null);
+        console.log('Cut component to clipboard:', componentToCut);
+    };
+
+    const pasteClipboardComponent = () => {
+        if (!clipboardComponent) return;
+
+        const OFFSET_DISTANCE = 20;
+        const { position } = clipboardComponent;
+        const newPosition = { x: position.x + OFFSET_DISTANCE, y: position.y + OFFSET_DISTANCE };
+        const newName = `${clipboardComponent.properties.name} Copy`;
+        const newComponent = createComponent(clipboardComponent.type, newPosition);
+
+        const updatedProperties = {
+            ...clipboardComponent.properties,
+            name: newName
+        }
+        newComponent.properties = updatedProperties;
+
+        addComponent(newComponent);
+        setSelectedComponent(newComponent.editorID);
+        console.log('Pasted component from clipboard:', newComponent);
+    };
 
     const addConnection = (connection: Connection) => {
         setConnections((prev) => ({
@@ -259,6 +302,10 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             clickedConnector,
             connections,
             connectorConnections,
+            clipboardComponent,
+            copySelectedComponent,
+            cutSelectedComponent,
+            pasteClipboardComponent,
             setProjectName,
             createComponent,
             addComponent,

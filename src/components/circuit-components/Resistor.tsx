@@ -71,7 +71,7 @@ const calculateColorBands = (value: number, unit: string): [string, string, stri
 };
 
 export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
-    const { components } = useSimulatorContext();
+    const { components, selectedComponent } = useSimulatorContext();
     const component = components[componentID] as ResistorComponent;
 
     if (!component) {
@@ -120,8 +120,10 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
                 height={dimensions.height}
                 fill={bodyColor}
                 cornerRadius={dimensions.height / 4}
+                stroke={'rgba(143,217,251, 0.5)'}
+                strokeEnabled={selectedComponent === componentID}
+                strokeWidth={0.5}
             />
-
             {/* Color bands */}
             <Group x={dimensions.width / 5}>
                 {colorBands.map((color, index) => (
