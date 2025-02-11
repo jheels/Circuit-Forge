@@ -15,6 +15,7 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
+import { getOS } from "@/lib/utils"
 
 interface DropdownItem {
     label?: string
@@ -99,6 +100,9 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
     const MAX_LENGTH = 20
+    const OS = getOS();
+
+    const shortcutSymbol = OS === "mac" ? "⌘" : "Ctrl ";
 
     useEffect(() => {
         if (isEditingName && inputRef.current) {
@@ -228,39 +232,39 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         {
             label: "File",
             items: [
-                { label: "New Project", shortcut: "⌘⇧N", onClick: handleNewProject },
-                { label: "Load Project", shortcut: "⌘L", onClick: handleLoadProject },
+                { label: "New Project", shortcut: shortcutSymbol + "⇧N", onClick: handleNewProject },
+                { label: "Load Project", shortcut: shortcutSymbol + "L", onClick: handleLoadProject },
                 { isSeparator: true },
-                { label: "Save", shortcut: "⌘S", onClick: handleSave, disabled: !hasUnsavedChanges || !currentFileHandle },
-                { label: "Save As", shortcut: "⌘⇧S", onClick: handleSaveAs },
+                { label: "Save", shortcut: shortcutSymbol + "S", onClick: handleSave, disabled: !hasUnsavedChanges || !currentFileHandle },
+                { label: "Save As", shortcut: shortcutSymbol+ "⇧S", onClick: handleSaveAs },
                 { isSeparator: true },
-                { label: "Export as PNG", shortcut: "⌘E", onClick: handleExportAsImage },
+                { label: "Export as PNG", shortcut: shortcutSymbol + "E", onClick: handleExportAsImage },
             ],
         },
         {
             label: "Edit",
             items: [
-                { label: "Undo", shortcut: "⌘Z" },
-                { label: "Redo", shortcut: "⌘⇧Z" },
+                { label: "Undo", shortcut: shortcutSymbol + "Z" },
+                { label: "Redo", shortcut: shortcutSymbol + "⇧Z" },
                 { isSeparator: true },
-                { label: "Cut", shortcut: "⌘X" },
-                { label: "Copy", shortcut: "⌘C" },
-                { label: "Paste", shortcut: "⌘V" },
+                { label: "Cut", shortcut: shortcutSymbol + "X" },
+                { label: "Copy", shortcut: shortcutSymbol + "C" },
+                { label: "Paste", shortcut: shortcutSymbol + "V" },
             ],
         },
         {
             label: "View",
             items: [
-                { label: "Zoom In", shortcut: "⌘+", onClick: onZoomIn },
-                { label: "Zoom Out", shortcut: "⌘-", onClick: onZoomOut },
+                { label: "Zoom In", shortcut: shortcutSymbol + "+", onClick: onZoomIn },
+                { label: "Zoom Out", shortcut: shortcutSymbol + "-", onClick: onZoomOut },
                 { isSeparator: true },
-                { label: "Reset Zoom", shortcut: "⌘0", onClick: onZoomReset },
+                { label: "Reset Zoom", shortcut: shortcutSymbol + "0", onClick: onZoomReset },
             ],
         },
         {
             label: "Help",
             items: [
-                { label: "Documentation", shortcut: "⌘D", onClick: onDocumentationClick },
+                { label: "Documentation", shortcut: shortcutSymbol + "D", onClick: onDocumentationClick },
                 { label: "About", onClick: onAboutClick },
             ],
         },

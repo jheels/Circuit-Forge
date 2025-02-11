@@ -58,3 +58,12 @@ export const rotatePoint = (point: Point, origin: Point, angle: number): Point =
         y: origin.y + (dx * sin + dy * cos)
     };
 };
+
+export const getOS = () => {
+    const platform = navigator.userAgent.toLowerCase();
+    console.log(platform);
+    if (platform.includes("mac")) return "mac";
+    if (platform.includes("linux")) return "linux";
+    if (platform.includes("win")) return "windows";
+    return "unknown";
+};
