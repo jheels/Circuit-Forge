@@ -90,7 +90,8 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         removeConnection,
         setCreatingWire,
         setClickedConnector,
-        addWire
+        addWire,
+        getConnectorConnections
     );
 
     // Handle component selection

@@ -14,7 +14,7 @@ import Konva from 'konva';
 
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
-    const { wires, components, updateWire, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID, connections, removeConnection, addConnection } = useSimulatorContext();
+    const { wires, components, updateWire, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID, connections, removeConnection, addConnection, getConnectorConnections } = useSimulatorContext();
     const wire = wires[wireID];
     const [isHovered, setIsHovered] = useState(false);
     const [draggingEnd, setDraggingEnd] = useState<null | { index: 0 | 1; oldPoint: Point }>(null);
@@ -80,6 +80,12 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 const conn = connectors[connectorKey];
                 if (!isPointInConnector(dropPoint, conn, position, dimensions)) continue;
 
+                const connectorConnections = getConnectorConnections(conn.id);
+                if (connectorConnections.size > 0) {
+                    console.log('Cannot connect to connector with existing connections');
+                    break;
+                }
+
                 const newPos = getConnectorPosition(conn, position, dimensions);
 
                 const newPoints = [...wire.points];
@@ -114,7 +120,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
             updateWire(wireID, { points: newPoints });
         }
         setDraggingEnd(null);
-    }, [draggingEnd, connections, wireID, components, wire.points, updateWire, removeConnection, addConnection]);
+    }, [draggingEnd, connections, wireID, components, getConnectorConnections, wire.points, updateWire, removeConnection, addConnection]);
 
     return (
         <>

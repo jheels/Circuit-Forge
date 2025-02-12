@@ -6,11 +6,11 @@ import { createWireConnection, createDirectConnection, Connection, createStripCo
 import { ConnectorPair, SnapState } from './useSnapManagement';
 import { BreadboardComponent } from '@/types/components/breadboard';
 
-const isBreadboard = (component: EditorComponent): boolean => {
+export const isBreadboard = (component: EditorComponent): boolean => {
     return component.type === 'breadboard';
 }
 
-const getStripID = (breadboard: BreadboardComponent, connector: Connector) => {
+export const getStripID = (breadboard: BreadboardComponent, connector: Connector) => {
     if (!isBreadboard(breadboard)) return '';
     const stripID = breadboard.stripMapping.connectorToStrip[connector.id];
 
@@ -49,14 +49,25 @@ export const useConnectorManagement = (
     removeConnection: (id: string) => void,
     setCreatingWire: (wire: Wire | null) => void,
     setClickedConnector: (connector: Connector | null) => void,
-    addWire: (wire: Wire) => void
+    addWire: (wire: Wire) => void,
+    getConnectorConnections: (connectorID: string) => Set<string>
 ) => {
     const handleConnectorClick = useCallback((connectorID: string) => {
+        const connectorConnections = getConnectorConnections(connectorID);
+        if (connectorConnections.size > 0) {
+            console.log('Cannot connect to connector with existing connections');
+            return;
+        }
+
         const connector = connectors[connectorID];
         const connectorPosition = getConnectorPosition(connector, position, dimensions);
         setSelectedWire(null);
 
         if (creatingWire) {
+            if (creatingWire.startConnectorID === connectorID) {
+                console.log('Cannot connect wire to same connector');
+                return;
+            }
             if (clickedConnector && validateConnection(clickedConnector, connector)) {
                 updateWire(creatingWire.id, { 
                     endConnectorID: connectorID, 
@@ -80,19 +91,7 @@ export const useConnectorManagement = (
             addWire(newWire);
             setClickedConnector(connector);
         }
-    }, [
-        connectors,
-        position,
-        dimensions,
-        creatingWire,
-        clickedConnector,
-        setSelectedWire,
-        updateWire,
-        addConnection,
-        setCreatingWire,
-        setClickedConnector,
-        addWire
-    ]);
+    }, [getConnectorConnections, connectors, position, dimensions, setSelectedWire, creatingWire, clickedConnector, updateWire, addConnection, setCreatingWire, setClickedConnector, addWire]);
 
     const updateConnectionsOnDrop = useCallback((snapState: SnapState) => {
         snapState.connectionIDs.forEach((connectionID: string) => {
