@@ -23,8 +23,8 @@ export interface PowerSupplyComponent extends EditorComponent {
 
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     const editorID = `PowerSupply-${uuidv4()}`;
-    const positiveConnector = createConnector(editorID, 'positive', { x: 1/3, y: 6/5 });
-    const groundConnector = createConnector(editorID, 'negative', { x: 2/3, y: 6/5 });
+    const groundConnector = createConnector(editorID, 'negative', { x: 1/3, y: 4/3 });
+    const positiveConnector = createConnector(editorID, 'positive', { x: 2/3, y: 4/3 });
 
     return {
         editorID: editorID,
@@ -32,10 +32,10 @@ export const createPowerSupplyComponent = (position: Point, name: string): Power
         properties: createDefaultProperties("power-supply", name),
         rotation: 0,
         position: position,
-        dimensions: { width: 60, height: 50 },
+        dimensions: { width: 15, height: 15 },
         connectors: {
-            [positiveConnector.id]: positiveConnector,
             [groundConnector.id]: groundConnector,
+            [positiveConnector.id]: positiveConnector,
         },
     };
 };

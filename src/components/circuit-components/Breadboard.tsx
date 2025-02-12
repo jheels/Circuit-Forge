@@ -8,15 +8,12 @@ import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH, BOARD_ROWS } f
 const CONNECTOR_COLORS = {
     positive: {
         outer: '#ff9999',
-        inner: '#dd7777'
     },
     negative: {
         outer: '#99ccff',
-        inner: '#77aadd'
     },
     bidirectional: {
         outer: '#e0e0e0',
-        inner: '#c0c0c0'
     }
 };
 

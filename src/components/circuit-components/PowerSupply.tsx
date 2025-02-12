@@ -1,5 +1,5 @@
 import React from 'react';
-import { Rect, Line } from 'react-konva';
+import { Rect, Line, Text } from 'react-konva';
 import { PowerSupplyComponent } from '@/types/components/powerSupply';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
@@ -27,7 +27,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
         >
             {/* Power Supply Body */}
             <Rect
-
                 width={dimensions.width}
                 height={dimensions.height}
                 fill="gray"
@@ -36,19 +35,35 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
             {/* Power Supply Leads */}
             <Line
                 points={[
-                    20, dimensions.height,
-                    20, dimensions.height+10
+                    5, dimensions.height,
+                    5, dimensions.height + 5
                 ]}
-                stroke="red"
-                strokeWidth={2}
+                stroke="#99ccff"
+                strokeWidth={1}
             />
             <Line
                 points={[
-                    40, dimensions.height,
-                    40, dimensions.height+10
+                    10, dimensions.height,
+                    10, dimensions.height + 5
                 ]}
-                stroke="black"
-                strokeWidth={2}
+                stroke="#ff9999"
+                strokeWidth={1}
+            />
+
+            {/* Labels */}
+            <Text
+                x={3.5}
+                y={10}
+                text="GND"
+                fontSize={1.5}
+                fill='#99ccff'
+            />
+            <Text
+                x={9}
+                y={10}
+                text="+V"
+                fontSize={1.5}
+                fill="#ff9999"
             />
         </BaseComponent>
     );
