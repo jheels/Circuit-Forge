@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Connector } from './connector';
 
-type ConnectionType = 'wire' | 'direct' | 'strip';
+type ConnectionType = 'wire' | 'strip';
 
 interface ConnectionMetadata {
     wireID?: string;
@@ -18,18 +18,6 @@ export interface Connection {
     type: ConnectionType;
     metadata: ConnectionMetadata;
 }
-
-// helper functions
-
-export const createDirectConnection = (sourceConnector: Connector, targetConnector: Connector): Connection => {
-    return {
-        id: `connection-${uuidv4()}`,
-        sourceConnectorID: sourceConnector.id,
-        targetConnectorID: targetConnector.id,
-        type: 'direct',
-        metadata: {},
-    };
-};
 
 export const createWireConnection = (sourceConnector: Connector, targetConnector: Connector, wireID: string): Connection => {
     return {
