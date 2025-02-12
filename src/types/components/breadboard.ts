@@ -28,7 +28,7 @@ export interface BreadboardComponent extends EditorComponent {
 }
 
 const createStrip = (type: ConnectorType, connectorIds: string[]): Strip => ({
-    id: `strip-${uuidv4()}`,
+    id: `${type}-strip-${uuidv4()}`,
     type,
     connectorIds
 });
