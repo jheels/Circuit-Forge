@@ -2,7 +2,6 @@
  * To do:
  * - Checking connector validations on snapping connectors directly
  * - Implement updating circuit series on connections, deletions etc.
- * - Implement serialisation/deserialisation of components for copy/pasting saving/loading
  * - Fix bug where moving the connector that you connected to does not remove a connection (only 1 way)
  */
 

@@ -33,7 +33,7 @@ const createAppropriateConnection = (
         return createStripConnection(sourceConnector, targetConnector, stripID);
     }
 
-    return createDirectConnection(sourceConnector, targetConnector);
+    throw new Error('Invalid connection attempted');
 }
 
 export const useConnectorManagement = (
