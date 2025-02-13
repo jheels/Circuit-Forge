@@ -38,7 +38,7 @@ export const createConnector = (
     offset: ConnectorOffset,
     hitAreaSize: number = 2.5
 ): Connector => ({
-    id: uuidv4(),
+    id: componentID + ':' + uuidv4(),
     componentID,
     type,
     offset,

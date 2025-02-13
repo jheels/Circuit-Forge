@@ -91,7 +91,7 @@ export const useConnectorManagement = (
             addWire(newWire);
             setClickedConnector(connector);
         }
-    }, [getConnectorConnections, connectors, position, dimensions, setSelectedWire, creatingWire, clickedConnector, updateWire, addConnection, setCreatingWire, setClickedConnector, addWire]);
+    }, [getConnectorConnections, connectors, position, dimensions, setSelectedWire, creatingWire, clickedConnector, components, updateWire, addConnection, setCreatingWire, setClickedConnector, addWire]);
 
     const updateConnectionsOnDrop = useCallback((snapState: SnapState) => {
         snapState.connectionIDs.forEach((connectionID: string) => {
