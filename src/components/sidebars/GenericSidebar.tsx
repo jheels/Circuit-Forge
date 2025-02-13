@@ -98,7 +98,7 @@ export function GenericSideBar({ components, showImportChipDialog }: GenericSide
                     </div>
 
                     <div className="p-4 h-[calc(100vh-10rem)] overflow-y-scroll">
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-2">
                             {filteredComponents.map((componentEntry) => (
                                 <DraggableComponent key={componentEntry.sidebarID} component={componentEntry} />
                             ))}
