@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point, Wire } from '@/types/general';
 import { Connector, getConnectorPosition, validateConnection } from '@/types/connector';
-import { createWireConnection, createDirectConnection, Connection, createStripConnection } from '@/types/connection';
+import { createWireConnection, Connection, createStripConnection } from '@/types/connection';
 import { ConnectorPair, SnapState } from './useSnapManagement';
 import { BreadboardComponent } from '@/types/components/breadboard';
 
@@ -68,7 +68,7 @@ export const useConnectorManagement = (
                 console.log('Cannot connect wire to same connector');
                 return;
             }
-            if (clickedConnector && validateConnection(clickedConnector, connector)) {
+            if (clickedConnector && validateConnection(clickedConnector, connector, components)) {
                 updateWire(creatingWire.id, { 
                     endConnectorID: connectorID, 
                     points: [...creatingWire.points, connectorPosition] 

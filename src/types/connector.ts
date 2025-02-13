@@ -4,7 +4,8 @@
  * - Check cathodes
  */
 import { v4 as uuidv4 } from 'uuid';
-import { Point } from './general';
+import { EditorComponent, Point } from './general';
+import { isBreadboard } from '@/hooks/useConnectorManagement';
 
 export const SNAPPING_THRESHOLD = 2.5;
 export const BREAKAWAY_THRESHOLD = 2.5;
@@ -85,7 +86,7 @@ export const getConnectorPosition = (
     };
 };
 
-export const validateConnection = (connector1: Connector, connector2: Connector): boolean => {
+export const validateConnection = (connector1: Connector, connector2: Connector, components: Record<string, EditorComponent>): boolean => {
     const connectionRules: Record<ConnectorType, ConnectorType[]> = {
         'input': ['output', 'bidirectional'],
         'output': ['input', 'bidirectional'],
@@ -96,5 +97,12 @@ export const validateConnection = (connector1: Connector, connector2: Connector)
         'anode': ['positive', 'bidirectional', 'cathode'], // possibly has more but need to check
     }
 
-    return connectionRules[connector1.type].includes(connector2.type);
+    const isValidConnection =  connectionRules[connector1.type].includes(connector2.type);
+
+    const component1 = components[connector1.componentID];
+    const component2 = components[connector2.componentID];
+
+    const HasBreadboardConnection = isBreadboard(component1) || isBreadboard(component2);
+
+    return isValidConnection && HasBreadboardConnection;
 }

@@ -6,9 +6,8 @@
  */
 import { useState, useCallback } from 'react';
 import { Point, EditorComponent } from '@/types/general';
-import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD } from '@/types/connector';
+import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/types/connector';
 import { calculateDistance } from '@/lib/utils';
-import { isBreadboard } from './useConnectorManagement';
 import Konva from 'konva';
 
 export interface SnapState {
@@ -70,10 +69,7 @@ export const useSnapManagement = (
                     const distance = calculateDistance(connectorPosition, otherConnectorPosition);
 
                     if (distance < SNAPPING_THRESHOLD) {
-                        if (!isBreadboard(otherComponent) && !isBreadboard(components[componentID])) {
-                            console.log('direct snapping between components not allowed unless one is a breadboard');
-                            return;
-                        };
+                        if (!validateConnection(connector, otherConnector, components)) return;
                         if (!firstSnap) {
                             firstSnap = {
                                 position: {
