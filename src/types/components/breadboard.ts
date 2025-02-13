@@ -11,7 +11,7 @@ const SECTION_SPACING = PIN_SPACING * 7;
 export const REGULAR_SECTION_WIDTH = (PINS_PER_STRIP + 1) * PIN_SPACING * 2;
 const POWER_RAIL_WIDTH = PIN_SPACING * 2;
 
-interface Strip {
+export interface Strip {
     readonly id: string;
     readonly type: ConnectorType;
     readonly connectorIds: string[];
@@ -20,6 +20,8 @@ interface Strip {
 interface StripMapping {
     connectorToStrip: Record<string, string>;
     strips: Record<string, Strip>;
+    positiveStripIDs: string[];
+    negativeStripIDs: string[];
 }
 
 export interface BreadboardComponent extends EditorComponent {
@@ -49,7 +51,9 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
     const connectors: Record<string, ReturnType<typeof createConnector>> = {};
     const stripMapping: StripMapping = {
         connectorToStrip: {},
-        strips: {}
+        strips: {},
+        positiveStripIDs: [],
+        negativeStripIDs: [],
     };  
 
     const createPinConnector = (
@@ -95,6 +99,8 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
 
         stripMapping.strips[positiveStrip.id] = positiveStrip;
         stripMapping.strips[negativeStrip.id] = negativeStrip;
+        stripMapping.positiveStripIDs.push(positiveStrip.id);
+        stripMapping.negativeStripIDs.push(negativeStrip.id);
 
         // Map connectors to their strips
         positiveConnectors.forEach(id => {
