@@ -2,10 +2,11 @@
  * TODO:
  * - Verify the connection rules
  * - Check cathodes
+ * - remove componentID since its already in the ID 
  */
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point } from './general';
-import { isBreadboard } from '@/hooks/useConnectorManagement';
+import { isBreadboard } from '@/lib/utils';
 
 export const SNAPPING_THRESHOLD = 2.5;
 export const BREAKAWAY_THRESHOLD = 2.5;

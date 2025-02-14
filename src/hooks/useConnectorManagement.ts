@@ -5,10 +5,7 @@ import { Connector, getConnectorPosition, validateConnection } from '@/types/con
 import { createWireConnection, Connection, createStripConnection } from '@/types/connection';
 import { ConnectorPair, SnapState } from './useSnapManagement';
 import { BreadboardComponent } from '@/types/components/breadboard';
-
-export const isBreadboard = (component: EditorComponent): boolean => {
-    return component.type === 'breadboard';
-}
+import { isBreadboard } from '@/lib/utils';
 
 export const getStripID = (breadboard: BreadboardComponent, connector: Connector) => {
     if (!isBreadboard(breadboard)) return '';

@@ -66,3 +66,7 @@ export const getOS = () => {
     if (platform.includes("win")) return "windows";
     return "unknown";
 };
+
+export const isBreadboard = (component: EditorComponent): boolean => {
+    return component.type === 'breadboard';
+}
