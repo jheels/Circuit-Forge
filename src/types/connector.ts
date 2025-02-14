@@ -3,6 +3,7 @@
  * - Verify the connection rules
  * - Check cathodes
  * - remove componentID since its already in the ID 
+ * - move connection validation to the connection.ts file
  */
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point } from './general';

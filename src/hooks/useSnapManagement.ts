@@ -115,7 +115,6 @@ export const useSnapManagement = (
             return;
         }
 
-        // Look for new connections
         const { firstSnap, potentialConnections } = findPotentialConnections(newPosition);
 
         if (firstSnap) {

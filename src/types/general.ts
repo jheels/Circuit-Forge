@@ -25,7 +25,7 @@ export interface EditorComponent {
 
 export interface Wire {
     id: string;
-    startConnectorID: string;
-    endConnectorID: string | null;
+    startConnector: Connector;
+    endConnector: Connector | null;
     points: Point[];
 }

@@ -7,7 +7,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector, getConnectorPosition, validateConnection } from '@/types/connector';
-import { Connection } from '@/types/connection';
+import { Connection, isWireConnection } from '@/types/connection';
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
@@ -69,7 +69,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         let foundConnector = false;
 
         const wireConnection = (Object.values(connections) as Connection[]).find(
-            (connection) => connection.type === 'wire' && connection.metadata.wireID === wireID
+            (connection) => isWireConnection(connection) && connection.metadata.wireID === wireID
         );
         
 
@@ -92,27 +92,27 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 newPoints[index] = newPos;
                 console.log(wire);
                 // needs refactoring for performance.
-                const startConnector = index === 0 ? conn : Object.values(components).find((component) => component.connectors[wire.startConnectorID])?.connectors[wire.startConnectorID];
-                const endConnector = index === 1 ? conn : Object.values(components).find((component) => component.connectors[wire.endConnectorID])?.connectors[wire.endConnectorID];
+                const startConnector = index === 0 ? conn: wire.startConnector;
+                const endConnector = index === 1 ? conn : wire.endConnector;
                 
-                if (!validateConnection(startConnector, endConnector, components)) {
+                if (endConnector && !validateConnection(startConnector, endConnector, components)) {
                     console.log('Invalid connection during wire modification');
                     break;
                 }
                 if (index === 0) {
-                    updateWire(wireID, { startConnectorID: conn.id, points: newPoints });
+                    updateWire(wireID, { startConnector: conn, points: newPoints });
                     // update connection
                     if (wireConnection) {
-                        const newConnection = { ...wireConnection, sourceConnectorID: conn.id };
+                        const newConnection = { ...wireConnection, sourceConnector: conn };
                         removeConnection(wireConnection.id);
                         addConnection(newConnection);
                     }
                 } else {
-                    updateWire(wireID, { endConnectorID: conn.id, points: newPoints });
+                    updateWire(wireID, { endConnector: conn, points: newPoints });
                     if (wireConnection) {
                         const updatedConnection = {
                             ...wireConnection,
-                            targetConnectorID: conn.id
+                            targetConnector: conn
                         };
                         removeConnection(wireConnection.id);
                         addConnection(updatedConnection);

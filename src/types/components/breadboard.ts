@@ -1,7 +1,8 @@
 import { EditorComponent, Point } from '../general';
 import { v4 as uuidv4 } from 'uuid';
-import { createConnector, ConnectorType } from '../connector';
+import { createConnector, ConnectorType, Connector } from '../connector';
 import { createDefaultProperties } from '../properties';
+import { isBreadboard } from '@/lib/utils';
 
 export const PIN_SPACING = 5;
 export const BOARD_ROWS = 64;
@@ -175,3 +176,10 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
         stripMapping
     };
 };
+
+export const getStripID = (breadboard: BreadboardComponent, connector: Connector): string | null => {
+    if (!isBreadboard(breadboard)) return null;
+    const stripID = breadboard.stripMapping.connectorToStrip[connector.id];
+
+    return stripID ?? null;
+}

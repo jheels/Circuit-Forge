@@ -8,7 +8,6 @@ import { Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/types/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from './BaseComponent';
-import { Group } from 'lucide-react';
 
 interface LEDProps {
     componentID: string;

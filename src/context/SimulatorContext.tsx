@@ -5,7 +5,7 @@ import { createResistorComponent } from "@/types/components/resistor";
 import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
-import { Connection } from "@/types/connection";
+import { Connection, isWireConnection } from "@/types/connection";
 
 interface SimulatorContextType {
     projectName: string;
@@ -122,14 +122,14 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             [connection.id]: connection
         }));
         setConnectorConnections((prev) => {
-            const startConnections = prev[connection.sourceConnectorID] || new Set();
+            const startConnections = prev[connection.sourceConnector.id] || new Set();
             startConnections.add(connection.id);
-            const endConnections = prev[connection.targetConnectorID] || new Set();
+            const endConnections = prev[connection.targetConnector.id] || new Set();
             endConnections.add(connection.id);
             return {
                 ...prev,
-                [connection.sourceConnectorID]: startConnections,
-                [connection.targetConnectorID]: endConnections
+                [connection.sourceConnector.id]: startConnections,
+                [connection.targetConnector.id]: endConnections
             };
         });
     }
@@ -143,22 +143,22 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             return newConnections;
         });
         setConnectorConnections((prev) => {
-            const startConnections = prev[connection.sourceConnectorID] || new Set();
+            const startConnections = prev[connection.sourceConnector.id] || new Set();
             startConnections.delete(connectionID);
-            const endConnections = prev[connection.targetConnectorID] || new Set();
+            const endConnections = prev[connection.targetConnector.id] || new Set();
             endConnections.delete(connectionID);
 
             const newConnections = { ...prev };
             if (startConnections.size === 0) {
-                delete newConnections[connection.sourceConnectorID];
+                delete newConnections[connection.sourceConnector.id];
             } else {
-                newConnections[connection.sourceConnectorID] = startConnections;
+                newConnections[connection.sourceConnector.id] = startConnections;
             }
 
             if (endConnections.size === 0) {
-                delete newConnections[connection.targetConnectorID];
+                delete newConnections[connection.targetConnector.id];
             } else {
-                newConnections[connection.targetConnectorID] = endConnections;
+                newConnections[connection.targetConnector.id] = endConnections;
             }
 
             return newConnections;
@@ -180,7 +180,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
             connectorConnections.forEach((connectionID) => {
                 const connection = connections[connectionID];
                 if (!connection) return;
-                if (connection.type === 'wire' && connection.metadata.wireID) {
+                if (isWireConnection(connection) && connection.metadata.wireID) {
                     removeWire(connection.metadata.wireID);
                 }
             });
@@ -256,12 +256,13 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const removeWire = (wireID: string) => {    
         const wire = wires[wireID];
         if (!wire) return;
-
+        console.log('Removing wire:', wireID);
+        // possibly bring back wireConnection
         const connectionID = Object.keys(connections).find((id) => {
             const connection = connections[id];
-            return connection.type === 'wire' && connection.metadata.wireID === wireID;
+            return isWireConnection(connection) && connection.metadata.wireID === wireID;
         });
-        
+        console.log('Removing connection:', connectionID);
         if (connectionID) {
             removeConnection(connectionID);
         }

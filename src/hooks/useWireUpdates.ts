@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Point, Wire } from '@/types/general';
 import { Connector, getConnectorPosition } from '@/types/connector';
-import { Connection } from '@/types/connection';
+import { Connection, isWireConnection } from '@/types/connection';
 
 export const useWireUpdates = (
     connectors: Record<string, Connector>,
@@ -33,16 +33,15 @@ export const updateWirePositions = (
 
         connectorConnections.forEach(connectionID => {
             const connection = connections[connectionID];
-            if (!connection) return;
-            if (connection.type === 'wire' && connection.metadata.wireID) {
+            if (connection && isWireConnection(connection) && connection.metadata.wireID) {
                 const wire = wires[connection.metadata.wireID];
                 if (!wire) return;
                 if (!wireUpdates[wire.id]) {
                     wireUpdates[wire.id] = { points: [...wire.points] };
                 }
-                if (connection.sourceConnectorID === connector.id) {
+                if (connection.sourceConnector.id === connector.id) {
                     wireUpdates[wire.id].points[0] = connectorPosition;
-                } else if (connection.targetConnectorID === connector.id) {
+                } else if (connection.targetConnector.id === connector.id) {
                     wireUpdates[wire.id].points[1] = connectorPosition;
                 }
             }
