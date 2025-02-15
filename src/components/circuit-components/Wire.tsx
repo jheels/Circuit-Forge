@@ -7,7 +7,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { isPointInConnector, getConnectorPosition, validateConnection } from '@/types/connector';
-import { Connection, isWireConnection } from '@/types/connection';
+import { Connection, createAppropriateConnection, isWireConnection } from '@/types/connection';
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
@@ -71,57 +71,53 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         const wireConnection = (Object.values(connections) as Connection[]).find(
             (connection) => isWireConnection(connection) && connection.metadata.wireID === wireID
         );
-        
 
-        for (const component of Object.values(components)) {
-            if (foundConnector) break;
+        Object.values(components).forEach((component) => {
+            if (foundConnector) return;
             const { connectors, position, dimensions } = component;
-            for (const connectorKey in connectors) {
-                const conn = connectors[connectorKey];
-
-                if (!isPointInConnector(dropPoint, conn, position, dimensions)) continue;
-                const connectorConnections = getConnectorConnections(conn.id);
+            
+            Object.values(connectors).forEach((connector) => {
+                if (!isPointInConnector(dropPoint, connector, position, dimensions)) return;
+                const connectorConnections = getConnectorConnections(connector.id);
                 if (connectorConnections.size > 0) {
                     console.log('Cannot connect to connector with existing connections');
-                    break;
+                    return;
                 }
 
-                const newPos = getConnectorPosition(conn, position, dimensions);
-
+                const newPosition = getConnectorPosition(connector, position, dimensions);
                 const newPoints = [...wire.points];
-                newPoints[index] = newPos;
+                newPoints[index] = newPosition;
                 console.log(wire);
-                // needs refactoring for performance.
-                const startConnector = index === 0 ? conn: wire.startConnector;
-                const endConnector = index === 1 ? conn : wire.endConnector;
-                
+
+                const startConnector = index === 0 ? connector : wire.startConnector;
+                const endConnector = index === 1 ? connector : wire.endConnector;
+
                 if (endConnector && !validateConnection(startConnector, endConnector, components)) {
                     console.log('Invalid connection during wire modification');
-                    break;
+                    return;
                 }
+
                 if (index === 0) {
-                    updateWire(wireID, { startConnector: conn, points: newPoints });
-                    // update connection
+                    updateWire(wireID, { startConnector: connector, points: newPoints });
                     if (wireConnection) {
-                        const newConnection = { ...wireConnection, sourceConnector: conn };
+                        const newConnection = createAppropriateConnection(connector, wireConnection.targetConnector, components, wireID);
                         removeConnection(wireConnection.id);
                         addConnection(newConnection);
+                        console.log('Updated connection');
                     }
                 } else {
-                    updateWire(wireID, { endConnector: conn, points: newPoints });
+                    updateWire(wireID, { endConnector: connector, points: newPoints });
                     if (wireConnection) {
-                        const updatedConnection = {
-                            ...wireConnection,
-                            targetConnector: conn
-                        };
+                        const newConnection = createAppropriateConnection(wireConnection.sourceConnector, connector, components, wireID);
                         removeConnection(wireConnection.id);
-                        addConnection(updatedConnection);
-                    }    
+                        addConnection(newConnection);
+                        console.log('Updated connection');
+                    }
                 }
                 foundConnector = true;
-                break;
-            }
-        }
+                return;
+            });
+        });
 
         if (!foundConnector) {
             const newPoints = [...wire.points];
@@ -139,16 +135,16 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 onMouseLeave={handleMouseLeave}
                 onClick={handleClick}
             >
-            {(isHovered || selectedWire == wireID) && (
-                <Line
-                    key={`${wireID}-hover`}
-                    points={wire.points.flatMap((point) => [point.x, point.y])}
-                    stroke={"blue"}
-                    strokeWidth={1.5}
-                    lineCap="round"
-                    opacity={0.5}
-                />
-            )}
+                {(isHovered || selectedWire == wireID) && (
+                    <Line
+                        key={`${wireID}-hover`}
+                        points={wire.points.flatMap((point) => [point.x, point.y])}
+                        stroke={"blue"}
+                        strokeWidth={1.5}
+                        lineCap="round"
+                        opacity={0.5}
+                    />
+                )}
                 <Line
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"black"}

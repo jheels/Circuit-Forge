@@ -100,7 +100,6 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         );
     }, [componentID, setSelectedComponent, setSelectedWire]);
 
-    // Handle wire escape key
     const handleWireEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape' && creatingWire) {
             removeWire(creatingWire.id);

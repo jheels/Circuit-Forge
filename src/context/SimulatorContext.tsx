@@ -256,13 +256,11 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const removeWire = (wireID: string) => {    
         const wire = wires[wireID];
         if (!wire) return;
-        console.log('Removing wire:', wireID);
         // possibly bring back wireConnection
         const connectionID = Object.keys(connections).find((id) => {
             const connection = connections[id];
             return isWireConnection(connection) && connection.metadata.wireID === wireID;
         });
-        console.log('Removing connection:', connectionID);
         if (connectionID) {
             removeConnection(connectionID);
         }
