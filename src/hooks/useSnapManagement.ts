@@ -2,6 +2,7 @@
  * TODO:
  * - Add occupied connector check before snapping onto it.
  * - Need to check connectors before snapping and rejecting if one of them is rejected?
+ * - optimise loops since we already know only breadboards can be snappped to (keep central id store?)
  * 
  */
 import { useState, useCallback } from 'react';
@@ -50,26 +51,41 @@ export const useSnapManagement = (
             position: Point;
             connection: ConnectorPair
         }
-
-        let firstSnap: FirstSnap | null = null as FirstSnap | null;
+    
+        let firstSnap: FirstSnap | null = null;
         const potentialConnections: ConnectorPair[] = [];
-
+        const unconnectedConnectors = Object.values(connectors).filter(
+            connector => !connector.isConnected
+        );
+    
+        // If all connectors are connected, no need to proceed
+        if (unconnectedConnectors.length === 0) return { firstSnap, potentialConnections };
+    
         Object.values(components).forEach((otherComponent) => {
             if (otherComponent.editorID === componentID) return;
-
-            Object.values(otherComponent.connectors).forEach((otherConnector) => {
-                Object.values(connectors).forEach((connector) => {
+    
+            unconnectedConnectors.forEach(connector => {
+                Object.values(otherComponent.connectors).forEach((otherConnector) => {
                     const connectorPosition = getConnectorPosition(connector, newPosition, dimensions);
                     const otherConnectorPosition = getConnectorPosition(
                         otherConnector,
                         otherComponent.position,
                         otherComponent.dimensions
                     );
-
+    
                     const distance = calculateDistance(connectorPosition, otherConnectorPosition);
-
+    
                     if (distance < SNAPPING_THRESHOLD) {
-                        if (!validateConnection(connector, otherConnector, components)) return;
+                        // Check if the target connector is occupied
+                        if (otherConnector.isConnected) {
+                            console.log('Cannot connect to occupied pinhole');
+                            return;
+                        }
+    
+                        if (!validateConnection(connector, otherConnector, components)) {
+                            return;
+                        }
+    
                         if (!firstSnap) {
                             firstSnap = {
                                 position: {
@@ -85,10 +101,18 @@ export const useSnapManagement = (
                 });
             });
         });
-
+    
+        // If we found any valid connections but not for all unconnected connectors,
+        // we should reject the entire snap attempt
+        if (potentialConnections.length > 0 && 
+            potentialConnections.length !== unconnectedConnectors.length) {
+            console.log('Cannot form valid connections for all unconnected connectors (hanging component).');
+            return { firstSnap: null, potentialConnections: [] };
+        }
+    
         return { firstSnap, potentialConnections };
     }, [componentID, components, connectors, dimensions, setHoveredConnectorID]);
-
+    
     const handleDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
         const newPosition = {
             x: e.target.x(),
@@ -98,6 +122,11 @@ export const useSnapManagement = (
         setHoveredConnectorID(null);
 
         if (checkBreakaway(newPosition)) {
+            const relevantConnections = snapState.connections;
+            relevantConnections.forEach(({ connector, otherConnector }) => {
+                connector.isConnected = false;
+                otherConnector.isConnected = false;
+            });
             setSnapState(prev => ({
                 ...prev,
                 isSnapped: false,
@@ -131,16 +160,7 @@ export const useSnapManagement = (
             updateComponent(componentID, { position: newPosition });
             updateWirePositions(newPosition);
         }
-    }, [
-        componentID,
-        snapState.isSnapped,
-        snapState.position,
-        checkBreakaway,
-        findPotentialConnections,
-        setHoveredConnectorID,
-        updateComponent,
-        updateWirePositions
-    ]);
+    }, [setHoveredConnectorID, checkBreakaway, snapState.isSnapped, snapState.position, findPotentialConnections, connectors, updateComponent, componentID, updateWirePositions]);
 
     return {
         snapState,

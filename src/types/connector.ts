@@ -4,6 +4,12 @@
  * - Check cathodes
  * - remove componentID since its already in the ID 
  * - move connection validation to the connection.ts file
+ * 
+ * 
+ * When attempting to connect and one or more connectors have a wire attached to it and we attempt to snap it
+ * to the breadboard the behaviour should be the following. The non-connected connector should snap to the pinhole
+ * but the other connector should not and will not form a new connection between that since its already occupied.
+ * Essentially non-connected connectors should only snap.
  */
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point } from './general';
@@ -32,6 +38,7 @@ export interface Connector {
     readonly type: ConnectorType;
     readonly hitAreaSize: number;
     offset: ConnectorOffset;
+    isConnected: boolean;
 }
 
 export const createConnector = (
@@ -44,7 +51,8 @@ export const createConnector = (
     componentID,
     type,
     offset,
-    hitAreaSize
+    hitAreaSize,
+    isConnected: false,
 });
 
 export const getInteractionRegion = (

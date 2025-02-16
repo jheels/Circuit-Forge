@@ -27,7 +27,7 @@ export const RotationControls = () => {
 
     const handleRotate = (direction: 'clockwise' | 'anticlockwise') => {
         const currentRotation = component.rotation || 0;
-        const rotationChange = direction === 'clockwise' ? 45 : -45;
+        const rotationChange = direction === 'clockwise' ? 90 : -90;
         const newRotation = (currentRotation + rotationChange + 360) % 360;
 
         const updatedConnectors = Object.values(component.connectors).reduce((acc, connector) => {

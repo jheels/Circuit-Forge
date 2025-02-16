@@ -132,11 +132,15 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
                 [connection.targetConnector.id]: endConnections
             };
         });
+        connection.sourceConnector.isConnected = true;
+        connection.targetConnector.isConnected = true;
     }
 
     const removeConnection = (connectionID: string) => {
         const connection = connections[connectionID];
         if (!connection) return;
+        connection.sourceConnector.isConnected = false;
+        connection.targetConnector.isConnected = false;
         setConnections((prev) => {
             const newConnections = { ...prev };
             delete newConnections[connectionID];
