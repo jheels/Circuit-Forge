@@ -39,7 +39,8 @@ export const RotationControls = () => {
 
             acc[connector.id] = {
                 ...connector,
-                offset: { x: offsetX, y: offsetY }
+                offset: { x: offsetX, y: offsetY },
+                isConnected: false,
             };
             return acc;
         }, {});
