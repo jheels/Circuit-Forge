@@ -11,8 +11,7 @@ interface BaseConnectionMetadata {
     targetStripID?: string;
 }
 
-export interface StripConnectionMetadata extends BaseConnectionMetadata {
-}
+export type StripConnectionMetadata = BaseConnectionMetadata
 
 export interface WireConnectionMetadata extends BaseConnectionMetadata {
     wireID: string;
@@ -26,6 +25,13 @@ export interface Connection {
     targetConnector: Connector;
     type: ConnectionType;
     metadata: ConnectionMetadata;
+}
+
+export const getNonBreadboardComponent = (connection: Connection, components: Record<string, EditorComponent>): EditorComponent => {
+    const sourceComponent = components[connection.sourceConnector.componentID];
+    const targetComponent = components[connection.targetConnector.componentID];
+
+    return isBreadboard(sourceComponent) ? targetComponent : sourceComponent;
 }
 
 export const isWireConnection = (connection: Connection): connection is Connection & { metadata: WireConnectionMetadata } => {
