@@ -87,7 +87,6 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 const newPosition = getConnectorPosition(connector, position, dimensions);
                 const newPoints = [...wire.points];
                 newPoints[index] = newPosition;
-                console.log(wire);
 
                 const startConnector = index === 0 ? connector : wire.startConnector;
                 const endConnector = index === 1 ? connector : wire.endConnector;

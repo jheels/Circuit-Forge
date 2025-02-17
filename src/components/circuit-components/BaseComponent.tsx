@@ -118,7 +118,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     const updateConnectors = useCallback(() => {
         // Then update connections
         const newConnectionIDs = updateConnectionsOnDrop(snapState);
-        
+
         // Update snap state with new connection IDs
         setSnapState(prev => ({
             ...prev,
@@ -141,7 +141,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                 width={region.width}
                 height={region.height}
                 fill="transparent"
-                stroke="black"
+                stroke={hoveredConnector.isConnected ? "red" : '#00c951'}
                 strokeWidth={0.25}
                 onClick={(e) => {
                     e.cancelBubble = true;
