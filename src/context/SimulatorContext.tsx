@@ -67,6 +67,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connections, setConnections] = useState<Record<string, Connection>>({});
+    // TODO: refactor to just store a one to one map since we just added a limitation Record<string, string>;
     const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
     const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
 
@@ -174,11 +175,11 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     }
 
     const cleanUpComponentWires = (editorID: string) => {
+        // Refactor to make it unified for connections so it handles wires or direct ones dynamically.
         const component = components[editorID];
         if (!component) return;
-        // remove all associated wires with the component using connectorConnections
+        console.log('Cleaning up connections for component:', component);
         const connectors = Object.values(component.connectors);
-        // iterate through each connectors connection and check if its a wire if so remove it
         connectors.forEach((connector) => {
             const connectorConnections = getConnectorConnections(connector.id);
             connectorConnections.forEach((connectionID) => {
@@ -186,6 +187,8 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
                 if (!connection) return;
                 if (isWireConnection(connection) && connection.metadata.wireID) {
                     removeWire(connection.metadata.wireID);
+                } else {
+                    removeConnection(connectionID);
                 }
             });
         });
