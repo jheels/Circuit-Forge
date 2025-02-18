@@ -4,6 +4,7 @@ import { EditorComponent, Point, Wire } from '@/types/general';
 import { Connector, getConnectorPosition } from '@/types/connector';
 import { Connection, createAppropriateConnection } from '@/types/connection';
 import { ConnectorPair, SnapState } from './useSnapManagement';
+import toast from 'react-hot-toast';
 
 export const useConnectorManagement = (
     position: Point,
@@ -23,7 +24,7 @@ export const useConnectorManagement = (
     const handleConnectorClick = useCallback((connectorID: string) => {
         const connectorConnections = getConnectorConnections(connectorID);
         if (connectorConnections.size > 0) {
-            console.log('Cannot connect to connector with existing connections');
+            toast.error('Max 1 connection per connector.');
             return;
         }
 
@@ -33,7 +34,7 @@ export const useConnectorManagement = (
 
         if (creatingWire) {
             if (creatingWire.startConnector.id === connectorID) {
-                console.log('Cannot connect wire to same connector');
+                toast.error('Cannot connect a connector to itself.');
                 return;
             }
             try {

@@ -12,6 +12,7 @@ import { Breadboard } from './circuit-components/Breadboard';
 import { Wire } from './circuit-components/Wire';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
+import toast from 'react-hot-toast';
 
 interface CanvasProps {
     scale: number;
@@ -95,7 +96,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
         if ((item.sidebarID == 'breadboard' || item.sidebarID == 'power-supply') && componentCounts[item.sidebarID] > 0) {
-            console.warn('max 1 breadboard or power supply');
+            toast.error('Only one breadboard or power supply is allowed.');
             return;
         }
         const newComponent = createComponent(item.sidebarID, { x: dropX, y: dropY });
@@ -112,6 +113,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 setCreatingWire(null);
                 setClickedConnector(null);
             }
+            toast.success('Component deleted.');
         }
     }, [creatingWire, removeComponent, removeWire, selectedComponent, setClickedConnector, setCreatingWire, setSelectedComponent]);
 

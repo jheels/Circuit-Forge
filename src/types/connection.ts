@@ -89,7 +89,6 @@ export const createAppropriateConnection = (
     if (!stripID) throw new Error('Strip ID cannot be null');
 
     if (!wireID) {
-        console.log('firing');
         return createStripConnection(sourceConnector, targetConnector, stripID);
     }
 

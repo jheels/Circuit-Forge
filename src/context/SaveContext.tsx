@@ -29,7 +29,7 @@ interface SaveContextType {
     hasUnsavedChanges: boolean;
     setCurrentFileHandle: (fileHandle: FileSystemFileHandle | null) => void;
     saveProject: (saveAs?: boolean) => Promise<SaveResult>;
-    loadProject: () => Promise<void>;
+    loadProject: () => Promise<SaveResult>;
     exportProjectAsImage: () => Promise<void>;
 }
 
@@ -98,7 +98,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
 
     const saveProject = useCallback(async (saveAs: boolean = false): Promise<SaveResult> => {
         if (!currentProject) {
-            return { success: false, error: 'No project to save' };
+            return { success: false, error: 'No project to save.' };
         }
 
         try {
@@ -135,7 +135,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         } catch (error) {
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Failed to save project'
+                error: error instanceof Error ? error.message : 'Failed to save project.'
             }
         }
     }, [currentFileHandle, currentProject, serialiseProject]);
@@ -167,7 +167,10 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
             setCurrentFileHandle(fileHandle);
             setHasUnsavedChanges(false);
         } catch (error) {
-            console.error('Failed to load project:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Failed to load project.'
+            }
         }
     }, [addComponent, addConnection, addWire, deserialiseProject, resetProject, setComponentCounts, setProjectName]);
 

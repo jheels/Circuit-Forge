@@ -16,6 +16,7 @@ import {
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { getOS } from "@/lib/utils"
+import toast from "react-hot-toast"
 
 interface DropdownItem {
     label?: string
@@ -152,17 +153,25 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     }
 
     const handleSave = useCallback(async () => {
-        const result = await saveProject();
-        if (!result.success) {
-            console.error(result.error);
-        }
+        toast.promise(
+            saveProject(),
+            {
+                loading: 'Saving project...',
+                success: 'Project saved successfully.',
+                error: (err) => `Error saving project: ${err.message}`,
+            }
+        );
     }, [saveProject]);
 
     const handleSaveAs = useCallback(async () => {
-        const result = await saveProject(true);
-        if (!result.success) {
-            console.error(result.error);
-        }
+        toast.promise(
+            saveProject(true),
+            {
+                loading: 'Saving project...',
+                success: 'Project saved successfully.',
+                error: (err) => `Error saving project: ${err.message}`,
+            }
+        );
     }, [saveProject]);
 
     const handleExportAsImage = useCallback(async () => {
@@ -170,7 +179,14 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
     }, [exportProjectAsImage]);
 
     const handleLoadProject = useCallback(async () => {
-        await loadProject();
+        toast.promise(
+            loadProject(),
+            {
+                loading: 'Loading project...',
+                success: 'Project loaded successfully.',
+                error: (err) => `Error loading project: ${err.message}`,
+            }
+        );
     }, [loadProject]);
 
     useEffect(() => {
@@ -193,8 +209,8 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                             handleSaveAs();
                         } else if (hasUnsavedChanges && currentFileHandle) {
                             handleSave();
-                        } else {
-                            console.log("You must use 'Save As' first.");
+                        } else if (!currentFileHandle) {
+                            toast.error('Must use Save As first.')
                         }
                         break;
                     case 'x':
@@ -212,6 +228,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                     case 'e':
                         e.preventDefault();
                         handleExportAsImage();
+                        toast.success('Exported as PNG.');
                         break;
                     case 'd':
                         e.preventDefault();
@@ -282,7 +299,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         },
     ]
 
-    usePreventUnloadWithUnsavedChanges(hasUnsavedChanges);
+    //usePreventUnloadWithUnsavedChanges(hasUnsavedChanges); // remove for now to allow HMR
 
     return (
         <div className="bg-white text-foreground flex justify-between items-center shadow-md z-10">

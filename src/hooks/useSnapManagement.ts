@@ -10,6 +10,7 @@ import { Point, EditorComponent } from '@/types/general';
 import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/types/connector';
 import { calculateDistance } from '@/lib/utils';
 import Konva from 'konva';
+import toast from 'react-hot-toast';
 
 export interface SnapState {
     isSnapped: boolean;
@@ -78,7 +79,7 @@ export const useSnapManagement = (
                     if (distance < SNAPPING_THRESHOLD) {
                         // Check if the target connector is occupied
                         if (otherConnector.isConnected) {
-                            console.log('Cannot connect to occupied pinhole');
+                            toast.error('Pinhole is occupied.', { id: 'pinhole-occupied' });
                             return;
                         }
     

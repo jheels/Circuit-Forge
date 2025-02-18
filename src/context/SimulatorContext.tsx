@@ -6,6 +6,7 @@ import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
 import { Connection, isWireConnection } from "@/types/connection";
+import { toast } from "react-hot-toast";
 
 interface SimulatorContextType {
     projectName: string;
@@ -76,11 +77,11 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
 
         const componentToCopy = components[selectedComponent];
         if (componentToCopy.type === 'breadboard' || componentToCopy.type === 'power-supply') {
-            console.log('Cannot copy breadboard or power supply components');
+            toast.error('Cannot copy breadboard or power supply components.');
             return;
         }
         setClipboardComponent(componentToCopy);
-        console.log('Copied component to clipboard:', componentToCopy);
+        toast.success('Component copied to clipboard.');
     };
 
     const cutSelectedComponent = () => {
@@ -88,13 +89,13 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
 
         const componentToCut = components[selectedComponent];
         if (componentToCut.type === 'breadboard' || componentToCut.type === 'power-supply') {
-            console.log('Cannot copy breadboard or power supply components');
+            toast.error('Cannot cut breadboard or power supply components.');
             return;
         }
         setClipboardComponent(componentToCut);
         removeComponent(selectedComponent);
         setSelectedComponent(null);
-        console.log('Cut component to clipboard:', componentToCut);
+        toast.success('Component cut to clipboard.');
     };
 
     const pasteClipboardComponent = () => {
@@ -114,7 +115,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
 
         addComponent(newComponent);
         setSelectedComponent(newComponent.editorID);
-        console.log('Pasted component from clipboard:', newComponent);
+        toast.success('Component pasted.');
     };
 
     const addConnection = (connection: Connection) => {
@@ -175,10 +176,9 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
     }
 
     const cleanUpComponentWires = (editorID: string) => {
-        // Refactor to make it unified for connections so it handles wires or direct ones dynamically.
+        // TODO: Refactor to make it unified for connections so it handles wires or direct ones dynamically.
         const component = components[editorID];
         if (!component) return;
-        console.log('Cleaning up connections for component:', component);
         const connectors = Object.values(component.connectors);
         connectors.forEach((connector) => {
             const connectorConnections = getConnectorConnections(connector.id);

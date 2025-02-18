@@ -11,6 +11,7 @@ import { Connection, createAppropriateConnection, isWireConnection } from '@/typ
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
+import toast from 'react-hot-toast';
 
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
@@ -80,7 +81,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 if (!isPointInConnector(dropPoint, connector, position, dimensions)) return;
                 const connectorConnections = getConnectorConnections(connector.id);
                 if (connectorConnections.size > 0) {
-                    console.log('Cannot connect to connector with existing connections');
+                    toast.error('Max 1 connection per connector.')
                     return;
                 }
 
@@ -92,7 +93,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 const endConnector = index === 1 ? connector : wire.endConnector;
 
                 if (endConnector && !validateConnection(startConnector, endConnector, components)) {
-                    console.log('Invalid connection during wire modification');
+                    toast.error('Invalid connection attempted.');
                     return;
                 }
 
@@ -102,7 +103,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                         const newConnection = createAppropriateConnection(connector, wireConnection.targetConnector, components, wireID);
                         removeConnection(wireConnection.id);
                         addConnection(newConnection);
-                        console.log('Updated connection');
+                        toast.success('Updated connection.');
                     }
                 } else {
                     updateWire(wireID, { endConnector: connector, points: newPoints });
@@ -110,7 +111,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                         const newConnection = createAppropriateConnection(wireConnection.sourceConnector, connector, components, wireID);
                         removeConnection(wireConnection.id);
                         addConnection(newConnection);
-                        console.log('Updated connection');
+                        toast.success('Updated connection.');
                     }
                 }
                 foundConnector = true;
