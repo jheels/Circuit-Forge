@@ -107,7 +107,7 @@ export const useSnapManagement = (
         // we should reject the entire snap attempt
         if (potentialConnections.length > 0 && 
             potentialConnections.length !== unconnectedConnectors.length) {
-            console.log('Cannot form valid connections for all unconnected connectors (hanging component).');
+            toast.error('Please connect all terminals.', { id: 'hanging-component' });
             return { firstSnap: null, potentialConnections: [] };
         }
     
@@ -169,3 +169,5 @@ export const useSnapManagement = (
         handleDragMove
     };
 };
+
+
