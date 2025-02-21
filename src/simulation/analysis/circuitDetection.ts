@@ -1,10 +1,10 @@
 
 import { PowerDistribution } from '@/hooks/simulation/useFindPowerDistribution';
 import { v4 as uuidv4 } from 'uuid';
-import { PowerSupplyComponent } from './components/powerSupply';
-import { Connection, isWireConnection } from './connection';
-import { BreadboardComponent } from './components/breadboard';
-import { EditorComponent } from './general';
+import { PowerSupplyComponent } from '@/types/components/powerSupply';
+import { Connection, isWireConnection } from '@/types/connection';
+import { BreadboardComponent } from '@/types/components/breadboard';
+import { EditorComponent } from '@/types/general';
 
 export type NodeType = 'power' | 'ground' | 'regular';
 
