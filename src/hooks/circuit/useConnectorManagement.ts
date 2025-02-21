@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point, Wire } from '@/types/general';
 import { Connector, getConnectorPosition } from '@/types/connector';
 import { Connection, createAppropriateConnection } from '@/types/connection';
-import { ConnectorPair, SnapState } from './useSnapManagement';
+import { ConnectorPair, SnapState } from './ui/useSnapManagement';
 import toast from 'react-hot-toast';
 
 export const useConnectorManagement = (

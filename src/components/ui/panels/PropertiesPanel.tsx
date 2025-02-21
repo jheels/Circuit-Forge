@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { X } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { PropertyField } from '@/components/PropertyField';
+import { PropertyField } from '@/components/ui/panels/PropertyField';
 import { getComponentProperties } from '@/types/properties';
 import { PropertyValue } from '@/types/properties';
 

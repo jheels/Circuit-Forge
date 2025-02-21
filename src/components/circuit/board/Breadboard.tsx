@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { BaseComponent } from './BaseComponent';
+import { BaseComponent } from '../base/BaseComponent';
 import { Rect, Text } from 'react-konva';
 import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH, BOARD_ROWS } from '@/types/components/breadboard';
 

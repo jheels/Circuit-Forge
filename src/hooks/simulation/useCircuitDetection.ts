@@ -25,6 +25,6 @@ export const useCircuitDetection = () => {
     }, [connections, components, powerDistribution, powerSupply, breadboard]);
 
     return {
-        circuitGraph,
+        circuitGraph, powerDistribution
     }
 }

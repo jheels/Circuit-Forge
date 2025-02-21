@@ -1,6 +1,6 @@
-import { NavBar } from '@/components/topbars/NavBar';
-import { Simulator } from './pages/Simulator';
-import { ICEditor } from './pages/ICEditor';
+import { NavBar } from '@/components/layout/topbars/NavBar';
+import { Simulator } from './routes/Simulator';
+import { ICEditor } from './routes/ICEditor';
 import { UIProvider, useUIContext } from '@/context/UIContext';
 import { Toaster } from 'react-hot-toast';
 

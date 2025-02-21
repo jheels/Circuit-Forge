@@ -1,5 +1,5 @@
 
-import { PowerDistribution } from '@/hooks/useFindPowerDistribution';
+import { PowerDistribution } from '@/hooks/simulation/useFindPowerDistribution';
 import { v4 as uuidv4 } from 'uuid';
 import { PowerSupplyComponent } from './components/powerSupply';
 import { Connection, isWireConnection } from './connection';

@@ -5,7 +5,7 @@ import { useSimulatorContext } from "@/context/SimulatorContext"
 import { useSaveContext } from "@/context/SaveContext"
 import { Clock } from 'lucide-react';
 import { ConfirmationDialog } from "@/components/dialogs/ConfirmationDialog"
-import { RotationControls } from "../RotationControls"
+import { RotationControls } from "@/components/RotationControls"
 import {
     Menubar,
     MenubarContent,

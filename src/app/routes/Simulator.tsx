@@ -1,4 +1,4 @@
-import { Editor } from "@/components/Editor";
+import { Editor } from "@/components/layout/Editor";
 import { SimulatorContextProvider } from "@/context/SimulatorContext";
 import { SaveProvider } from "@/context/SaveContext";
 import { useRef } from "react";

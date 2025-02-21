@@ -5,7 +5,7 @@ import { RotateCcw, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { rotatePoint } from '@/lib/utils';
-import { updateWirePositions  } from '@/hooks/useWireUpdates';
+import { updateWirePositions } from '@/hooks/ui/useWireUpdates';
 
 export const RotationControls = () => {
     const { 

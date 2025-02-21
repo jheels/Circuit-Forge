@@ -2,7 +2,7 @@ import React from 'react';
 import { Rect, Line, Text } from 'react-konva';
 import { PowerSupplyComponent } from '@/types/components/powerSupply';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { BaseComponent } from './BaseComponent';
+import { BaseComponent } from '../base/BaseComponent';
 
 interface PowerSupplyProps {
     componentID: string;

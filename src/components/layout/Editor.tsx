@@ -1,6 +1,6 @@
-import { ToolBar } from '@/components/topbars/ToolBar';
-import { SimSideBar } from '@/components/sidebars/SimSideBar';
-import { Canvas } from '@/components/Canvas';
+import { ToolBar } from '@/components/layout/topbars/ToolBar';
+import { SimSideBar } from '@/components/layout/sidebars/SimSideBar';
+import { Canvas } from '@/components/layout/Canvas';
 import { useState, useCallback } from 'react';
 import Konva from 'konva';
 

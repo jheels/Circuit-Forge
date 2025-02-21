@@ -7,7 +7,7 @@ import React from 'react';
 import { Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/types/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { BaseComponent } from './BaseComponent';
+import { BaseComponent } from '../base/BaseComponent';
 
 interface LEDProps {
     componentID: string;

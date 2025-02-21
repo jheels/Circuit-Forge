@@ -8,7 +8,7 @@ import React, { useMemo } from 'react';
 import { Group, Rect, Line } from 'react-konva';
 import { ResistorComponent } from '@/types/components/resistor';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { BaseComponent } from './BaseComponent';
+import { BaseComponent } from '../base/BaseComponent';
 
 // Standard resistor color codes
 const RESISTOR_COLORS = {

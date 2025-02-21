@@ -4,15 +4,16 @@ import { Stage, Layer, Line } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { SidebarComponent, Point } from '@/types/general';
-import { PropertiesPanel } from './PropertiesPanel';
-import { LED } from './circuit-components/LED';
-import { Resistor } from './circuit-components/Resistor';
-import { PowerSupply } from './circuit-components/PowerSupply';
-import { Breadboard } from './circuit-components/Breadboard';
-import { Wire } from './circuit-components/Wire';
+import { PropertiesPanel } from '../ui/panels/PropertiesPanel';
+import { LED } from '../circuit/active/LED';
+import { Resistor } from '../circuit/passive/Resistor';
+import { PowerSupply } from '../circuit/active/PowerSupply';
+import { Wire } from '../circuit/passive/Wire';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
+import { useCircuitAnalysis } from '@/hooks/useCircuitAnalysis';
+import { Breadboard } from '../circuit/board/Breadboard';
 
 interface CanvasProps {
     scale: number;
@@ -44,6 +45,8 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
     } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
+
+    const { circuitAnalysis } = useCircuitAnalysis()
 
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
