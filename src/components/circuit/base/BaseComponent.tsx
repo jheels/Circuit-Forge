@@ -10,7 +10,7 @@ import { Group, Rect } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useSnapManagement } from '@/hooks/ui/useSnapManagement';
 import { useWireUpdates } from '@/hooks/ui/useWireUpdates';
-import { useConnectorManagement } from '@/hooks/useConnectorManagement';
+import { useConnectorManagement } from '@/hooks/circuit/useConnectorManagement';
 import { getInteractionRegion } from '@/types/connector';
 import Konva from 'konva';
 

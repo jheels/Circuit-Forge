@@ -213,7 +213,7 @@ export const findConnectedCircuit = (
     return { nodes: connectedNodes, edges: resultEdges };
 };
 
-export const weedOutUnconnectedPaths = (
+export const removeDisconnectedPaths = (
     graph: CircuitGraph,
     powerDistribution: PowerDistribution
 ): CircuitGraph => {

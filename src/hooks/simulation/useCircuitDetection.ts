@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { CircuitGraph, initialisePowerDistribution, initialiseCircuitGraph, initialiseActiveRegularStrips, createEdgesFromConnections, findConnectedCircuit, weedOutUnconnectedPaths } from '@/types/circuitDetection';
 import { useFindPowerDistribution } from './useFindPowerDistribution';
+import {
+    CircuitGraph,
+    initialisePowerDistribution,
+    initialiseCircuitGraph,
+    initialiseActiveRegularStrips,
+    createEdgesFromConnections,
+    findConnectedCircuit,
+    removeDisconnectedPaths
+} from '@/simulation/analysis/circuitDetection';
 
 export const useCircuitDetection = () => {
     const { components, connections, getConnectorConnections } = useSimulatorContext();
@@ -20,7 +28,7 @@ export const useCircuitDetection = () => {
         graph = initialiseActiveRegularStrips(graph, connections, breadboard);
         graph = createEdgesFromConnections(graph, connections, components, powerDistribution, getConnectorConnections);
         graph = findConnectedCircuit(graph);
-        graph = weedOutUnconnectedPaths(graph, powerDistribution);
+        graph = removeDisconnectedPaths(graph, powerDistribution);
         setCircuitGraph(graph);
     }, [connections, components, powerDistribution, powerSupply, breadboard]);
 

@@ -12,7 +12,6 @@ import { Wire } from '../circuit/passive/Wire';
 import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
-import { useCircuitAnalysis } from '@/hooks/useCircuitAnalysis';
 import { Breadboard } from '../circuit/board/Breadboard';
 
 interface CanvasProps {
@@ -45,8 +44,6 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
     } = useSimulatorContext();
     const [stageWidth, setStageWidth] = useState<number>(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
     const [stageHeight, setStageHeight] = useState<number>(window.innerHeight - 100);
-
-    const { circuitAnalysis } = useCircuitAnalysis()
 
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
