@@ -13,6 +13,7 @@ import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
 import { Breadboard } from '../circuit/board/Breadboard';
+import { useCircuitDetection } from '@/hooks/simulation/useCircuitDetection';
 
 interface CanvasProps {
     scale: number;
@@ -47,6 +48,8 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
 
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
+
+    const { detectCircuit } = useCircuitDetection();
 
     const deSelectItems = useCallback(() => {
         setSelectedComponent(null);
