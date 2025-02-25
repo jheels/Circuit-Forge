@@ -30,15 +30,15 @@ export interface BreadboardComponent extends EditorComponent {
     readonly stripMapping: StripMapping;
 }
 
-const createStrip = (type: ConnectorType, connectorIds: string[]): Strip => ({
-    id: `${type}-strip-${uuidv4()}`,
+const createStrip = (type: ConnectorType, connectorIds: string[], stripIdentifier: string, boardPosition: string): Strip => ({
+    id: `${type}-strip-${stripIdentifier}-${boardPosition}`,
     type,
     connectorIds
 });
 
-const createPositiveStrip = (connectorIds: string[]): Strip => createStrip('positive', connectorIds);
-const createNegativeStrip = (connectorIds: string[]): Strip => createStrip('negative', connectorIds);
-const createRegularStrip = (connectorIds: string[]): Strip => createStrip('bidirectional', connectorIds);
+const createPositiveStrip = (connectorIds: string[], boardPosition: string): Strip => createStrip('positive', connectorIds, 'plus', boardPosition);
+const createNegativeStrip = (connectorIds: string[], boardPosition: string): Strip => createStrip('negative', connectorIds, 'minus', boardPosition);
+const createRegularStrip = (connectorIds: string[], stripIdentifier: string, boardPosition: string): Strip => createStrip('bidirectional', connectorIds, stripIdentifier, boardPosition);
 
 const calculateBreadboardDimensions = () => {
     const width = 3 * REGULAR_SECTION_WIDTH + 4 * POWER_RAIL_WIDTH + 4 * PIN_SPACING;
@@ -76,7 +76,7 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
     };
 
     // Create a power rail section (both positive and negative rails)
-    const createPowerRailSection = (startX: number) => {
+    const createPowerRailSection = (startX: number, boardPosition: string) => {
         const positiveConnectors: string[] = [];
         const negativeConnectors: string[] = [];
 
@@ -95,8 +95,8 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
 
 
         // Create strips for power and ground rails
-        const positiveStrip = createPositiveStrip(positiveConnectors);
-        const negativeStrip = createNegativeStrip(negativeConnectors);
+        const positiveStrip = createPositiveStrip(positiveConnectors, boardPosition);
+        const negativeStrip = createNegativeStrip(negativeConnectors, boardPosition);
 
         stripMapping.strips[positiveStrip.id] = positiveStrip;
         stripMapping.strips[negativeStrip.id] = negativeStrip;
@@ -112,7 +112,7 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
         });
     };
     // Create a regular section of the breadboard
-    const createRegularSection = (startX: number) => {
+    const createRegularSection = (startX: number, boardPosition: string ) => {
         for (let row = 0; row < BOARD_ROWS; row++) {
             const leftStripConnectors: string[] = [];
             const rightStripConnectors: string[] = [];
@@ -135,8 +135,8 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
             }
 
             // Create strips and map connectors
-            const leftStrip = createRegularStrip(leftStripConnectors);
-            const rightStrip = createRegularStrip(rightStripConnectors);
+            const leftStrip = createRegularStrip(leftStripConnectors, (row + 1).toString(), boardPosition + '-left');
+            const rightStrip = createRegularStrip(rightStripConnectors,(row + 1).toString(), boardPosition + '-right');
             stripMapping.strips[leftStrip.id] = leftStrip;
             stripMapping.strips[rightStrip.id] = rightStrip;
             leftStripConnectors.forEach(id => {
@@ -150,20 +150,15 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
 
     let currentX = 0;
 
-    // Left power rail
-    createPowerRailSection(currentX);
-    currentX += POWER_RAIL_WIDTH + PIN_SPACING; // gap of 1 pin
-    createRegularSection(currentX);
-    currentX += REGULAR_SECTION_WIDTH + PIN_SPACING;
-    createPowerRailSection(currentX);
-    currentX += POWER_RAIL_WIDTH + PIN_SPACING;
-    createRegularSection(currentX);
-    currentX += REGULAR_SECTION_WIDTH + PIN_SPACING;
-    createPowerRailSection(currentX);
-    currentX += POWER_RAIL_WIDTH + PIN_SPACING;
-    createRegularSection(currentX);
-    currentX += REGULAR_SECTION_WIDTH + PIN_SPACING;
-    createPowerRailSection(currentX);
+    for (let sectionIndex = 0; sectionIndex < 7; sectionIndex++) {
+        if (sectionIndex % 2 === 0) {
+            createPowerRailSection(currentX, sectionIndex.toString());
+            currentX += POWER_RAIL_WIDTH + PIN_SPACING;
+        } else {
+            createRegularSection(currentX, sectionIndex.toString());
+            currentX += REGULAR_SECTION_WIDTH + PIN_SPACING;
+        }
+    }
 
     return {
         editorID,
