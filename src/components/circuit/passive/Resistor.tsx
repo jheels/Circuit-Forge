@@ -91,7 +91,7 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
     // Calculate band dimensions and spacing
     const bandWidth = dimensions.width / 12;
     const bandSpacing = dimensions.width / 6;
-    const bodyColor = '#E8C49C';
+    const bodyColour = '#E8C49C';
 
     return (
         <BaseComponent componentID={componentID}>
@@ -118,7 +118,7 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
             <Rect
                 width={dimensions.width}
                 height={dimensions.height}
-                fill={bodyColor}
+                fill={bodyColour}
                 cornerRadius={dimensions.height / 4}
                 stroke={'rgba(143,217,251, 0.5)'}
                 strokeEnabled={selectedComponent === componentID}

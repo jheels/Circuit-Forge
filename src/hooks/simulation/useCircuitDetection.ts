@@ -12,6 +12,7 @@ import {
 } from '@/simulation/analysis/circuitDetection';
 import { validateCircuit } from '@/simulation/validation';
 import toast from 'react-hot-toast';
+import { solveCircuit } from '@/simulation/core/MNASystem';
 
 export const useCircuitDetection = () => {
     const { components, connections, getConnectorConnections } = useSimulatorContext();
@@ -62,6 +63,9 @@ export const useCircuitDetection = () => {
             setCircuitGraph(graph);
         }
         setCircuitGraph(graph);
+
+        const sol = solveCircuit(graph, components);
+        console.log(sol);
     }, [connections, components, powerDistribution, powerSupply, breadboard]);
 
     return {
