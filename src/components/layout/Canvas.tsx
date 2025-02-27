@@ -14,6 +14,7 @@ import Konva from 'konva';
 import toast from 'react-hot-toast';
 import { Breadboard } from '../circuit/board/Breadboard';
 import { useCircuitDetection } from '@/hooks/simulation/useCircuitDetection';
+import { DipSwitch } from '../circuit/passive/DIPSwitch';
 
 interface CanvasProps {
     scale: number;
@@ -151,6 +152,11 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                         <PowerSupply key={component.editorID} componentID={component.editorID} />
                     );
                     break;
+                case 'dip-switch':
+                    otherComponents.push(
+                        <DipSwitch key={component.editorID} componentID={component.editorID} />
+                    );
+                    break;    
                 case 'breadboard':
                     breadboard = <Breadboard key={component.editorID} componentID={component.editorID} />;
                     break;

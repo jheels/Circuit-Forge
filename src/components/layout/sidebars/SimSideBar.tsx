@@ -21,6 +21,11 @@ const simulatorComponents: SidebarComponent[] = [
         sidebarID: 'power-supply',
         name: 'Power Supply',
         description: 'A power supply is an electrical device that supplies electric power to an electrical load.',
+    },
+    {
+        sidebarID: 'dip-switch',
+        name: 'Dip Switch x8',
+        description: 'A collection of 8 toggle switches with two positions each.'
     }
 ];
 

@@ -148,6 +148,9 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
     ],
     'breadboard': [
         CommonProperties.name,
+    ],
+    'dip-switch': [
+        CommonProperties.name,
     ]
 };
 

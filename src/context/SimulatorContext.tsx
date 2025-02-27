@@ -7,6 +7,7 @@ import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
 import { Connection, isWireConnection } from "@/types/connection";
 import { toast } from "react-hot-toast";
+import { createDIPSwitchComponent } from "@/types/components/dipswitch";
 
 interface SimulatorContextType {
     projectName: string;
@@ -210,6 +211,8 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
                 return createPowerSupplyComponent(position, name);
             case 'breadboard':
                 return createBreadboardComponent(position, name);
+            case 'dip-switch':
+                return createDIPSwitchComponent(position, name);
             default:
                 throw new Error(`Invalid component type: ${type}`);
         }

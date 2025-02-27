@@ -1,3 +1,7 @@
+/*
+TODO: 
+- fix bug where when creating a wire and you are moving then it will not follow (cancel creation maybe?)
+*/
 import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point, Wire } from '@/types/general';
