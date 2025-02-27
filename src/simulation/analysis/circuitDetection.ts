@@ -5,13 +5,77 @@ import { PowerSupplyComponent } from '@/types/components/powerSupply';
 import { Connection, isWireConnection } from '@/types/connection';
 import { BreadboardComponent } from '@/types/components/breadboard';
 import { EditorComponent } from '@/types/general';
+import { DIPSwitchComponent } from '@/types/components/dipswitch';
 
 export type NodeType = 'power' | 'ground' | 'regular';
 
 export interface CircuitConnection {
     type: 'wire' | 'component';
     id: string;
+    metadata?: {
+        componentType?: string;
+        switchIndex?: number;
+    }
 }
+
+export const createComponentConnection = (
+    componentId: string,
+    componentType: string,
+    metadata?: Record<string, any>
+): CircuitConnection => {
+    return {
+        type: 'component',
+        id: componentId,
+        metadata: {
+            componentType,
+            ...metadata
+        }
+    }
+}
+
+export const createDIPSwitchConnection = (
+    componentId: string,
+    switchIndex: number
+): CircuitConnection => {
+    return {
+        type: 'component',
+        id: componentId,
+        metadata: {
+            componentType: 'dip-switch',
+            switchIndex
+        }
+    }
+}
+
+export const createWireConnection = (
+    wireId: string
+): CircuitConnection => {
+    return {
+        type: 'wire',
+        id: wireId
+    }
+}
+
+// Type guard functions
+export const isDIPSwitchConnection = (
+    connection: CircuitConnection
+): boolean => {
+    return connection.type === 'component' &&
+        connection.metadata?.componentType === 'dip-switch' &&
+        typeof connection.metadata?.switchIndex === 'number';
+};
+
+export const getComponentType = (
+    connection: CircuitConnection
+): string | undefined => {
+    return connection.type === 'component' ? connection.metadata?.componentType : undefined;
+};
+
+export const getSwitchIndex = (
+    connection: CircuitConnection
+): number | undefined => {
+    return isDIPSwitchConnection(connection) ? connection.metadata?.switchIndex : undefined;
+};
 
 export interface CircuitNode {
     id: string;
@@ -23,7 +87,7 @@ export interface CircuitEdge {
     id: string;
     sourceId: string;
     targetId: string;
-    connections: CircuitConnection[];
+    connection: CircuitConnection;
 }
 
 export interface CircuitGraph {
@@ -44,14 +108,13 @@ export const createCircuitNode = (
 export const createCircuitEdge = (
     sourceId: string,
     targetId: string,
-    connections: CircuitConnection[] = []
-
+    connection: CircuitConnection
 ): CircuitEdge => {
     return {
         id: 'edge-' + sourceId + '-' + targetId + '-' + uuidv4(),
         sourceId,
         targetId,
-        connections
+        connection
     }
 }
 
@@ -73,7 +136,7 @@ export const initialisePowerDistribution = (
     nodes[powerNode] = createCircuitNode('power', powerNode);
     nodes[groundNode] = createCircuitNode('ground', groundNode);
 
-    const edge = createCircuitEdge(powerNode, groundNode, [{ type: 'component', id: powerSupply.editorID }]);
+    const edge = createCircuitEdge(powerNode, groundNode, createComponentConnection(powerSupply.editorID, powerSupply.type));
     edges[edge.id] = edge;
 
     return { nodes, edges };
@@ -139,7 +202,7 @@ export const createEdgesFromConnections = (
             const edge = createCircuitEdge(
                 sourceId,
                 targetId,
-                [{ type: 'wire', id: connection.id }]
+                createWireConnection(connection.metadata.wireID)
             );
             edges[edge.id] = edge;
             processedConnections.add(connection.id);
@@ -149,29 +212,65 @@ export const createEdgesFromConnections = (
     // TODO: refactor since only one connection per connector so unnecessary loops.
     Object.values(components).forEach(component => {
         if (component.type === 'power-supply' || component.type === 'breadboard') return;
-        const stripIDs: string[] = [];
-        Object.values(component.connectors).forEach(connector => {
-            const connectorConnections = getConnectorConnections(connector.id);
-            connectorConnections.forEach(connection => {
-                let stripID = connections[connection].metadata.stripID;
 
-                if (poweredRails.has(stripID)) {
-                    stripID = powerNode;
-                } else if (groundedRails.has(stripID)) {
-                    stripID = groundNode;
-                }
 
-                stripIDs.push(stripID);
+        // TODO: refactor to use functions for each component type.
+        if (component.type === 'dip-switch') {
+            const dipSwitch = component as DIPSwitchComponent;
+            const connectorArray = Object.values(dipSwitch.connectors);
+            if (connectorArray.length !== 16) return;
+
+            for (let i = 0; i < 8; i++) {
+                const leftConnector = connectorArray[i * 2];
+                const rightConnector = connectorArray[i * 2 + 1];
+                const leftConnection = connections[Array.from(getConnectorConnections(leftConnector.id))[0]];
+                const rightConnection = connections[Array.from(getConnectorConnections(rightConnector.id))[0]];
+
+                if (!leftConnection || !rightConnection) return;
+
+                let leftStripID = leftConnection.metadata.stripID;
+                let rightStripID = rightConnection.metadata.stripID;
+
+                if (poweredRails.has(leftStripID)) leftStripID = powerNode;
+                else if (groundedRails.has(leftStripID)) leftStripID = groundNode;
+
+                if (poweredRails.has(rightStripID)) rightStripID = powerNode;
+                else if (groundedRails.has(rightStripID)) rightStripID = groundNode;
+
+                const edge = createCircuitEdge(
+                    nodes[leftStripID].id,
+                    nodes[rightStripID].id,
+                    createDIPSwitchConnection(component.editorID, i)
+                );
+                edges[edge.id] = edge;
+            }
+        } else {
+
+
+            const stripIDs: string[] = [];
+            Object.values(component.connectors).forEach(connector => {
+                const connectorConnections = getConnectorConnections(connector.id);
+                connectorConnections.forEach(connection => {
+                    let stripID = connections[connection].metadata.stripID;
+
+                    if (poweredRails.has(stripID)) {
+                        stripID = powerNode;
+                    } else if (groundedRails.has(stripID)) {
+                        stripID = groundNode;
+                    }
+
+                    stripIDs.push(stripID);
+                });
             });
-        });
-        if (stripIDs.length !== 2) return;
+            if (stripIDs.length !== 2) return;
 
-        const edge = createCircuitEdge(
-            nodes[stripIDs[0]].id,
-            nodes[stripIDs[1]].id,
-            [{ type: 'component', id: component.editorID }]
-        )
-        edges[edge.id] = edge;
+            const edge = createCircuitEdge(
+                nodes[stripIDs[0]].id,
+                nodes[stripIDs[1]].id,
+                createComponentConnection(component.editorID, component.type)
+            )
+            edges[edge.id] = edge;
+        }
     });
 
     return { nodes, edges };

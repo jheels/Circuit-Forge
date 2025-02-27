@@ -17,14 +17,14 @@ const validateDirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
     const issues: ValidationIssue[] = [];
 
     Object.values(graph.edges).forEach((edge) => {
-        if (edge.connections[0].type !== 'component') return;
+        if (edge.connection.type !== 'component') return;
 
         if (edge.sourceId === edge.targetId) {
             issues.push(
                 createValidationIssue(
                     'warning',
                     'Shorted component detected',
-                    [edge.connections[0].id],
+                    [edge.connection.id],
                     [edge.sourceId],
                     'Connect the component to different strips to create a PD.'
                 )
@@ -39,7 +39,7 @@ const validateIndirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
     const issues: ValidationIssue[] = [];
 
     Object.values(graph.edges).forEach((edge) => {
-        if (edge.connections[0].type !== 'component') return;
+        if (edge.connection.type !== 'component') return;
 
         if (['unified-power', 'unified-ground'].includes(edge.sourceId) && ['unified-power', 'unified-ground'].includes(edge.targetId)) return;
         if (edge.sourceId === edge.targetId) return;
@@ -49,7 +49,7 @@ const validateIndirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
                 createValidationIssue(
                     'warning',
                     'Indirect short circuit detected!',
-                    [edge.connections[0].id],
+                    [edge.connection.id],
                     [edge.sourceId, edge.targetId],
                     'Remove the loop of wires to prevent a short circuit.'
                 )

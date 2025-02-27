@@ -1,8 +1,9 @@
 import { ResistorComponent } from "@/types/components/resistor";
 import { CircuitEdge } from "../analysis/circuitDetection";
 import { Matrix } from 'mathjs';
+import { ComponentModel } from "./componentModelFactory";
 
-export interface ResistorModel {
+export interface ResistorModel extends ComponentModel {
     type: 'resistor';
     conductance: number;
     edge: CircuitEdge

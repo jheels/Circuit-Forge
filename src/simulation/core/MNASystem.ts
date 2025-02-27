@@ -1,17 +1,14 @@
 import { lusolve, matrix, Matrix, zeros } from "mathjs";
-import { CircuitGraph, CircuitNode } from "../analysis/circuitDetection";
+import { CircuitEdge, CircuitGraph, CircuitNode } from "../analysis/circuitDetection";
 import { EditorComponent } from "@/types/general";
-import { applyResistorStamp, createResistorModel } from "../models/resistorModel";
-import { ResistorComponent } from "@/types/components/resistor";
 import { applyWireStamp, createWireModel } from "../models/wireModel";
-import { PowerSupplyComponent } from "@/types/components/powerSupply";
-import { applyPowerSupplyStamp, createPowerSupplyModel } from "../models/powerSupplyModel";
+import { applyComponentStamp, createComponentModel } from "../models/componentModelFactory";
 
 interface MNAMatrixSystem {
     conductanceMatrix: Matrix;          // The (n+m)×(n+m) coefficient matrix
     conductanceUnknownVector: Matrix;          // The (n+m)×1 unknown vector (voltages and currents)
     inputSourcesVector: Matrix;          // The (n+m)×1 known vector (source values)
-    nodeMapping: Record<string, number>;  // Maps node IDs to matrix indices
+    nodeMap: Record<string, number>;  // Maps node IDs to matrix indices
     nodeCount: number;  // Number of nodes excluding ground (n)
 }
 
@@ -38,9 +35,38 @@ const initialiseMNASystem = (nodeCount: number): MNAMatrixSystem => {
         conductanceMatrix,
         conductanceUnknownVector,
         inputSourcesVector,
-        nodeMapping: {},
+        nodeMap: {},
         nodeCount,
     }
+}
+
+export const processEdge = (
+    edge: CircuitEdge,
+    components: Record<string, EditorComponent>,
+    system: MNAMatrixSystem
+): void => {
+    const { conductanceMatrix, inputSourcesVector, nodeMap } = system;
+
+    if (edge.connection.type === 'wire') {
+        const wireModel = createWireModel(edge);
+        applyWireStamp(conductanceMatrix, wireModel, nodeMap);
+        return;
+    }
+
+    const component = components[edge.connection.id];
+
+    if (!component) {
+        console.warn(`Component ${edge.connection.id} not found`);
+        return;
+    }
+
+    const model = createComponentModel(component, edge);
+    if (!model) {
+        console.warn(`Model for component ${component.type} not found`);
+        return;
+    }
+
+    applyComponentStamp(model, conductanceMatrix, nodeMap, inputSourcesVector);
 }
 
 export const solveCircuit = (graph: CircuitGraph, components: Record<string, EditorComponent>): Record<string, number> => {
@@ -48,27 +74,10 @@ export const solveCircuit = (graph: CircuitGraph, components: Record<string, Edi
     const nodeCount = Object.keys(nodeMapping).length;
 
     const system = initialiseMNASystem(nodeCount);
-    system.nodeMapping = nodeMapping;
+    system.nodeMap = nodeMapping;
 
     Object.values(graph.edges).forEach((edge) => {
-        if (edge.connections[0].type !== 'component') {
-            const wireModel = createWireModel(edge);
-            applyWireStamp(system.conductanceMatrix, wireModel, nodeMapping);
-            return;
-        }
-
-        const component = components[edge.connections[0].id];
-        if (component.type === 'resistor') {
-            const resistorModel = createResistorModel(component as ResistorComponent, edge);
-            applyResistorStamp(system.conductanceMatrix, resistorModel, nodeMapping);
-        } else if (component.type === 'power-supply') {
-            const newSize = system.conductanceMatrix.size()[0] + 1;
-            system.conductanceMatrix.resize([newSize, newSize]);
-            system.inputSourcesVector.resize([newSize, 1]);
-            const PowerSupplyModel = createPowerSupplyModel(component as PowerSupplyComponent, edge);
-            applyPowerSupplyStamp(system.conductanceMatrix, system.inputSourcesVector,
-                PowerSupplyModel, nodeMapping);
-        }
+        processEdge(edge, components, system);
     });
 
     const solution = lusolve(system.conductanceMatrix, system.inputSourcesVector);

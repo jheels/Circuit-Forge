@@ -18,7 +18,7 @@ export const hasWireOnlyPath = (
             (edge.sourceId === currentNode || edge.targetId === currentNode) &&
             !excludeEdgeIds.includes(edge.id) &&
             !newVisited.has(edge.id) &&
-            edge.connections.every(conn => conn.type === 'wire')
+            edge.connection.type === 'wire'
         );
 
         for (const edge of availableEdges) {
