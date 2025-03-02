@@ -81,7 +81,9 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 if (!isPointInConnector(dropPoint, connector, position, dimensions)) return;
                 const connectorConnections = getConnectorConnections(connector.id);
                 if (connectorConnections.size > 0) {
-                    toast.error('Max 1 connection per connector.')
+                    toast.error('Max 1 connection per connector.', {
+                        id: 'max-connection-toast'
+                    })
                     return;
                 }
 

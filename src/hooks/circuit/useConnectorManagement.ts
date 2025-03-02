@@ -28,7 +28,9 @@ export const useConnectorManagement = (
     const handleConnectorClick = useCallback((connectorID: string) => {
         const connectorConnections = getConnectorConnections(connectorID);
         if (connectorConnections.size > 0) {
-            toast.error('Max 1 connection per connector.');
+            toast.error('Max 1 connection per connector.', {
+                id: 'max-connection-toast'
+            });
             return;
         }
 
