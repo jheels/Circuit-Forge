@@ -6,7 +6,6 @@ import { ComponentModel } from "./componentModelFactory";
 export interface ResistorModel extends ComponentModel {
     type: 'resistor';
     conductance: number;
-    edge: CircuitEdge
 }
 
 const convertToBaseUnits = (value: number, unit: string): number => {
@@ -28,6 +27,7 @@ export const createResistorModel = (component: ResistorComponent, edge: CircuitE
     const conductance = 1 / resistance;
 
     return {
+        isLinear: true,
         type: 'resistor',
         conductance,
         edge

@@ -6,13 +6,13 @@ import { ComponentModel } from "./componentModelFactory";
 export interface PowerSupplyModel extends ComponentModel {
     type: 'power-supply';
     voltage: number;
-    edge: CircuitEdge
 }
 
 export const createPowerSupplyModel = (component: PowerSupplyComponent, edge: CircuitEdge): PowerSupplyModel => {
     const voltage = component.properties.voltage as number;
 
     return {
+        isLinear: true,
         type: 'power-supply',
         voltage,
         edge

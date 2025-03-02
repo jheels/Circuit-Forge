@@ -1,17 +1,18 @@
 import { Matrix } from "mathjs";
 import { CircuitEdge } from "../analysis/circuitDetection";
 import { applyResistorStamp } from "./resistorModel";
+import { ComponentModel } from "./componentModelFactory";
 
 
-export interface DipSwitchModel {
+export interface DipSwitchModel extends ComponentModel {
     type: 'dip-switch';
     switchIndex: number;
     switchState: boolean;
-    edge: CircuitEdge;
 }
 
 export const createDipSwitchModel = (switchIndex: number, switchState: boolean, edge: CircuitEdge): DipSwitchModel => {
     return {
+        isLinear: true,
         type: 'dip-switch',
         switchIndex,
         switchState,
@@ -32,6 +33,7 @@ export const applyDipSwitchStamp = (
     const conductance = switchState ? CLOSED_SWITCH_CONDUCTANCE : OPEN_SWITCH_CONDUCTANCE;
 
     applyResistorStamp(conductanceMatrix, {
+        isLinear: true,
         type: 'resistor',
         conductance,
         edge

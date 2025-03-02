@@ -8,6 +8,7 @@ const WIRE_RESISTANCE = 1; // 1Ω TEMPORARY FIX TO AVOID DIVISION BY ZERO
 
 export const createWireModel = (edge: CircuitEdge): WireModel => {
     return {
+        isLinear: true,
         type: 'resistor',
         conductance: 1 / WIRE_RESISTANCE,
         edge
