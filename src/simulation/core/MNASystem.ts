@@ -1,8 +1,6 @@
 import { lusolve, matrix, Matrix, zeros } from "mathjs";
-import { CircuitEdge, CircuitGraph, CircuitNode } from "../analysis/circuitDetection";
-import { EditorComponent } from "@/types/general";
-import { applyWireStamp, createWireModel } from "../models/wireModel";
-import { applyComponentStamp, createComponentModel } from "../models/componentModelFactory";
+import { CircuitGraph, CircuitNode } from "../analysis/circuitDetection";
+import { applyComponentStamp, ComponentModel } from "../models/componentModelFactory";
 
 interface MNAMatrixSystem {
     conductanceMatrix: Matrix;          // The (n+m)×(n+m) coefficient matrix
@@ -40,44 +38,15 @@ const initialiseMNASystem = (nodeCount: number): MNAMatrixSystem => {
     }
 }
 
-export const processEdge = (
-    edge: CircuitEdge,
-    components: Record<string, EditorComponent>,
-    system: MNAMatrixSystem
-): void => {
-    const { conductanceMatrix, inputSourcesVector, nodeMap } = system;
-
-    if (edge.connection.type === 'wire') {
-        const wireModel = createWireModel(edge);
-        applyWireStamp(conductanceMatrix, wireModel, nodeMap);
-        return;
-    }
-
-    const component = components[edge.connection.id];
-
-    if (!component) {
-        console.warn(`Component ${edge.connection.id} not found`);
-        return;
-    }
-
-    const model = createComponentModel(component, edge);
-    if (!model) {
-        console.warn(`Model for component ${component.type} not found`);
-        return;
-    }
-
-    applyComponentStamp(model, conductanceMatrix, nodeMap, inputSourcesVector);
-}
-
-export const solveCircuit = (graph: CircuitGraph, components: Record<string, EditorComponent>): Record<string, number> => {
+export const solveCircuit = (graph: CircuitGraph,  models: Record<string, ComponentModel>): Record<string, number> => {
     const nodeMapping = createNodeMap(graph.nodes);
     const nodeCount = Object.keys(nodeMapping).length;
 
     const system = initialiseMNASystem(nodeCount);
     system.nodeMap = nodeMapping;
 
-    Object.values(graph.edges).forEach((edge) => {
-        processEdge(edge, components, system);
+    Object.values(models).forEach((model) => {
+        applyComponentStamp(model, system.conductanceMatrix, nodeMapping, system.inputSourcesVector);
     });
 
     const solution = lusolve(system.conductanceMatrix, system.inputSourcesVector);
