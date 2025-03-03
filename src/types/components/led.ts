@@ -9,8 +9,8 @@ export interface LEDComponent extends EditorComponent {
 
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
     const editorID = `LED-${uuidv4()}`;
-    const powerConnector = createConnector(editorID, 'cathode', { x: -0.11111, y: 0.444444 });
-    const groundConnector = createConnector(editorID, 'anode', { x: 0.233333, y: 0.44444 });
+    const anodeConnector = createConnector(editorID, 'anode', { x: 0.233333, y: 0.44444 });
+    const cathodeConnector = createConnector(editorID, 'cathode', { x: -0.11111, y: 0.444444 });
 
     return {
         editorID: editorID,
@@ -20,9 +20,8 @@ export const createLEDComponent = (position: Point, name: string): LEDComponent 
         position: position,
         properties: createDefaultProperties('led', name),
         connectors: {
-            [powerConnector.id]: powerConnector,
-            [groundConnector.id]: groundConnector,
+            [anodeConnector.id]: anodeConnector,
+            [cathodeConnector.id]: cathodeConnector
         }
     }
-}   
-
+}
