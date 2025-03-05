@@ -8,6 +8,7 @@ import { Connector } from "@/types/connector";
 import { Connection, isWireConnection } from "@/types/connection";
 import { toast } from "react-hot-toast";
 import { createDIPSwitchComponent } from "@/types/components/dipswitch";
+import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/types/components/ic";
 
 interface SimulatorContextType {
     projectName: string;
@@ -56,7 +57,7 @@ export const useSimulatorContext = () => {
     return context;
 }
 
-export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ children }) => {
+export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [projectName, setProjectName] = useState<string>(() => {
         return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
     });
@@ -213,6 +214,19 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
                 return createBreadboardComponent(position, name);
             case 'dip-switch':
                 return createDIPSwitchComponent(position, name);
+            case '74LS04':
+                return createHexInverter(position, name);
+            case '74LS00':
+                return createQuadNANDGate(position, name);
+            case '74LS08':
+                return createQuadANDGate(position, name);
+            case '74LS32':
+                return createQuadORGate(position, name);
+            case '74LS02':
+                return createQuadNORGate(position, name);
+            case '74LS86':
+                return createQuadXORGate(position, name);
+
             default:
                 throw new Error(`Invalid component type: ${type}`);
         }
@@ -263,7 +277,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         }));
     }
 
-    const removeWire = (wireID: string) => {    
+    const removeWire = (wireID: string) => {
         const wire = wires[wireID];
         if (!wire) return;
         // possibly bring back wireConnection
@@ -274,7 +288,7 @@ export const SimulatorContextProvider: React.FC<{children : ReactNode}> = ({ chi
         if (connectionID) {
             removeConnection(connectionID);
         }
-                
+
         setWires((prev) => {
             const newWires = { ...prev };
             delete newWires[wireID];

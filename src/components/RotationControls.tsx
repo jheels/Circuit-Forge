@@ -21,9 +21,8 @@ export const RotationControls = () => {
     if (!selectedComponent || !components[selectedComponent]) return null;
 
     const component = components[selectedComponent];
-    
-    // Don't show rotation controls for breadboard
-    if (component.type === 'breadboard') return null;
+
+    if (component.type === 'breadboard' || component.type === 'ic') return null;
 
     const handleRotate = (direction: 'clockwise' | 'anticlockwise') => {
         const currentRotation = component.rotation || 0;

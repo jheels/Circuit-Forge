@@ -151,7 +151,10 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
     ],
     'dip-switch': [
         CommonProperties.name,
-    ]
+    ],
+    'ic' : [
+        CommonProperties.name,
+    ],
 };
 
 // Helper function to get property definitions for a component type

@@ -26,6 +26,37 @@ const simulatorComponents: SidebarComponent[] = [
         sidebarID: 'dip-switch',
         name: 'Dip Switch x8',
         description: 'A collection of 8 toggle switches with two positions each.'
+    },
+    // New IC components
+    {
+        sidebarID: '74LS04',
+        name: '74LS04 Hex Inverter',
+        description: 'Contains six independent NOT gates (inverters).'
+    },
+    {
+        sidebarID: '74LS00',
+        name: '74LS00 Quad NAND',
+        description: 'Contains four independent 2-input NAND gates.'
+    },
+    {
+        sidebarID: '74LS08',
+        name: '74LS08 Quad AND',
+        description: 'Contains four independent 2-input AND gates.'
+    },
+    {
+        sidebarID: '74LS32',
+        name: '74LS32 Quad OR',
+        description: 'Contains four independent 2-input OR gates.'
+    },
+    {
+        sidebarID: '74LS02',
+        name: '74LS02 Quad NOR',
+        description: 'Contains four independent 2-input NOR gates.'
+    },
+    {
+        sidebarID: '74LS86',
+        name: '74LS86 Quad XOR',
+        description: 'Contains four independent 2-input XOR gates.'
     }
 ];
 
