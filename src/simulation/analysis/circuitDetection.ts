@@ -6,6 +6,7 @@ import { Connection, isWireConnection } from '@/types/connection';
 import { BreadboardComponent } from '@/types/components/breadboard';
 import { EditorComponent } from '@/types/general';
 import { DIPSwitchComponent } from '@/types/components/dipswitch';
+import { processDIPSwitchConnections, processTwoTerminalComponents, processWireConnections } from './circuitProcessing';
 
 export type NodeType = 'power' | 'ground' | 'regular';
 
@@ -176,104 +177,20 @@ export const createEdgesFromConnections = (
     powerDistribution: PowerDistribution,
     getConnectorConnections: (connectorID: string) => Set<string>,
 ): CircuitGraph => {
-    const { nodes, edges } = graph;
-    const { powerNode, groundNode, poweredRails, groundedRails } = powerDistribution;
-
-    const processedConnections = new Set<string>();
-
-    Object.values(connections).forEach(connection => {
-        if (isWireConnection(connection) && connection.metadata.targetStripID && !processedConnections.has(connection.id)) {
-            let sourceId = connection.metadata.stripID;
-            let targetId = connection.metadata.targetStripID;
-
-            if (poweredRails.has(sourceId)) {
-                sourceId = powerNode;
-            } else if (groundedRails.has(sourceId)) {
-                sourceId = groundNode;
-            }
-
-            if (poweredRails.has(targetId)) {
-                targetId = powerNode;
-            } else if (groundedRails.has(targetId)) {
-                targetId = groundNode;
-            }
-
-            if (!nodes[sourceId] || !nodes[targetId]) return;
-            const edge = createCircuitEdge(
-                sourceId,
-                targetId,
-                createWireConnection(connection.metadata.wireID)
-            );
-            edges[edge.id] = edge;
-            processedConnections.add(connection.id);
-        }
-    });
+    graph = processWireConnections(graph, connections, powerDistribution);
 
     // TODO: refactor since only one connection per connector so unnecessary loops.
     Object.values(components).forEach(component => {
         if (component.type === 'power-supply' || component.type === 'breadboard') return;
-
-
         // TODO: refactor to use functions for each component type.
         if (component.type === 'dip-switch') {
-            const dipSwitch = component as DIPSwitchComponent;
-            const connectorArray = Object.values(dipSwitch.connectors);
-            if (connectorArray.length !== 16) return;
-
-            for (let i = 0; i < 8; i++) {
-                const leftConnector = connectorArray[i * 2];
-                const rightConnector = connectorArray[i * 2 + 1];
-                const leftConnection = connections[Array.from(getConnectorConnections(leftConnector.id))[0]];
-                const rightConnection = connections[Array.from(getConnectorConnections(rightConnector.id))[0]];
-
-                if (!leftConnection || !rightConnection) return;
-
-                let leftStripID = leftConnection.metadata.stripID;
-                let rightStripID = rightConnection.metadata.stripID;
-
-                if (poweredRails.has(leftStripID)) leftStripID = powerNode;
-                else if (groundedRails.has(leftStripID)) leftStripID = groundNode;
-
-                if (poweredRails.has(rightStripID)) rightStripID = powerNode;
-                else if (groundedRails.has(rightStripID)) rightStripID = groundNode;
-
-                const edge = createCircuitEdge(
-                    nodes[leftStripID].id,
-                    nodes[rightStripID].id,
-                    createDIPSwitchConnection(component.editorID, i)
-                );
-                edges[edge.id] = edge;
-            }
+            graph = processDIPSwitchConnections(graph, connections, powerDistribution, component as DIPSwitchComponent, getConnectorConnections);
         } else {
-
-
-            const stripIDs: string[] = [];
-            Object.values(component.connectors).forEach(connector => {
-                const connectorConnections = getConnectorConnections(connector.id);
-                connectorConnections.forEach(connection => {
-                    let stripID = connections[connection].metadata.stripID;
-
-                    if (poweredRails.has(stripID)) {
-                        stripID = powerNode;
-                    } else if (groundedRails.has(stripID)) {
-                        stripID = groundNode;
-                    }
-
-                    stripIDs.push(stripID);
-                });
-            });
-            if (stripIDs.length !== 2) return;
-
-            const edge = createCircuitEdge(
-                nodes[stripIDs[0]].id,
-                nodes[stripIDs[1]].id,
-                createComponentConnection(component.editorID, component.type)
-            )
-            edges[edge.id] = edge;
+            graph = processTwoTerminalComponents(graph, connections, powerDistribution, component, getConnectorConnections);
         }
     });
 
-    return { nodes, edges };
+    return graph;
 }
 
 export const findConnectedCircuit = (
