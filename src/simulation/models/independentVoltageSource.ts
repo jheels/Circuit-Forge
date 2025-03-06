@@ -19,6 +19,21 @@ export const createIndependentVoltageSource = (component: PowerSupplyComponent, 
     }
 }
 
+export const applyVoltageSourceStamp = (
+    conductanceMatrix: Matrix,
+    inputSourcesVector: Matrix,
+    voltage: number,
+    nodeIndex: number
+): void => {
+    const newSize = conductanceMatrix.size()[0] + 1;
+    conductanceMatrix.resize([newSize, newSize]);
+    inputSourcesVector.resize([newSize, 1]);
+    conductanceMatrix.set([nodeIndex, conductanceMatrix.size()[1]-1], 1);
+    conductanceMatrix.set([conductanceMatrix.size()[1]-1, nodeIndex], 1);
+    inputSourcesVector.set([inputSourcesVector.size()[0]-1, 0], voltage);
+
+}
+
 export const applyIndependentVoltageSourceStamp = (
     conductanceMatrix: Matrix,
     inputSourcesVector: Matrix,
@@ -30,15 +45,7 @@ export const applyIndependentVoltageSourceStamp = (
 
     // This is because of the circuit initialisation
     const powerNode = nodeMap[sourceId];
-    const newSize = conductanceMatrix.size()[0] + 1;
-    
-    conductanceMatrix.resize([newSize, newSize]);
-    inputSourcesVector.resize([newSize, 1]);
 
-    // Add the voltage source to the conductance matrix with +1 at the col i and +1 at the row i
-    conductanceMatrix.set([powerNode, conductanceMatrix.size()[1]-1], 1);
-    conductanceMatrix.set([conductanceMatrix.size()[1]-1, powerNode], 1);
-
-    // Add the voltage source to the input sources matrix with the voltage value at the end
-    inputSourcesVector.set([inputSourcesVector.size()[0]-1, 0], voltage);
+    if (powerNode === undefined) return;
+    applyVoltageSourceStamp(conductanceMatrix, inputSourcesVector, voltage, powerNode);
 }

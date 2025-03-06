@@ -25,8 +25,8 @@ export const applyDipSwitchStamp = (
     model: DipSwitchModel,
     nodeMap: Record<string, number>
 ): void => {
-    const CLOSED_SWITCH_CONDUCTANCE = 1e12;
-    const OPEN_SWITCH_CONDUCTANCE = 1e-12;
+    const CLOSED_SWITCH_CONDUCTANCE = 1e10;
+    const OPEN_SWITCH_CONDUCTANCE = 1e-20;
 
     const { switchState, edge } = model;
 

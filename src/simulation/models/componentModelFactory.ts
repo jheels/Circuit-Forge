@@ -8,6 +8,7 @@ import { applyIndependentVoltageSourceStamp, createIndependentVoltageSource, Ind
 import { PowerSupplyComponent } from "@/types/components/powerSupply";
 import { Matrix } from "mathjs";
 import { applyLEDStamp, createLEDModel, LEDModel } from "./LEDModel";
+import { applyLogicGateStamp, LogicGateModel } from "./logicGateModel";
 
 export interface ComponentModel {
     isLinear: boolean;
@@ -30,7 +31,7 @@ export const createComponentModel = (
     switch (component.type) {
         case 'resistor':
             return createResistorModel(component as ResistorComponent, edge);
-        case 'independent-voltage-source':
+        case 'power-supply':
             return createIndependentVoltageSource(component as PowerSupplyComponent, edge);
         case 'led':
             return createLEDModel(edge);
@@ -53,7 +54,7 @@ export const applyComponentStamp = (
         case 'dip-switch':
             applyDipSwitchStamp(conductanceMatrix, model as DipSwitchModel, nodeMap);
             break;
-        case 'power-supply':
+        case 'independent-voltage-source':
             if (inputSourcesMatrix) {
                 applyIndependentVoltageSourceStamp(conductanceMatrix, inputSourcesMatrix, model as IndependentVoltageSource, nodeMap);
             }
@@ -61,6 +62,11 @@ export const applyComponentStamp = (
         case 'led':
             if (inputSourcesMatrix) {
                 applyLEDStamp(conductanceMatrix, inputSourcesMatrix, model as LEDModel, nodeMap);
+            }
+            break;
+        case 'logic-gate':
+            if (inputSourcesMatrix) {
+                applyLogicGateStamp(conductanceMatrix, inputSourcesMatrix, model as LogicGateModel, nodeMap);
             }
             break;
         default:
