@@ -4,7 +4,7 @@ import { DIPSwitchComponent } from "@/types/components/dipswitch";
 import { applyDipSwitchStamp, createDipSwitchModel, DipSwitchModel } from "./DIPSwitchModel";
 import { applyResistorStamp, createResistorModel, ResistorModel } from "./resistorModel";
 import { ResistorComponent } from "@/types/components/resistor";
-import { applyPowerSupplyStamp, createPowerSupplyModel, PowerSupplyModel } from "./powerSupplyModel";
+import { applyIndependentVoltageSourceStamp, createIndependentVoltageSource, IndependentVoltageSource } from "./independentVoltageSource";
 import { PowerSupplyComponent } from "@/types/components/powerSupply";
 import { Matrix } from "mathjs";
 import { applyLEDStamp, createLEDModel, LEDModel } from "./LEDModel";
@@ -30,8 +30,8 @@ export const createComponentModel = (
     switch (component.type) {
         case 'resistor':
             return createResistorModel(component as ResistorComponent, edge);
-        case 'power-supply':
-            return createPowerSupplyModel(component as PowerSupplyComponent, edge);
+        case 'independent-voltage-source':
+            return createIndependentVoltageSource(component as PowerSupplyComponent, edge);
         case 'led':
             return createLEDModel(edge);
         default:
@@ -55,7 +55,7 @@ export const applyComponentStamp = (
             break;
         case 'power-supply':
             if (inputSourcesMatrix) {
-                applyPowerSupplyStamp(conductanceMatrix, inputSourcesMatrix, model as PowerSupplyModel, nodeMap);
+                applyIndependentVoltageSourceStamp(conductanceMatrix, inputSourcesMatrix, model as IndependentVoltageSource, nodeMap);
             }
             break;
         case 'led':

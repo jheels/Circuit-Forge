@@ -3,26 +3,26 @@ import { CircuitEdge } from "../analysis/circuitDetection";
 import { Matrix } from 'mathjs';
 import { ComponentModel } from "./componentModelFactory";
 
-export interface PowerSupplyModel extends ComponentModel {
-    type: 'power-supply';
+export interface IndependentVoltageSource extends ComponentModel {
+    type: 'independent-voltage-source';
     voltage: number;
 }
 
-export const createPowerSupplyModel = (component: PowerSupplyComponent, edge: CircuitEdge): PowerSupplyModel => {
+export const createIndependentVoltageSource = (component: PowerSupplyComponent, edge: CircuitEdge): IndependentVoltageSource => {
     const voltage = component.properties.voltage as number;
 
     return {
         isLinear: true,
-        type: 'power-supply',
+        type: 'independent-voltage-source',
         voltage,
         edge
     }
 }
 
-export const applyPowerSupplyStamp = (
+export const applyIndependentVoltageSourceStamp = (
     conductanceMatrix: Matrix,
     inputSourcesVector: Matrix,
-    model: PowerSupplyModel,
+    model: IndependentVoltageSource,
     nodeMap: Record<string, number>
 ): void => {
     const { voltage, edge } = model;
