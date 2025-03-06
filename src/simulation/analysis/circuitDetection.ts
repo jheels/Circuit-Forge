@@ -6,17 +6,33 @@ import { Connection, isWireConnection } from '@/types/connection';
 import { BreadboardComponent } from '@/types/components/breadboard';
 import { EditorComponent } from '@/types/general';
 import { DIPSwitchComponent } from '@/types/components/dipswitch';
-import { processDIPSwitchConnections, processTwoTerminalComponents, processWireConnections } from './circuitProcessing';
+import { processDIPSwitchConnections, processTwoTerminalComponentConnections, processICComponentConnections, processWireConnections } from './circuitProcessing';
+import { ICComponent } from '@/types/components/ic';
 
 export type NodeType = 'power' | 'ground' | 'regular';
+
+interface DIPSwitchMetadata {
+    componentType: 'dip-switch';
+    switchIndex: number;
+}
+
+interface ICComponentMetadata {
+    componentType: 'ic';
+    icType: string;
+    gateIndex: number;
+    gateType: string;
+    pinFunction: string;
+    inputIndex?: number;
+}
+
+interface GeneralComponentMetadata {
+    componentType: string;
+}
 
 export interface CircuitConnection {
     type: 'wire' | 'component';
     id: string;
-    metadata?: {
-        componentType?: string;
-        switchIndex?: number;
-    }
+    metadata?: DIPSwitchMetadata | ICComponentMetadata | GeneralComponentMetadata;
 }
 
 export const createComponentConnection = (
@@ -30,7 +46,7 @@ export const createComponentConnection = (
         metadata: {
             componentType,
             ...metadata
-        }
+        } as GeneralComponentMetadata
     }
 }
 
@@ -44,7 +60,29 @@ export const createDIPSwitchConnection = (
         metadata: {
             componentType: 'dip-switch',
             switchIndex
-        }
+        } as DIPSwitchMetadata
+    }
+}
+
+export const createICComponentConnection = (
+    componentId: string,
+    icType: string,
+    gateIndex: number,
+    gateType: string,
+    pinFunction: string,
+    inputIndex?: number
+): CircuitConnection => {
+    return {
+        type: 'component',
+        id: componentId,
+        metadata: {
+            componentType: 'ic',
+            icType,
+            gateIndex,
+            gateType,
+            pinFunction,
+            inputIndex
+        } as ICComponentMetadata
     }
 }
 
@@ -53,17 +91,22 @@ export const createWireConnection = (
 ): CircuitConnection => {
     return {
         type: 'wire',
-        id: wireId
+        id: wireId,
     }
 }
 
-// Type guard functions
 export const isDIPSwitchConnection = (
     connection: CircuitConnection
-): boolean => {
+): connection is CircuitConnection & { metadata: DIPSwitchMetadata } => {
     return connection.type === 'component' &&
-        connection.metadata?.componentType === 'dip-switch' &&
-        typeof connection.metadata?.switchIndex === 'number';
+        connection.metadata?.componentType === 'dip-switch';
+};
+
+export const isICComponentConnection = (
+    connection: CircuitConnection
+): connection is CircuitConnection & { metadata: ICComponentMetadata } => {
+    return connection.type === 'component' &&
+        connection.metadata?.componentType === 'ic';
 };
 
 export const getComponentType = (
@@ -75,7 +118,7 @@ export const getComponentType = (
 export const getSwitchIndex = (
     connection: CircuitConnection
 ): number | undefined => {
-    return isDIPSwitchConnection(connection) ? connection.metadata?.switchIndex : undefined;
+    return isDIPSwitchConnection(connection) ? connection.metadata.switchIndex : undefined;
 };
 
 export interface CircuitNode {
@@ -185,8 +228,11 @@ export const createEdgesFromConnections = (
         // TODO: refactor to use functions for each component type.
         if (component.type === 'dip-switch') {
             graph = processDIPSwitchConnections(graph, connections, powerDistribution, component as DIPSwitchComponent, getConnectorConnections);
+        } else if (component.type === 'ic') {
+            console.log('processing ic connections');
+            graph = processICComponentConnections(graph, connections, powerDistribution, component as ICComponent, getConnectorConnections);
         } else {
-            graph = processTwoTerminalComponents(graph, connections, powerDistribution, component, getConnectorConnections);
+            graph = processTwoTerminalComponentConnections(graph, connections, powerDistribution, component, getConnectorConnections);
         }
     });
 

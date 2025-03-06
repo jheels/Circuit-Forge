@@ -36,17 +36,16 @@ export const createICComponent = (
 
     const connectors: Record<string, Connector> = {};
 
-    for (let pinNumber = 1; pinNumber <= 14; pinNumber++) {
-        const isLeftSide = pinNumber <= 7;
-        const pinDefinition = definition.pinMappings[pinNumber];
+    for (let pinNum = 1; pinNum <= 14; pinNum++) {
+        const isLeftSide = pinNum <= 7;
+        const pinDefinition = definition.pinMappings[pinNum];
 
         let yPosition;
         if (isLeftSide) {
-            yPosition = (pinNumber - 1) / 7 + 1/14;
+            yPosition = (pinNum - 1) / 7 + 1/14;
         } else {
-            yPosition = (14 - pinNumber) / 7 + 1/14;
+            yPosition = (14 - pinNum) / 7 + 1/14;
         }
-
         const connector = createConnector(
             editorID,
             pinDefinition.type,
@@ -57,7 +56,7 @@ export const createICComponent = (
             2.5,
             pinDefinition.name,
             {
-                pinNumber,
+                pinNumber: pinNum,
                 gateIndex: pinDefinition.gateIndex,
                 inputIndex: pinDefinition.inputIndex
             }

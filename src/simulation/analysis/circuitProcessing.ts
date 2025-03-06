@@ -1,8 +1,10 @@
 import { Connection, isWireConnection } from "@/types/connection";
-import { CircuitGraph, createCircuitEdge, createComponentConnection, createDIPSwitchConnection, createWireConnection } from "./circuitDetection";
+import { CircuitGraph, createCircuitEdge, createComponentConnection, createDIPSwitchConnection, createICComponentConnection, createWireConnection } from "./circuitDetection";
 import { PowerDistribution } from "@/hooks/simulation/useFindPowerDistribution";
 import { DIPSwitchComponent } from "@/types/components/dipswitch";
 import { EditorComponent } from "@/types/general";
+import { getICDefinition, ICComponent } from "@/types/components/ic";
+import { Connector } from "@/types/connector";
 
 const updateStripIDForPowerAndGround = (
     stripID: string,
@@ -80,7 +82,69 @@ export const processDIPSwitchConnections = (
     return { nodes, edges };
 }
 
-export const processTwoTerminalComponents = (
+export const processICComponentConnections = (
+    graph: CircuitGraph,
+    connections: Record<string, Connection>,
+    powerDistribution: PowerDistribution,
+    ICComponent: ICComponent,
+    getConnectorConnections: (connectorID: string) => Set<string>
+): CircuitGraph => {
+    const gateConnectors: Record<number, {
+        inputs: { connector: Connector, node: string }[],
+        output: { connector: Connector, node: string } | null
+    }> = {};
+
+    const { nodes, edges } = graph;
+
+    Object.values(ICComponent.connectors).forEach(connector => {
+        const connectorConnections = Array.from(getConnectorConnections(connector.id));
+        if (connectorConnections.length === 0) return;
+
+        const connectionId = Array.from(connectorConnections)[0];
+        const connection = connections[connectionId];
+
+        const stripID = updateStripIDForPowerAndGround(connection.metadata.stripID, powerDistribution);
+        if (!connector.metadata) return;
+        if (connector.metadata.gateIndex === undefined) return;
+
+        const gateIndex = connector.metadata.gateIndex;
+
+        if (!gateConnectors[gateIndex]) {
+            gateConnectors[gateIndex] = { inputs: [], output: null };
+        }
+
+        if (connector.type === 'output') {
+            gateConnectors[gateIndex].output = { connector, node: stripID };
+        } else if (connector.type === 'input') {
+            gateConnectors[gateIndex].inputs.push({ connector, node: stripID });
+        }
+    });
+
+    Object.entries(gateConnectors).forEach(([gateIndex, gate]) => {
+        if (!gate.output) return;
+
+        gate.inputs.forEach(input => {
+            const edge = createCircuitEdge(
+                input.node,
+                gate.output!.node,
+                createICComponentConnection(
+                    ICComponent.editorID,
+                    ICComponent.icType,
+                    parseInt(gateIndex),
+                    getICDefinition(ICComponent.icType).gateType,
+                    'input',
+                    input.connector.metadata?.inputIndex
+                )
+            );
+
+            edges[edge.id] = edge;
+        });
+    });
+
+    return { nodes, edges };
+}
+
+export const processTwoTerminalComponentConnections = (
     graph: CircuitGraph,
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
