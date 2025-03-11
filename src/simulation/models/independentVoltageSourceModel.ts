@@ -8,7 +8,7 @@ export interface IndependentVoltageSource extends ComponentModel {
     voltage: number;
 }
 
-export const createIndependentVoltageSource = (component: PowerSupplyComponent, edge: CircuitEdge): IndependentVoltageSource => {
+export const createIndependentVoltageSourceModel = (component: PowerSupplyComponent, edge: CircuitEdge): IndependentVoltageSource => {
     const voltage = component.properties.voltage as number;
 
     return {
@@ -31,8 +31,8 @@ export const applyVoltageSourceStamp = (
     conductanceMatrix.set([nodeIndex, conductanceMatrix.size()[1]-1], 1);
     conductanceMatrix.set([conductanceMatrix.size()[1]-1, nodeIndex], 1);
     inputSourcesVector.set([inputSourcesVector.size()[0]-1, 0], voltage);
-
 }
+
 
 export const applyIndependentVoltageSourceStamp = (
     conductanceMatrix: Matrix,
@@ -42,10 +42,8 @@ export const applyIndependentVoltageSourceStamp = (
 ): void => {
     const { voltage, edge } = model;
     const { sourceId } = edge;
+    // Generalise for any source node
+    const sourceIndex = nodeMap[sourceId];
 
-    // This is because of the circuit initialisation
-    const powerNode = nodeMap[sourceId];
-
-    if (powerNode === undefined) return;
-    applyVoltageSourceStamp(conductanceMatrix, inputSourcesVector, voltage, powerNode);
+    applyVoltageSourceStamp(conductanceMatrix, inputSourcesVector, voltage, sourceIndex);
 }

@@ -1,7 +1,7 @@
 import { Matrix } from "mathjs";
 import { CircuitEdge, isICComponentConnection } from "../analysis/circuitDetection";
 import { ComponentModel } from "./componentModelFactory";
-import { applyVoltageSourceStamp } from "./independentVoltageSource";
+import { applyVoltageSourceStamp } from "./independentVoltageSourceModel";
 
 export interface LogicGateModel extends ComponentModel {
     type: 'logic-gate';
