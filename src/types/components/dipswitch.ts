@@ -19,7 +19,7 @@ export const createDIPSwitchComponent = (position: Point, name: string): DIPSwit
             editorID, 
             'bidirectional', 
             { x: 0.125, y: (i + 0.5) / 8 },
-            5,
+            2.5,
             'terminal-' + i + '-left'
         );
         connectors[leftConnector.id] = leftConnector;
@@ -29,7 +29,7 @@ export const createDIPSwitchComponent = (position: Point, name: string): DIPSwit
             editorID, 
             'bidirectional', 
             { x: 0.875, y: (i + 0.5) / 8 },
-            5,
+            2.5,
             'terminal-' + i + '-right'
         );
         connectors[rightConnector.id] = rightConnector;
