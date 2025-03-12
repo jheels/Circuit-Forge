@@ -133,18 +133,9 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             defaultValue: 5,
             editable: true,
             required: true,
-            minValue: 0,
-            maxValue: 24,
             unit: 'V',
-            validationFn: (value) => typeof value === 'number'
+            validationFn: (value) => typeof value === 'number' &&  value <= 24 && value >= 0, // voltage must be less than or equal to 24V
         },
-        {
-            type: 'boolean',
-            id: 'isEnabled',
-            label: 'Enabled',
-            defaultValue: false,
-            editable: true,
-        }
     ],
     'breadboard': [
         CommonProperties.name,
