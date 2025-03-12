@@ -30,13 +30,12 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
             
             // Determine if the pin is on the left or right side
             const isLeftSide = connector.offset.x < 0.5;
-            
             pins.push(
                 <Rect
                     key={`pin-${connector.id}`}
                     width={pinWidth}
                     height={pinHeight}
-                    fill="#888888"
+                    fill={connector.type === 'positive' ? '#ff9999' : connector.type === 'negative' ? '#99ccff' : '#888888'}
                     x={isLeftSide ? -pinWidth * 0.5 : dimensions.width - pinWidth * 0.5}
                     y={y - pinHeight / 2}
                     cornerRadius={0.25}

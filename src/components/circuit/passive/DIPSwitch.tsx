@@ -2,6 +2,7 @@ import { useSimulatorContext } from "@/context/SimulatorContext";
 import { DIPSwitchComponent } from "@/types/components/dipswitch";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Text } from "react-konva";
+import Konva from "konva";
 
 interface DipSwitchProps {
     componentID: string
@@ -25,7 +26,8 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
     const sliderOffsetY = 0.5;
     const sliderSpacingY = 5; // Adjusted spacing for better aesthetics
 
-    const handleToggle = (index: number) => {
+    const handleToggle = (index: number, e: Konva.KonvaEventObject<MouseEvent>) => {
+        e.cancelBubble = true;
         const newSwitchStates = [...switchStates];
         newSwitchStates[index] = !newSwitchStates[index];
         updateComponent(componentID, { ...component, switchStates: newSwitchStates } as Partial<DIPSwitchComponent>);
@@ -67,6 +69,7 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
                         fill='#F5F5F5' // Light grey color for the slider
                         stroke='#BDC3C7' // Slightly darker grey stroke
                         strokeWidth={0.25}
+                        onClick={(event) => handleToggle(index, event)}
                     />
                     <Rect
                         x={switchStates[index] ? sliderWidth + sliderOffsetX -  sliderHeight : sliderOffsetX}
@@ -76,7 +79,7 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
                         fill='white' // Grey color for the toggle button
                         stroke='#95A5A6' // Slightly lighter grey stroke
                         strokeWidth={0.25}
-                        onClick={() => handleToggle(index)}
+                        onClick={(event) => handleToggle(index, event)}
                     />
                 </Group>
             ))}
