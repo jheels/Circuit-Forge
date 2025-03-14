@@ -21,6 +21,17 @@ export const useCircuitDetection = () => {
 
     useEffect(() => {
         // TODO: refactor to central store for easy access
+        if ((!powerSupply || !breadboard) && Object.entries(components).length !== 0) {
+            toast.error('Please add a power supply/breadboard', {
+                id: 'power-supply-breadboard',
+                style: {
+                    background: '#FEE2E2', // Soft red, not too aggressive
+                    color: '#991B1B', // Dark red for strong contrast
+                },
+            });
+
+            return;
+        }
         if (powerDistribution.sourceNode === '' || !powerDistribution.poweredRails.size || !powerDistribution.groundedRails.size) {
             return;
         };
@@ -60,6 +71,13 @@ export const useCircuitDetection = () => {
         if (!validationResult.hasErrors) {
             graph = removeDisconnectedPaths(graph, powerDistribution);
             setCircuitGraph(graph);
+            toast.success('Circuit detected', {
+                id: 'circuit-detected',
+                style: {
+                    background: '#D1FAE5', // Soft green, not too aggressive
+                    color: '#065F46', // Dark green for strong contrast
+                },
+            });
             return;
         }
         setCircuitGraph(null);

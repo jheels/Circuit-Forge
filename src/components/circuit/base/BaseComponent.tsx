@@ -1,11 +1,4 @@
-/**
- * To do:
- * - Checking connector validations on snapping connectors directly
- * - Implement updating circuit series on connections, deletions etc.
- * - Fix bug where moving the connector that you connected to does not remove a connection (only 1 way)
- */
-
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Group, Rect } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useSnapManagement } from '@/hooks/ui/useSnapManagement';
@@ -13,6 +6,7 @@ import { useWireUpdates } from '@/hooks/ui/useWireUpdates';
 import { useConnectorManagement } from '@/hooks/circuit/useConnectorManagement';
 import { getInteractionRegion } from '@/types/connector';
 import Konva from 'konva';
+import { ComponentTooltip } from '@/components/ComponentTooltip';
 
 interface BaseComponentProps {
     componentID: string;
@@ -43,7 +37,10 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         removeConnection,
         setClickedConnector,
         getConnectorConnections,
+        componentElectricalValues
     } = useSimulatorContext();
+
+    const [isHovered, setIsHovered] = useState(false);
 
     // Get component details
     const component = components[componentID];
@@ -159,11 +156,21 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             onClick={handleSelection}
             x={position.x}
             y={position.y}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <Group rotation={rotation}>
                 {children}
             </Group>
             {renderedConnectors}
+            {(component.type !== 'breadboard' && component.type !== 'power-supply') && (
+                <ComponentTooltip
+                    componentId={componentID}
+                    componentElectricalValues={componentElectricalValues}
+                    component={component}
+                    visible={isHovered}
+                />
+            )}
         </Group>
     );
 };

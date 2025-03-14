@@ -1,14 +1,15 @@
+import React from 'react';
 import { useSimulatorContext } from "@/context/SimulatorContext";
 import { ICComponent } from "@/types/components/ic";
 import { BaseComponent } from "../base/BaseComponent";
-import { Rect, Group, Arc, Text, Circle } from "react-konva";
+import { Rect, Group, Arc, Text, Circle, Star } from "react-konva";
 
 interface ICProps {
     componentID: string;
 }
 
 export const IC: React.FC<ICProps> = ({ componentID }) => {
-    const { components, selectedComponent } = useSimulatorContext();
+    const { components, selectedComponent, componentElectricalValues } = useSimulatorContext();
     const component = components[componentID] as ICComponent;
 
     if (!component) {
@@ -17,6 +18,62 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
     }
 
     const { dimensions, icType } = component;
+    
+    // Get electrical values from context
+    const allValues = componentElectricalValues[componentID] || {};
+    
+    // Get VCC voltage (we'll use the first voltage value as a simplification)
+    const vccValue = allValues[0]?.voltage || 0;
+    
+    // Fixed voltage range for all ICs
+    const MIN_VOLTAGE = -0.8;
+    const MAX_VOLTAGE = 5.5;
+    
+    // Determine if IC has failed (voltage outside acceptable range)
+    const hasFailed = vccValue > 0 && (vccValue < MIN_VOLTAGE || vccValue > MAX_VOLTAGE);
+    
+    // Function to render the exploding effect
+    const renderExplosionEffect = () => {
+        if (!hasFailed) return null;
+        
+        // Create a star burst effect for explosion
+        const centerX = dimensions.width / 2;
+        const centerY = dimensions.height / 2;
+        // Make the starburst smaller as requested - around 60% of the IC's max dimension
+        const outerRadius = Math.max(dimensions.width, dimensions.height) * 0.3;
+        const innerRadius = outerRadius * 0.5;
+        const numPoints = 10; // Number of points in the starburst
+        
+        return (
+            <Group opacity={0.8}>
+                {/* Yellow starburst */}
+                <Star
+                    x={centerX}
+                    y={centerY}
+                    numPoints={numPoints}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius}
+                    fill="yellow"
+                    stroke="orange"
+                    strokeWidth={1.5}
+                    opacity={0.9}
+                />
+                
+                {/* Red center */}
+                <Star
+                    x={centerX}
+                    y={centerY}
+                    numPoints={numPoints}
+                    innerRadius={innerRadius * 0.6}
+                    outerRadius={outerRadius * 0.7}
+                    fill="red"
+                    stroke="darkred"
+                    strokeWidth={1}
+                    opacity={0.9}
+                />
+            </Group>
+        );
+    };
 
     // Function to render pins aligned with connector positions
     const renderPins = () => {
@@ -48,45 +105,57 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
 
     return (
         <BaseComponent componentID={componentID}>
-            {/* Render all pins */}
+            {/* Always show the IC, even if failed */}
             <Group>
-                {renderPins()}
+                {/* Render all pins */}
+                <Group>
+                    {renderPins()}
+                </Group>
+                
+                {/* IC Body */}
+                <Rect
+                    width={dimensions.width}
+                    height={dimensions.height}
+                    fill={"#222222"} 
+                    stroke={hasFailed ? 'rgba(255,100,100, 0.7)' : 'rgba(143,217,251, 0.5)'}
+                    strokeEnabled={hasFailed || selectedComponent === componentID}
+                    strokeWidth={0.75}
+                    cornerRadius={1}
+                />
+                
+                {/* Notch at the top to indicate pin 1 (typical on real ICs) */}
+                <Arc
+                    x={dimensions.width / 2}
+                    y={0}
+                    innerRadius={0}
+                    outerRadius={dimensions.width / 5}
+                    angle={180}
+                    fill={"gray"}
+                />
+                
+                {/* IC Type Label */}
+                <Text
+                    text={icType}
+                    fontSize={4}
+                    fill="white"
+                    x={dimensions.width / 2 + 2}
+                    y={dimensions.height / 3}
+                    rotation={90}
+                    opacity={hasFailed ? 0.7 : 1}
+                />
+                
+                {/* Pin 1 indicator (small dot near pin 1) */}
+                <Circle
+                    x={dimensions.width / 8}
+                    y={dimensions.height / 14}
+                    radius={0.5}
+                    fill="white"
+                    opacity={hasFailed ? 0.7 : 1}
+                />
             </Group>
-            {/* IC Body */}
-            <Rect
-                width={dimensions.width}
-                height={dimensions.height}
-                fill="#222222" // Dark gray color for the chip body
-                stroke={'rgba(143,217,251, 0.5)'}
-                strokeEnabled={selectedComponent === componentID}
-                strokeWidth={0.75}
-                cornerRadius={1}
-            />
-            {/* Notch at the top to indicate pin 1 (typical on real ICs) */}
-            <Arc
-                x={dimensions.width / 2}
-                y={0}
-                innerRadius={0}
-                outerRadius={dimensions.width / 5}
-                angle={180}
-                fill="gray"
-            />
-            {/* IC Type Label */}
-            <Text
-                text={icType}
-                fontSize={4}
-                fill="white"
-                x={dimensions.width / 2 + 2}
-                y={dimensions.height / 3}
-                rotation={90}
-            />
-            {/* Pin 1 indicator (small dot near pin 1) */}
-            <Circle
-                x={dimensions.width / 8}
-                y={dimensions.height / 14}
-                radius={0.5}
-                fill="white"
-            />
+            
+            {/* Explosion effect as an overlay */}
+            {renderExplosionEffect()}
         </BaseComponent>
     );
 };

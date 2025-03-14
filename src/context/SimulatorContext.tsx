@@ -13,6 +13,7 @@ import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORG
 interface SimulatorContextType {
     projectName: string;
     components: Record<string, EditorComponent>;
+    componentElectricalValues: Record<string, Record<number, { voltage: number, current: number }>>
     componentCounts: Record<string, number>;
     selectedComponent: string | null;
     selectedWire: string | null;
@@ -31,6 +32,7 @@ interface SimulatorContextType {
     addComponent: (component: EditorComponent) => void;
     removeComponent: (editorID: string) => void;
     updateComponent: (editorID: string, updates: Partial<EditorComponent>) => void;
+    updateComponentElectricalValues: (componentElectricalValues: Record<string, Record<number, { voltage: number, current: number }>>) => void;
     cleanUpComponentWires: (editorID: string) => void;
     addWire: (wire: Wire) => void;
     removeWire: (wireID: string) => void;
@@ -73,6 +75,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     // TODO: refactor to just store a one to one map since we just added a limitation Record<string, string>;
     const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
     const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
+    const [componentElectricalValues, setComponentElectricalValues] = useState<{ [key: string]: { [key: number]: { voltage: number, current: number } } }>({});
 
     const copySelectedComponent = () => {
         if (!selectedComponent || !components[selectedComponent]) return;
@@ -270,6 +273,10 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }));
     }
 
+    const updateComponentElectricalValues = (componentElectricalValues: Record<string, Record<number, { voltage: number, current: number }>>) => {
+        setComponentElectricalValues(componentElectricalValues);
+    }
+
     const addWire = (wire: Wire) => {
         setWires((prev) => ({
             ...prev,
@@ -335,6 +342,8 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
             connections,
             connectorConnections,
             clipboardComponent,
+            componentElectricalValues,
+            updateComponentElectricalValues,
             copySelectedComponent,
             cutSelectedComponent,
             pasteClipboardComponent,

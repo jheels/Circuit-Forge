@@ -26,8 +26,8 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
     const voltage = component.properties.voltage as number || 0;
     const currentValue = Math.abs(electricalValues.current || 0);
     const currentDisplay = currentValue < 1 
-        ? `${(currentValue * 1000).toFixed(2)}    mA` 
-        : `${currentValue.toFixed(2)}       A`;
+        ? `${(currentValue * 1000).toFixed(2)}mA` 
+        : `${currentValue.toFixed(2)}A`;
 
     // Define dimensions for a larger power supply
     const width = dimensions.width;

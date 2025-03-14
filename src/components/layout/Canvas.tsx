@@ -13,8 +13,9 @@ import { findConnectorIDAtPoint } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
 import { Breadboard } from '../circuit/board/Breadboard';
-import { useCircuitDetection } from '@/hooks/simulation/useCircuitDetection';
+import { useSimulationExecution } from '@/hooks/simulation/useSimulationExecution';
 import { DipSwitch } from '../circuit/passive/DIPSwitch';
+import { IC } from '../circuit/active/IC';
 
 interface CanvasProps {
     scale: number;
@@ -50,7 +51,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
     const positionRef = useRef<Point>(position);
     const scaleRef = useRef<number>(scale);
 
-    const { detectCircuit } = useCircuitDetection();
+    useSimulationExecution();
 
     const deSelectItems = useCallback(() => {
         setSelectedComponent(null);
@@ -156,7 +157,12 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                     otherComponents.push(
                         <DipSwitch key={component.editorID} componentID={component.editorID} />
                     );
-                    break;    
+                    break;
+                case 'ic':
+                    otherComponents.push(
+                        <IC key={component.editorID} componentID={component.editorID} />
+                    )
+                    break;
                 case 'breadboard':
                     breadboard = <Breadboard key={component.editorID} componentID={component.editorID} />;
                     break;

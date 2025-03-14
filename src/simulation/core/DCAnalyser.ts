@@ -1,12 +1,13 @@
 import { EditorComponent } from "@/types/general";
-import { CircuitGraph } from "../analysis/circuitDetection";
+import { CircuitEdge, CircuitGraph, isICComponentConnection } from "../analysis/circuitDetection";
 import { ComponentModel, createComponentModel } from "../models/componentModelFactory";
 import { createWireModel } from "../models/wireModel";
 import { solveCircuit } from "./MNASystem";
 import { LEDModel, updateLEDModel } from "../models/LEDModel";
+import { createLogicGateModel, LogicGateModel, updateLogicGateModel } from "../models/logicGateModel";
 
 const MAX_ITERATIONS = 50;
-const CONVERGENCE_THRESHOLD = 1e-6;
+const CONVERGENCE_THRESHOLD = 1e-5;
 
 export interface AnalysisState {
     models: Record<string, ComponentModel>;
@@ -20,7 +21,7 @@ export interface AnalysisState {
 export interface AnalysisResult {
     success: boolean;
     voltages: Record<string, number>;
-    nonLinearModels: Record<string, ComponentModel>;
+    models: Record<string, ComponentModel>;
     iterations: number;
     error?: string;
 }
@@ -35,6 +36,60 @@ const createComponentModels = (
     const models: Record<string, ComponentModel> = {};
     const nonLinearModels: Record<string, ComponentModel> = {};
 
+    // Find all IC gate edges and group them by target node (output node)
+    const gateGroups: Record<string, {
+        outputNodeId: string,
+        gateType: string,
+        edges: CircuitEdge[],
+        componentId: string
+    }> = {};
+
+    Object.values(circuitGraph.edges).forEach(edge => {
+        if (edge.connection.type === 'component' &&
+            isICComponentConnection(edge.connection) &&
+            edge.connection.metadata.pinFunction === 'input') {
+
+            const outputNodeId = edge.targetId;
+            const { gateType, gateIndex, icType } = edge.connection.metadata;
+
+            // Create a unique key for this gate
+            const gateKey = `${edge.connection.id}-${icType}-${gateIndex}-${outputNodeId}`;
+
+            if (!gateGroups[gateKey]) {
+                gateGroups[gateKey] = {
+                    outputNodeId: outputNodeId,
+                    gateType: gateType,
+                    edges: [],
+                    componentId: edge.connection.id
+                };
+            }
+
+            gateGroups[gateKey].edges.push(edge);
+        }
+    });
+
+
+    Object.entries(gateGroups).forEach(([gateKey, gateInfo]) => {
+        if (gateInfo.edges.length === 0) return;
+        
+        // Get a representative edge for the gate
+        const representativeEdge = gateInfo.edges[0];
+        
+        // Get all input node IDs
+        const inputNodeIds = gateInfo.edges.map(edge => edge.sourceId);
+        
+        // Create a logic gate model
+        const gateModel = createLogicGateModel(
+            representativeEdge,
+            inputNodeIds,
+            gateInfo.outputNodeId
+        );
+        // Use the gate key as the model ID to avoid conflicts
+        models[gateKey] = gateModel;
+        nonLinearModels[gateKey] = gateModel;
+    });
+
+
     Object.entries(circuitGraph.edges).forEach(([edgeId, edge]) => {
         if (edge.connection.type === 'wire') {
             const wireModel = createWireModel(edge);
@@ -48,6 +103,8 @@ const createComponentModels = (
             console.warn(`Component ${edge.connection.id} not found`);
             return;
         }
+
+        if (component.type === 'ic') return;
 
         const model = createComponentModel(component, edge);
         if (!model) {
@@ -96,15 +153,14 @@ export const updateNonLinearModels = (
     updatedState: AnalysisState,
     allModelsConverged: boolean
 } => {
-
     const { voltages, models, nonLinearModels } = state;
     let allModelsConverged = true;
 
     const updatedNonLinearModels = { ...nonLinearModels };
     const updatedModels = { ...models };
 
-    Object.entries(nonLinearModels).forEach(([edgeId, model]) => {
-        const edge = circuitGraph.edges[edgeId];
+    Object.entries(nonLinearModels).forEach(([modelId, model]) => {
+        const edge = circuitGraph.edges[model.edge.id];
 
         const sourceVoltage = voltages[edge.sourceId] || 0;
         const targetVoltage = voltages[edge.targetId] || 0;
@@ -119,8 +175,18 @@ export const updateNonLinearModels = (
             }
 
             const updatedModel = updateLEDModel(ledModel, voltageDiff);
-            updatedNonLinearModels[edgeId] = updatedModel;
-            updatedModels[edgeId] = updatedModel;
+            updatedNonLinearModels[modelId] = updatedModel;
+            updatedModels[modelId] = updatedModel;
+        } else if (model.type === 'logic-gate') {
+            const logicModel = model as LogicGateModel;
+            const updatedModel = updateLogicGateModel(logicModel, voltages);
+            const modelConverged = hasConverged(logicModel.lastOutputVoltage, updatedModel.lastOutputVoltage);
+            if (!modelConverged) {
+                allModelsConverged = false;
+            }
+            
+            updatedNonLinearModels[modelId] = updatedModel;
+            updatedModels[modelId] = updatedModel;
         }
     });
 
@@ -151,6 +217,7 @@ export const performIteration = (
             converged: voltagesConverged && allModelsConverged
         }
     } catch (error) {
+        console.log('Error during iteration:', error);
         return {
             ...state,
             iteration: state.iteration + 1,
@@ -177,40 +244,44 @@ export const performDCAnalysis = (
 
         state.voltages = solveCircuit(circuitGraph, state.models);
 
+        console.log('Initial voltages:', state.voltages);
+
         if (Object.keys(state.nonLinearModels).length === 0) {
             return {
                 success: true,
                 voltages: roundVoltages(state.voltages),
-                nonLinearModels: {},
+                models: state.models,
                 iterations: 1
             }
         }
 
         while (!state.converged && state.iteration < MAX_ITERATIONS) {
             state = performIteration(state, circuitGraph);
+            console.log(state.iteration, state.voltages);
         }
 
         if (state.converged) {
             return {
                 success: true,
                 voltages: roundVoltages(state.voltages),
-                nonLinearModels: state.nonLinearModels,
+                models: state.models,
                 iterations: state.iteration
             };
         } else {
             return {
                 success: false,
                 voltages: roundVoltages(state.voltages),
-                nonLinearModels: state.nonLinearModels,
+                models: state.models,
                 iterations: state.iteration,
                 error: state.error || `Failed to converge after ${MAX_ITERATIONS} iterations`
             };
         }
     } catch (error) {
+        console.log('Analysis error:', error);
         return {
             success: false,
             voltages: {},
-            nonLinearModels: {},
+            models: {},
             iterations: 0,
             error: `Analysis error: ${error instanceof Error ? error.message : String(error)}`
         }

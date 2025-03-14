@@ -82,8 +82,7 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             defaultValue: 1000,
             editable: true,
             required: true,
-            minValue: 0,
-            validationFn: (value) => typeof value === 'number' && Number.isInteger(value), // resistance must be a whole number
+            validationFn: (value) => typeof value === 'number' && Number.isInteger(value) && value >= 1, // resistance must be a whole number
         },
         {
             type: 'select',
