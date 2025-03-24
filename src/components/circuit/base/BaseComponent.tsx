@@ -5,8 +5,11 @@ import { useSnapManagement } from '@/hooks/ui/useSnapManagement';
 import { useWireUpdates } from '@/hooks/ui/useWireUpdates';
 import { useConnectorManagement } from '@/hooks/circuit/useConnectorManagement';
 import { getInteractionRegion } from '@/types/connector';
-import Konva from 'konva';
 import { ComponentTooltip } from '@/components/ComponentTooltip';
+
+import Konva from 'konva';
+
+const ORIGIN = { x: 0, y: 0 };
 
 interface BaseComponentProps {
     componentID: string;
@@ -25,6 +28,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         wires,
         hoveredConnectorID,
         creatingWire,
+        componentElectricalValues,
         updateComponent,
         setSelectedComponent,
         setHoveredConnectorID,
@@ -36,23 +40,21 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         addConnection,
         removeConnection,
         setClickedConnector,
-        getConnectorConnection,
-        componentElectricalValues
+        getConnectorConnection
     } = useSimulatorContext();
 
     const [isHovered, setIsHovered] = useState(false);
 
-    // Get component details
     const component = components[componentID];
     const { position, connectors, dimensions, rotation = 0 } = component;
 
     const updateWirePositions = useWireUpdates(
         connectors,
         dimensions,
-        getConnectorConnection,
         connections,
         wires,
-        updateWire,
+        getConnectorConnection,
+        updateWire
     );
 
     const {
@@ -88,7 +90,6 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         getConnectorConnection
     );
 
-    // Handle component selection
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         setSelectedWire(null);
@@ -105,18 +106,14 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         }
     }, [creatingWire, removeWire, setClickedConnector, setCreatingWire]);
 
-    // Setup and cleanup escape key listener
     useEffect(() => {
         window.addEventListener('keydown', handleWireEscape);
         return () => window.removeEventListener('keydown', handleWireEscape);
     }, [handleWireEscape]);
 
-    // Handle drag end and connection updates
     const updateConnectors = useCallback(() => {
-        // Then update connections
         const newConnectionIDs = updateConnectionsOnDrop(snapState);
 
-        // Update snap state with new connection IDs
         setSnapState(prev => ({
             ...prev,
             connectionIDs: newConnectionIDs
@@ -128,7 +125,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         const hoveredConnector = connectors[hoveredConnectorID];
         if (!hoveredConnector) return null;
 
-        const region = getInteractionRegion(hoveredConnector, { x: 0, y: 0 }, dimensions);
+        const region = getInteractionRegion(hoveredConnector, ORIGIN, dimensions);
 
         return (
             <Rect
@@ -144,13 +141,15 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
                     e.cancelBubble = true;
                     handleConnectorClick(hoveredConnectorID);
                 }}
+                onMouseEnter={() => document.body.style.cursor = 'pointer'}
+                onMouseLeave={() => document.body.style.cursor = 'default'}
             />
         );
     }, [hoveredConnectorID, connectors, dimensions, handleConnectorClick]);
 
     return (
         <Group
-            draggable={draggable}
+            draggable={draggable && !creatingWire}
             onDragMove={handleDragMove}
             onDragEnd={updateConnectors}
             onClick={handleSelection}

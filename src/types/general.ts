@@ -29,3 +29,7 @@ export interface Wire {
     endConnector: Connector | null;
     points: Point[];
 }
+
+export interface ComponentProps {
+    componentID: string
+}

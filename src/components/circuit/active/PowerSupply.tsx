@@ -3,12 +3,9 @@ import { Rect, Text, Circle } from 'react-konva';
 import { PowerSupplyComponent } from '@/types/components/powerSupply';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
+import { ComponentProps } from '@/types/general';
 
-interface PowerSupplyProps {
-    componentID: string;
-}
-
-export const PowerSupply: React.FC<PowerSupplyProps> = ({
+export const PowerSupply: React.FC<ComponentProps> = ({
     componentID,
 }) => {
     const { components, componentElectricalValues } = useSimulatorContext();
@@ -35,7 +32,7 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
     
     // Define display areas
     const displayWidth = width * 0.85;
-    const displayHeight = height * 0.28;
+    const displayHeight = height * 0.3;
     const displayMarginTop = height * 0.1;
     const displayMarginLeft = width * 0.075;
     
@@ -52,7 +49,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
                 strokeWidth={0.3}
                 cornerRadius={1}
             />
-            
             {/* Voltage Display */}
             <Rect
                 x={displayMarginLeft}
@@ -63,7 +59,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
                 stroke="#444444"
                 strokeWidth={0.3}
             />
-            
             {/* Current Display */}
             <Rect
                 x={displayMarginLeft}
@@ -74,8 +69,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
                 stroke="#444444"
                 strokeWidth={0.3}
             />
-            
-
             <Text
                 x={displayMarginLeft + displayWidth * 0.05}
                 y={displayMarginTop + displayHeight * 0.3}
@@ -85,7 +78,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
                 fontFamily="Arial"
                 fill="#333333"
             />
-
             <Text
                 x={displayMarginLeft + displayWidth * 0.05}
                 y={displayMarginTop + displayHeight + height * 0.08 + displayHeight * 0.3}
@@ -95,7 +87,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
                 fontFamily="Arial"
                 fill="#333333"
             />
-
         <Circle
             x={5/12 * width}
             y={height - 2}
@@ -112,7 +103,6 @@ export const PowerSupply: React.FC<PowerSupplyProps> = ({
             stroke="gray"
             strokeWidth={0.25}
         />
-            
         </BaseComponent>
     );
 };

@@ -17,6 +17,7 @@ import { isBreadboard } from '@/lib/utils';
 
 export const SNAPPING_THRESHOLD = 2.5;
 export const BREAKAWAY_THRESHOLD = 2.5;
+export const DEFAULT_HIT_AREA = 2.5;
 
 interface ConnectorOffset {
     x: number;
@@ -46,7 +47,7 @@ export const createConnector = (
     componentID: string,
     type: ConnectorType,
     offset: ConnectorOffset,
-    hitAreaSize: number = 2.5,
+    hitAreaSize: number = DEFAULT_HIT_AREA,
     connectorIDOverride?: string,
     metadata?: Record<string, any>
 ): Connector => ({

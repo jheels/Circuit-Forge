@@ -3,12 +3,13 @@ import { useSimulatorContext } from "@/context/SimulatorContext";
 import { ICComponent } from "@/types/components/ic";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Arc, Text, Circle, Star } from "react-konva";
+import { ComponentProps } from '@/types/general';
+import { DEFAULT_HIT_AREA } from '@/types/connector';
 
-interface ICProps {
-    componentID: string;
-}
+const MIN_VOLTAGE = -0.8;
+const MAX_VOLTAGE = 5.5;
 
-export const IC: React.FC<ICProps> = ({ componentID }) => {
+export const IC: React.FC<ComponentProps> = ({ componentID }) => {
     const { components, selectedComponent, componentElectricalValues } = useSimulatorContext();
     const component = components[componentID] as ICComponent;
 
@@ -18,35 +19,21 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
     }
 
     const { dimensions, icType } = component;
-    
-    // Get electrical values from context
     const allValues = componentElectricalValues[componentID] || {};
-    
-    // Get VCC voltage (we'll use the first voltage value as a simplification)
     const vccValue = allValues[0]?.voltage || 0;
-    
-    // Fixed voltage range for all ICs
-    const MIN_VOLTAGE = -0.8;
-    const MAX_VOLTAGE = 5.5;
-    
-    // Determine if IC has failed (voltage outside acceptable range)
     const hasFailed = vccValue > 0 && (vccValue < MIN_VOLTAGE || vccValue > MAX_VOLTAGE);
     
-    // Function to render the exploding effect
     const renderExplosionEffect = () => {
         if (!hasFailed) return null;
         
-        // Create a star burst effect for explosion
         const centerX = dimensions.width / 2;
         const centerY = dimensions.height / 2;
-        // Make the starburst smaller as requested - around 60% of the IC's max dimension
         const outerRadius = Math.max(dimensions.width, dimensions.height) * 0.3;
         const innerRadius = outerRadius * 0.5;
-        const numPoints = 10; // Number of points in the starburst
+        const numPoints = 10; 
         
         return (
             <Group opacity={0.8}>
-                {/* Yellow starburst */}
                 <Star
                     x={centerX}
                     y={centerY}
@@ -58,8 +45,6 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
                     strokeWidth={1.5}
                     opacity={0.9}
                 />
-                
-                {/* Red center */}
                 <Star
                     x={centerX}
                     y={centerY}
@@ -75,13 +60,11 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
         );
     };
 
-    // Function to render pins aligned with connector positions
     const renderPins = () => {
         const pins: JSX.Element[] = [];
-        const pinWidth = 2;
-        const pinHeight = 2;
+        console.log(component.connectors);
+        const pinSize  = DEFAULT_HIT_AREA;
         
-        // Render a pin for each connector
         Object.values(component.connectors).forEach(connector => {
             const y = connector.offset.y * dimensions.height;
             
@@ -90,11 +73,11 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
             pins.push(
                 <Rect
                     key={`pin-${connector.id}`}
-                    width={pinWidth}
-                    height={pinHeight}
+                    width={pinSize}
+                    height={pinSize}
                     fill={connector.type === 'positive' ? '#ff9999' : connector.type === 'negative' ? '#99ccff' : '#888888'}
-                    x={isLeftSide ? -pinWidth * 0.5 : dimensions.width - pinWidth * 0.5}
-                    y={y - pinHeight / 2}
+                    x={isLeftSide ? - pinSize * 0.5 : dimensions.width - pinSize * 0.5}
+                    y={y - pinSize / 2}
                     cornerRadius={0.25}
                 />
             );
@@ -105,14 +88,12 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
 
     return (
         <BaseComponent componentID={componentID}>
-            {/* Always show the IC, even if failed */}
             <Group>
-                {/* Render all pins */}
                 <Group>
                     {renderPins()}
                 </Group>
                 
-                {/* IC Body */}
+                {/* Main IC body */}
                 <Rect
                     width={dimensions.width}
                     height={dimensions.height}
@@ -123,7 +104,6 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
                     cornerRadius={1}
                 />
                 
-                {/* Notch at the top to indicate pin 1 (typical on real ICs) */}
                 <Arc
                     x={dimensions.width / 2}
                     y={0}
@@ -133,7 +113,6 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
                     fill={"gray"}
                 />
                 
-                {/* IC Type Label */}
                 <Text
                     text={icType}
                     fontSize={4}
@@ -144,7 +123,6 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
                     opacity={hasFailed ? 0.7 : 1}
                 />
                 
-                {/* Pin 1 indicator (small dot near pin 1) */}
                 <Circle
                     x={dimensions.width / 8}
                     y={dimensions.height / 14}
@@ -153,8 +131,6 @@ export const IC: React.FC<ICProps> = ({ componentID }) => {
                     opacity={hasFailed ? 0.7 : 1}
                 />
             </Group>
-            
-            {/* Explosion effect as an overlay */}
             {renderExplosionEffect()}
         </BaseComponent>
     );

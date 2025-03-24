@@ -1,7 +1,3 @@
-/**
- * To do:
- * - Implement connection validation when modifying wire endpoints.
- */
 
 import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
@@ -10,6 +6,7 @@ import { isPointInConnector, getConnectorPosition, validateConnection } from '@/
 import { Connection, createAppropriateConnection, isWireConnection } from '@/types/connection';
 import { Point } from '@/types/general';
 import { findConnectorIDAtPoint } from '@/lib/utils';
+
 import Konva from 'konva';
 import toast from 'react-hot-toast';
 
@@ -18,13 +15,13 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
     const {
         wires,
         components,
-        updateWire,
+        connections,
         selectedWire,
         setSelectedWire,
         setSelectedComponent,
+        updateWire,
         removeWire,
         setHoveredConnectorID,
-        connections,
         removeConnection,
         addConnection,
         getConnectorConnection
@@ -63,6 +60,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
 
     const handlePointDragStart = useCallback((index: 0 | 1) => {
         setDraggingEnd({ index, oldPoint: wire.points[index] });
+        document.body.style.cursor = 'grabbing';
     }, [wire.points]);
 
     const handlePointDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>, index: 0 | 1) => {
@@ -75,6 +73,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
     }, [components, wire.points, updateWire, wireID, setHoveredConnectorID]);
 
     const handlePointDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>, index: 0 | 1) => {
+        document.body.style.cursor = 'default';
         if (!draggingEnd) return;
         const stage = e.target.getStage();
         if (!stage) return;
@@ -178,7 +177,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     key={`${wireID}-point-${index}`}
                     x={point.x}
                     y={point.y}
-                    radius={0.75}
+                    radius={1}
                     stroke='black'
                     strokeWidth={0.15}
                     fill="red"

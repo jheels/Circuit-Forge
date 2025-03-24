@@ -6,9 +6,9 @@ import { Connection, isWireConnection } from '@/types/connection';
 export const useWireUpdates = (
     connectors: Record<string, Connector>,
     dimensions: { width: number; height: number },
-    getConnectorConnection: (id: string) => string,
     connections: Record<string, Connection>,
     wires: Record<string, Wire>,
+    getConnectorConnection: (id: string) => string,
     updateWire: (id: string, updates: Partial<Wire>) => void
 ) => {
     return useCallback((position: Point) => {

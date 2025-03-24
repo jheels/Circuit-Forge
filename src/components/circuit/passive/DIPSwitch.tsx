@@ -2,13 +2,11 @@ import { useSimulatorContext } from "@/context/SimulatorContext";
 import { DIPSwitchComponent } from "@/types/components/dipswitch";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Text } from "react-konva";
+import { ComponentProps } from "@/types/general";
+
 import Konva from "konva";
 
-interface DipSwitchProps {
-    componentID: string
-}
-
-export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
+export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
     const { components, selectedComponent, updateComponent } = useSimulatorContext();
     const component = components[componentID] as DIPSwitchComponent;
     
@@ -21,10 +19,10 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
 
     const bodyColour = '#4A90E2';
     const sliderWidth = 10;
-    const sliderHeight = 4; // Adjusted height to 5 as per your requirement
+    const sliderHeight = 4;
     const sliderOffsetX = 5;
     const sliderOffsetY = 0.5;
-    const sliderSpacingY = 5; // Adjusted spacing for better aesthetics
+    const sliderSpacingY = 5;
 
     const handleToggle = (index: number, e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
@@ -39,7 +37,7 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
                 width={dimensions.width}
                 height={dimensions.height}
                 fill={bodyColour}
-                stroke={'#2C3E50'} // Darker stroke color for contrast
+                stroke={'#2C3E50'}
                 strokeEnabled={selectedComponent === componentID}
                 strokeWidth={0.25}
             />
@@ -61,26 +59,31 @@ export const DipSwitch: React.FC<DipSwitchProps> = ({ componentID }) => {
                         fill="white"
                         rotation={90}
                     />
-                    <Rect
-                        x={sliderOffsetX}
-                        y={index * sliderSpacingY + sliderOffsetY}
-                        width={sliderWidth}
-                        height={sliderHeight}
-                        fill='#F5F5F5' // Light grey color for the slider
-                        stroke='#BDC3C7' // Slightly darker grey stroke
-                        strokeWidth={0.25}
-                        onClick={(event) => handleToggle(index, event)}
-                    />
-                    <Rect
-                        x={switchStates[index] ? sliderWidth + sliderOffsetX -  sliderHeight : sliderOffsetX}
-                        y={index * sliderSpacingY + sliderOffsetY}
-                        width={sliderHeight}
-                        height={sliderHeight}
-                        fill='white' // Grey color for the toggle button
-                        stroke='#95A5A6' // Slightly lighter grey stroke
-                        strokeWidth={0.25}
-                        onClick={(event) => handleToggle(index, event)}
-                    />
+                    <Group
+                        onMouseEnter={() => document.body.style.cursor = 'pointer'}
+                        onMouseLeave={() => document.body.style.cursor = 'default'}
+                    >
+                        <Rect
+                            x={sliderOffsetX}
+                            y={index * sliderSpacingY + sliderOffsetY}
+                            width={sliderWidth}
+                            height={sliderHeight}
+                            fill='#F5F5F5' // Light grey color for the slider
+                            stroke='#BDC3C7' // Slightly darker grey stroke
+                            strokeWidth={0.25}
+                            onClick={(event) => handleToggle(index, event)}
+                        />
+                        <Rect
+                            x={switchStates[index] ? sliderWidth + sliderOffsetX -  sliderHeight : sliderOffsetX}
+                            y={index * sliderSpacingY + sliderOffsetY}
+                            width={sliderHeight}
+                            height={sliderHeight}
+                            fill='white' // Grey color for the toggle button
+                            stroke='#95A5A6' // Slightly lighter grey stroke
+                            strokeWidth={0.25}
+                            onClick={(event) => handleToggle(index, event)}
+                        />
+                    </Group>
                 </Group>
             ))}
         </BaseComponent>

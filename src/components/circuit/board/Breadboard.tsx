@@ -2,7 +2,13 @@ import React, { useMemo } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
 import { Rect, Text } from 'react-konva';
-import { BreadboardComponent, PIN_SPACING, REGULAR_SECTION_WIDTH, BOARD_ROWS } from '@/types/components/breadboard';
+import {
+    BreadboardComponent,
+    PIN_SPACING,
+    REGULAR_SECTION_WIDTH,
+    BOARD_ROWS
+} from '@/types/components/breadboard';
+import { ComponentProps } from '@/types/general';
 
 
 const CONNECTOR_COLORS = {
@@ -32,7 +38,6 @@ const PinHole: React.FC<{
             fill={CONNECTOR_COLORS[type].outer}
             stroke={'gray'}
             strokeWidth={0.25}
-            perfectDrawEnabled={false}
             listening={false}
         />
 );
@@ -97,11 +102,7 @@ const generateRowNumbers = () => {
     return labels;
 }
 
-interface BreadboardProps {
-    componentID: string;
-}
-
-export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
+export const Breadboard: React.FC<ComponentProps> = ({ componentID }) => {
     const { components, selectedComponent } = useSimulatorContext();
     const component = components[componentID] as BreadboardComponent;
 
@@ -134,10 +135,10 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
     return (
         <BaseComponent componentID={componentID} draggable={false}>
             <Rect
-                x={-2.5*PIN_SPACING}
-                y={-1.5*PIN_SPACING}
-                width={component.dimensions.width + 6*PIN_SPACING}
-                height={component.dimensions.height + 2*PIN_SPACING}
+                x={-2.5 * PIN_SPACING}
+                y={-1.5 * PIN_SPACING}
+                width={component.dimensions.width + 6 * PIN_SPACING}
+                height={component.dimensions.height + 2 * PIN_SPACING}
                 fill={'lightgrey'}
                 cornerRadius={2.5}
                 stroke={'rgba(143,217,251, 0.5)'}
@@ -145,7 +146,7 @@ export const Breadboard: React.FC<BreadboardProps> = ({ componentID }) => {
             />
             <Rect
                 x={0}
-                y={-0.5*PIN_SPACING}
+                y={-0.5 * PIN_SPACING}
                 width={component.dimensions.width}
                 height={component.dimensions.height}
                 fill={'rgba(200, 200, 200)'}

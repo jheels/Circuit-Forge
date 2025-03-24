@@ -1,30 +1,20 @@
-/**
- * To do:
- * - Implement different colours depending on input
- */
-
 import React from 'react';
 import { Circle, Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/types/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
-
-interface LEDProps {
-    componentID: string;
-}
+import { ComponentProps } from '@/types/general';
 
 const getColorWithOpacity = (baseColor: string, opacity: number = 1): string => {
-    // For standard color names, convert to RGB with opacity
     if (baseColor === 'red') return `rgba(255, 0, 0, ${opacity})`;
     if (baseColor === 'green') return `rgba(0, 255, 0, ${opacity})`;
     if (baseColor === 'blue') return `rgba(0, 0, 255, ${opacity})`;
     if (baseColor === 'yellow') return `rgba(255, 255, 0, ${opacity})`;
     
-
     return baseColor;
 };
 
-export const LED: React.FC<LEDProps> = ({
+export const LED: React.FC<ComponentProps> = ({
     componentID,
 }) => {
     const { components, componentElectricalValues } = useSimulatorContext()
@@ -73,6 +63,7 @@ export const LED: React.FC<LEDProps> = ({
                     0.3, getColorWithOpacity(properties.colour as string, 0.3 * glowOpacity),
                     1, getColorWithOpacity(properties.colour as string, 0)
                 ]}
+                listening={false}
             />
         );
     }
@@ -114,7 +105,6 @@ export const LED: React.FC<LEDProps> = ({
             />
         ));
     }
-
 
     return (
         <BaseComponent
@@ -162,7 +152,7 @@ export const LED: React.FC<LEDProps> = ({
                         0.5,
                         0,
                         dimensions.width / 4 + 0.5, // radius of the semicircle
-                        Math.PI, // start angle (half-circle starts at Math.PI)
+                        Math.PI, // start angle
                         0, // end angle (ends at 0)
                         false // counterclockwise drawing
                     );
@@ -174,7 +164,7 @@ export const LED: React.FC<LEDProps> = ({
                     context.closePath();
                     context.fillStrokeShape(shape);
                 }}
-                fill={bodyColour}
+                fill={bodyColour as string}
                 opacity={bodyOpacity}
             />
 
@@ -183,7 +173,7 @@ export const LED: React.FC<LEDProps> = ({
                 y={dimensions.height / 4 - 0.1}
                 width={dimensions.width / 2 + 1}
                 height={dimensions.height / 12 + 0.25}
-                fill={bodyColour}
+                fill={bodyColour as string}
                 opacity={bodyOpacity}
             />
             

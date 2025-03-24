@@ -3,12 +3,8 @@ import { Line, Rect, Group, Circle } from 'react-konva';
 import { ResistorComponent } from '@/types/components/resistor';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
+import { ComponentProps } from '@/types/general';
 
-interface ResistorProps {
-    componentID: string;
-}
-
-// Helper function to convert resistor value to base units (ohms)
 const convertToBaseUnits = (value: number, unit: string): number => {
     switch (unit) {
         case 'kΩ':
@@ -16,25 +12,15 @@ const convertToBaseUnits = (value: number, unit: string): number => {
         case 'MΩ':
             return value * 1000000;
         default:
-            return value; // Assume ohms
+            return value;
     }
 };
 
 // Calculate the color bands for a resistor based on value
-const calculateColorBands = (value: number, unit: string): string[] => {
-    // Convert to base ohms
-    let ohms = value;
-    switch (unit) {
-        case 'kΩ':
-            ohms *= 1000;
-            break;
-        case 'MΩ':
-            ohms *= 1000000;
-            break;
-    }
+const calculateColorBands = (resistance: number): string[] => {
 
     // Standard resistor color codes
-    const RESISTOR_COLORS = {
+    const RESISTOR_COLOURS: Record<number, string> = {
         0: '#000000', // Black
         1: '#964B00', // Brown
         2: '#FF0000', // Red
@@ -48,7 +34,7 @@ const calculateColorBands = (value: number, unit: string): string[] => {
     };
 
     // Multiplier values and their corresponding colors
-    const MULTIPLIER_COLORS = {
+    const MULTIPLIER_COLOURS: Record<number, string> = {
         0: '#000000',  // ×1 (Black)
         1: '#964B00',  // ×10 (Brown)
         2: '#FF0000',  // ×100 (Red)
@@ -59,25 +45,24 @@ const calculateColorBands = (value: number, unit: string): string[] => {
     };
 
     // Convert to string and pad with leading zeros to ensure at least three digits
-    const ohmsString = ohms.toFixed(0).padStart(3, '0');
+    const resistanceAsString = resistance.toFixed(0).padStart(3, '0');
 
     // Extract the first three digits
-    const firstDigit = parseInt(ohmsString[0], 10);
-    const secondDigit = parseInt(ohmsString[1], 10);
-    const thirdDigit = parseInt(ohmsString[2], 10);
+    const firstDigit = parseInt(resistanceAsString[0], 10);
+    const secondDigit = parseInt(resistanceAsString[1], 10);
+    const thirdDigit = parseInt(resistanceAsString[2], 10);
 
     // Calculate the multiplier as the length of the number minus 3
-    const multiplier = Math.max(0, ohmsString.length - 3);
-
+    const multiplier = Math.max(0, resistanceAsString.length - 3);
     return [
-        RESISTOR_COLORS[firstDigit],
-        RESISTOR_COLORS[secondDigit],
-        RESISTOR_COLORS[thirdDigit],
-        MULTIPLIER_COLORS[multiplier] || MULTIPLIER_COLORS[0],
+        RESISTOR_COLOURS[firstDigit],
+        RESISTOR_COLOURS[secondDigit],
+        RESISTOR_COLOURS[thirdDigit],
+        MULTIPLIER_COLOURS[multiplier] || MULTIPLIER_COLOURS[0],
     ];
 };
 
-export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
+export const Resistor: React.FC<ComponentProps> = ({ componentID }) => {
     const { components, selectedComponent, componentElectricalValues } = useSimulatorContext();
     const component = components[componentID] as ResistorComponent;
 
@@ -88,17 +73,15 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
 
     const { dimensions, properties } = component;
     
-    // Get electrical values from context
     const electricalValues = componentElectricalValues[componentID]?.[0] || { voltage: 0, current: 0 };
-    const { voltage, current } = electricalValues;
+    const { current } = electricalValues;
     
-    // Calculate resistance in base units (ohms)
     const resistance = properties.value as number;
     const unit = properties.unit as string;
-    const actualResistance = convertToBaseUnits(resistance, unit);
+    const standardisedResistance = convertToBaseUnits(resistance, unit);
     
     // Calculate power dissipation using P = I²R
-    const power = current * current * actualResistance;
+    const power = current * current * standardisedResistance;
     
     // Determine rated power (assuming 0.25W as default)
     const ratedPower = 0.25; // Default to 0.25W
@@ -107,24 +90,22 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
     const powerRatio = power / ratedPower;
     
     // Determine resistor state based on power ratio
-    const isWarm = powerRatio >= 0.5 && powerRatio < 0.75;
     const isHot = powerRatio >= 0.75 && powerRatio < 1.0;
     const isOverheating = powerRatio >= 1.0 && powerRatio < 1.5;
     const hasFailed = powerRatio >= 1.5;
     
-    // Resistor body color
-    const bodyColour = '#E8C49C'; // Default resistor beige color
+    const bodyColour = '#E8C49C';
     
     // Calculate band dimensions and spacing
     const bandWidth = dimensions.width / 12;
     const bandSpacing = dimensions.width / 6;
     
     // Get color bands based on resistor value
-    const colorBands = calculateColorBands(resistance, unit as string);
+    const colorBands = calculateColorBands(standardisedResistance);
 
     // Render thermal overlay based on power ratio
     const renderThermalOverlay = () => {
-        if (powerRatio < 0.5) return null; // No overlay for normal operation
+        if (powerRatio < 0.5) return null;
         
         let overlayColor;
         let opacity;
@@ -160,8 +141,8 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
 
     // Render glow effect based on power ratio
     const renderGlowEffect = () => {
-        if (powerRatio < 0.5) return null; // No glow for normal operation
-        if (hasFailed) return null; // No glow for failed state
+        if (powerRatio < 0.5) return null;
+        if (hasFailed) return null; 
         
         let glowColor;
         let intensity;
@@ -196,13 +177,13 @@ export const Resistor: React.FC<ResistorProps> = ({ componentID }) => {
                     0.5, glowColor + (intensity * 0.4) + ")",
                     1, glowColor + "0)"
                 ]}
+                listening={false}
             />
         );
     };
 
     return (
         <BaseComponent componentID={componentID}>
-            {/* Glow effect (behind everything) */}
             {renderGlowEffect()}
             
             {/* Resistor leads */}
