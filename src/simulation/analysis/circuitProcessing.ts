@@ -53,7 +53,7 @@ export const processDIPSwitchConnections = (
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     DIPSwitchComponent: DIPSwitchComponent,
-    getConnectorConnections: (connectorID: string) => Set<string>
+    getConnectorConnection: (connectorID: string) => string
 ): CircuitGraph => {
     const { nodes, edges } = graph;
     const connectorArray = Object.values(DIPSwitchComponent.connectors);
@@ -63,8 +63,8 @@ export const processDIPSwitchConnections = (
     for (let i = 0; i < 8; i++) {
         const leftConnector = connectorArray[i * 2];
         const rightConnector = connectorArray[i * 2 + 1];
-        const leftConnection = connections[Array.from(getConnectorConnections(leftConnector.id))[0]];
-        const rightConnection = connections[Array.from(getConnectorConnections(rightConnector.id))[0]];
+        const leftConnection = connections[getConnectorConnection(leftConnector.id)];
+        const rightConnection = connections[getConnectorConnection(rightConnector.id)];
 
         if (!leftConnection || !rightConnection) return graph;
 
@@ -87,7 +87,7 @@ export const processICComponentConnections = (
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     ICComponent: ICComponent,
-    getConnectorConnections: (connectorID: string) => Set<string>
+    getConnectorConnection: (connectorID: string) => string
 ): CircuitGraph => {
     const gateConnectors: Record<number, {
         inputs: { connector: Connector, node: string }[],
@@ -97,11 +97,10 @@ export const processICComponentConnections = (
     const { nodes, edges } = graph;
 
     Object.values(ICComponent.connectors).forEach(connector => {
-        const connectorConnections = Array.from(getConnectorConnections(connector.id));
-        if (connectorConnections.length === 0) return;
+        const connectorConnectionID = getConnectorConnection(connector.id)
+        if (!connectorConnectionID) return;
 
-        const connectionId = Array.from(connectorConnections)[0];
-        const connection = connections[connectionId];
+        const connection = connections[connectorConnectionID];
 
         const stripID = updateStripIDForPowerAndGround(connection.metadata.stripID, powerDistribution);
         if (!connector.metadata) return;
@@ -149,17 +148,15 @@ export const processTwoTerminalComponentConnections = (
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     component: EditorComponent,
-    getConnectorConnections: (connectorID: string) => Set<string>
+    getConnectorConnection: (connectorID: string) => string
 ): CircuitGraph => {
     const { nodes, edges } = graph;
 
     const stripIDs: string[] = [];
     Object.values(component.connectors).forEach(connector => {
-        const connectorConnections = getConnectorConnections(connector.id);
-        connectorConnections.forEach(connection => {
-            const stripID = updateStripIDForPowerAndGround(connections[connection].metadata.stripID, powerDistribution);
-            stripIDs.push(stripID);
-        });
+        const connectorConnectionID = getConnectorConnection(connector.id);
+        const stripID = updateStripIDForPowerAndGround(connections[connectorConnectionID].metadata.stripID, powerDistribution);
+        stripIDs.push(stripID);
     });
 
     if (stripIDs.length !== 2) return graph;

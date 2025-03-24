@@ -12,7 +12,7 @@ export const RotationControls = () => {
         selectedComponent, 
         components,
         updateComponent,
-        getConnectorConnections,
+        getConnectorConnection,
         connections,
         wires,
         updateWire
@@ -52,7 +52,7 @@ export const RotationControls = () => {
         updateWirePositions(
             updatedConnectors,
             component.dimensions,
-            getConnectorConnections,
+            getConnectorConnection,
             connections,
             wires,
             updateWire,

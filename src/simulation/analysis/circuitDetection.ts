@@ -218,21 +218,19 @@ export const createEdgesFromConnections = (
     connections: Record<string, Connection>,
     components: Record<string, EditorComponent>,
     powerDistribution: PowerDistribution,
-    getConnectorConnections: (connectorID: string) => Set<string>,
+    getConnectorConnection: (connectorID: string) => string,
 ): CircuitGraph => {
     graph = processWireConnections(graph, connections, powerDistribution);
 
     // TODO: refactor since only one connection per connector so unnecessary loops.
     Object.values(components).forEach(component => {
         if (component.type === 'power-supply' || component.type === 'breadboard') return;
-        // TODO: refactor to use functions for each component type.
         if (component.type === 'dip-switch') {
-            graph = processDIPSwitchConnections(graph, connections, powerDistribution, component as DIPSwitchComponent, getConnectorConnections);
+            graph = processDIPSwitchConnections(graph, connections, powerDistribution, component as DIPSwitchComponent, getConnectorConnection);
         } else if (component.type === 'ic') {
-            console.log('processing ic connections');
-            graph = processICComponentConnections(graph, connections, powerDistribution, component as ICComponent, getConnectorConnections);
+            graph = processICComponentConnections(graph, connections, powerDistribution, component as ICComponent, getConnectorConnection);
         } else {
-            graph = processTwoTerminalComponentConnections(graph, connections, powerDistribution, component, getConnectorConnections);
+            graph = processTwoTerminalComponentConnections(graph, connections, powerDistribution, component, getConnectorConnection);
         }
     });
 

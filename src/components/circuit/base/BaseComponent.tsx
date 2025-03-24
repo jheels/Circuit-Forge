@@ -36,7 +36,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         addConnection,
         removeConnection,
         setClickedConnector,
-        getConnectorConnections,
+        getConnectorConnection,
         componentElectricalValues
     } = useSimulatorContext();
 
@@ -49,7 +49,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     const updateWirePositions = useWireUpdates(
         connectors,
         dimensions,
-        getConnectorConnections,
+        getConnectorConnection,
         connections,
         wires,
         updateWire,
@@ -85,7 +85,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         setCreatingWire,
         setClickedConnector,
         addWire,
-        getConnectorConnections
+        getConnectorConnection
     );
 
     // Handle component selection

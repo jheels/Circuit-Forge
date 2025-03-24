@@ -23,11 +23,11 @@ export const useConnectorManagement = (
     setCreatingWire: (wire: Wire | null) => void,
     setClickedConnector: (connector: Connector | null) => void,
     addWire: (wire: Wire) => void,
-    getConnectorConnections: (connectorID: string) => Set<string>
+    getConnectorConnection: (connectorID: string) => string
 ) => {
     const handleConnectorClick = useCallback((connectorID: string) => {
-        const connectorConnections = getConnectorConnections(connectorID);
-        if (connectorConnections.size > 0) {
+        const connectorConnection = getConnectorConnection(connectorID);
+        if (connectorConnection) {
             toast.error('Max 1 connection per connector.', {
                 id: 'max-connection-toast'
             });
@@ -66,7 +66,7 @@ export const useConnectorManagement = (
             addWire(newWire);
             setClickedConnector(connector);
         }
-    }, [getConnectorConnections, connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, components, addConnection, setCreatingWire, setClickedConnector, addWire]);
+    }, [getConnectorConnection, connectors, position, dimensions, setSelectedWire, creatingWire, updateWire, components, addConnection, setCreatingWire, setClickedConnector, addWire]);
 
     const updateConnectionsOnDrop = useCallback((snapState: SnapState) => {
         snapState.connectionIDs.forEach((connectionID: string) => {

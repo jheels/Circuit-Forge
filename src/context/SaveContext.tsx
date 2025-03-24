@@ -14,7 +14,7 @@ interface CircuitProject {
     components: Record<string, EditorComponent>;
     componentCounts: Record<string, number>;
     connections: Record<string, Connection>;
-    connectorConnections: Record<string, Set<string>>;
+    connectorConnectionMap: Record<string, string>;
     wires: Record<string, Wire>;
 }
 
@@ -46,7 +46,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         components,
         componentCounts,
         connections,
-        connectorConnections,
+        connectorConnectionMap,
         wires,
         resetProject,
         setProjectName,
@@ -66,34 +66,22 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         components,
         componentCounts,
         connections,
-        connectorConnections,
+        connectorConnectionMap,
         wires,
-    }), [projectName, components, componentCounts, connections, connectorConnections, wires]);
+    }), [projectName, components, componentCounts, connections, connectorConnectionMap, wires]);
 
     useEffect(() => {
         setHasUnsavedChanges(true);
-    }, [projectName, components, connections, connectorConnections, wires]);
+    }, [projectName, components, connections, connectorConnectionMap, wires]);
 
     const serialiseProject = useCallback((project: CircuitProject) => {
-        const serialisedProject = {
-            ...project,
-            connectorConnections: Object.fromEntries(
-                Object.entries(project.connectorConnections).map(([key, value]) => [key, Array.from(value)])
-            )
-        };
-
-        return JSON.stringify(serialisedProject, null, 2);
+        return JSON.stringify(project, null, 2);
     }, []);
 
     const deserialiseProject = useCallback((json: string): CircuitProject => {
         const deserialisedProject = JSON.parse(json);
 
-        return {
-            ...deserialisedProject,
-            connectorConnections: Object.fromEntries(
-                Object.entries(deserialisedProject.connectorConnections).map(([key, value]) => [key, new Set(value)])
-            )
-        };
+        return { ...deserialisedProject };
     }, []);
 
     const saveProject = useCallback(async (saveAs: boolean = false): Promise<SaveResult> => {

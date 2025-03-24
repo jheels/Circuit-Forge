@@ -15,7 +15,20 @@ import toast from 'react-hot-toast';
 
 
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
-    const { wires, components, updateWire, selectedWire, setSelectedWire, setSelectedComponent, removeWire, setHoveredConnectorID, connections, removeConnection, addConnection, getConnectorConnections } = useSimulatorContext();
+    const {
+        wires,
+        components,
+        updateWire,
+        selectedWire,
+        setSelectedWire,
+        setSelectedComponent,
+        removeWire,
+        setHoveredConnectorID,
+        connections,
+        removeConnection,
+        addConnection,
+        getConnectorConnection
+    } = useSimulatorContext();
     const wire = wires[wireID];
     const [isHovered, setIsHovered] = useState(false);
     const [draggingEnd, setDraggingEnd] = useState<null | { index: 0 | 1; oldPoint: Point }>(null);
@@ -79,8 +92,8 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
             
             Object.values(connectors).forEach((connector) => {
                 if (!isPointInConnector(dropPoint, connector, position, dimensions)) return;
-                const connectorConnections = getConnectorConnections(connector.id);
-                if (connectorConnections.size > 0) {
+                const connectorConnection = getConnectorConnection(connector.id);
+                if (connectorConnection) {
                     toast.error('Max 1 connection per connector.', {
                         id: 'max-connection-toast'
                     })
@@ -127,7 +140,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
             updateWire(wireID, { points: newPoints });
         }
         setDraggingEnd(null);
-    }, [draggingEnd, connections, wireID, components, getConnectorConnections, wire, updateWire, removeConnection, addConnection]);
+    }, [draggingEnd, connections, wireID, components, wire, updateWire, removeConnection, addConnection]);
 
     return (
         <>

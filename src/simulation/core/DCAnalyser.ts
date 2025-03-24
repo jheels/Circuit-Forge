@@ -244,7 +244,6 @@ export const performDCAnalysis = (
 
         state.voltages = solveCircuit(circuitGraph, state.models);
 
-        console.log('Initial voltages:', state.voltages);
 
         if (Object.keys(state.nonLinearModels).length === 0) {
             return {
@@ -257,7 +256,6 @@ export const performDCAnalysis = (
 
         while (!state.converged && state.iteration < MAX_ITERATIONS) {
             state = performIteration(state, circuitGraph);
-            console.log(state.iteration, state.voltages);
         }
 
         if (state.converged) {

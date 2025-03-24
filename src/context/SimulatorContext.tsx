@@ -22,7 +22,7 @@ interface SimulatorContextType {
     hoveredConnectorID: string | null;
     clickedConnector: Connector | null;
     connections: Record<string, Connection>;
-    connectorConnections: Record<string, Set<string>>;
+    connectorConnectionMap: Record<string, string>;
     clipboardComponent: EditorComponent | null;
     copySelectedComponent: () => void;
     cutSelectedComponent: () => void;
@@ -45,7 +45,7 @@ interface SimulatorContextType {
     setClickedConnector: (connector: Connector | null) => void;
     addConnection: (connection: Connection) => void;
     removeConnection: (connectionID: string) => void;
-    getConnectorConnections: (connectorID: string) => Set<string>;
+    getConnectorConnection: (connectorID: string) => string;
     resetProject: () => void;
 }
 
@@ -73,7 +73,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connections, setConnections] = useState<Record<string, Connection>>({});
     // TODO: refactor to just store a one to one map since we just added a limitation Record<string, string>;
-    const [connectorConnections, setConnectorConnections] = useState<Record<string, Set<string>>>({});
+    const [connectorConnectionMap, setConnectorConnectionMap] = useState<Record<string, string>>({});
     const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
     const [componentElectricalValues, setComponentElectricalValues] = useState<{ [key: string]: { [key: number]: { voltage: number, current: number } } }>({});
 
@@ -128,17 +128,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
             ...prev,
             [connection.id]: connection
         }));
-        setConnectorConnections((prev) => {
-            const startConnections = prev[connection.sourceConnector.id] || new Set();
-            startConnections.add(connection.id);
-            const endConnections = prev[connection.targetConnector.id] || new Set();
-            endConnections.add(connection.id);
-            return {
-                ...prev,
-                [connection.sourceConnector.id]: startConnections,
-                [connection.targetConnector.id]: endConnections
-            };
-        });
+
+        setConnectorConnectionMap((prev) => ({
+            ...prev,
+            [connection.sourceConnector.id]: connection.id,
+            [connection.targetConnector.id]: connection.id,
+        }));
         connection.sourceConnector.isConnected = true;
         connection.targetConnector.isConnected = true;
     }
@@ -153,31 +148,16 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
             delete newConnections[connectionID];
             return newConnections;
         });
-        setConnectorConnections((prev) => {
-            const startConnections = prev[connection.sourceConnector.id] || new Set();
-            startConnections.delete(connectionID);
-            const endConnections = prev[connection.targetConnector.id] || new Set();
-            endConnections.delete(connectionID);
-
-            const newConnections = { ...prev };
-            if (startConnections.size === 0) {
-                delete newConnections[connection.sourceConnector.id];
-            } else {
-                newConnections[connection.sourceConnector.id] = startConnections;
-            }
-
-            if (endConnections.size === 0) {
-                delete newConnections[connection.targetConnector.id];
-            } else {
-                newConnections[connection.targetConnector.id] = endConnections;
-            }
-
-            return newConnections;
+        setConnectorConnectionMap((prev) => {
+            const newMap = { ...prev };
+            delete newMap[connection.sourceConnector.id];
+            delete newMap[connection.targetConnector.id];
+            return newMap;
         });
     }
 
-    const getConnectorConnections = (connectorID: string) => {
-        return connectorConnections[connectorID] || new Set();
+    const getConnectorConnection = (connectorID: string) => {
+        return connectorConnectionMap[connectorID] || null;
     }
 
     const cleanUpComponentWires = (editorID: string) => {
@@ -186,16 +166,15 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         if (!component) return;
         const connectors = Object.values(component.connectors);
         connectors.forEach((connector) => {
-            const connectorConnections = getConnectorConnections(connector.id);
-            connectorConnections.forEach((connectionID) => {
-                const connection = connections[connectionID];
-                if (!connection) return;
-                if (isWireConnection(connection) && connection.metadata.wireID) {
-                    removeWire(connection.metadata.wireID);
-                } else {
-                    removeConnection(connectionID);
-                }
-            });
+            const connectorConnectionID = getConnectorConnection(connector.id);
+            if (!connectorConnectionID) return;
+            const connection = connections[connectorConnectionID];
+            if (!connection) return;
+            if (isWireConnection(connection) && connection.metadata.wireID) {
+                removeWire(connection.metadata.wireID);
+            } else {
+                removeConnection(connectorConnectionID);
+            }
         });
     }
 
@@ -287,7 +266,6 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     const removeWire = (wireID: string) => {
         const wire = wires[wireID];
         if (!wire) return;
-        // possibly bring back wireConnection
         const connectionID = Object.keys(connections).find((id) => {
             const connection = connections[id];
             return isWireConnection(connection) && connection.metadata.wireID === wireID;
@@ -314,6 +292,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     }
 
     const resetProject = () => {
+        // check if it resets everything
         setProjectName('Untitled Project');
         setComponents({});
         setSelectedComponent(null);
@@ -324,7 +303,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         setHoveredConnectorID(null);
         setClickedConnector(null);
         setConnections({});
-        setConnectorConnections({});
+        setConnectorConnectionMap({});
         setClipboardComponent(null);
     }
 
@@ -340,7 +319,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
             hoveredConnectorID,
             clickedConnector,
             connections,
-            connectorConnections,
+            connectorConnectionMap,
             clipboardComponent,
             componentElectricalValues,
             updateComponentElectricalValues,
@@ -365,7 +344,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
             resetProject,
             addConnection,
             removeConnection,
-            getConnectorConnections,
+            getConnectorConnection,
         }}>
             {children}
         </SimulatorContext.Provider>

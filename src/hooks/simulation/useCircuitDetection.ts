@@ -14,7 +14,7 @@ import { validateCircuit } from '@/simulation/validation';
 import toast from 'react-hot-toast';
 
 export const useCircuitDetection = () => {
-    const { components, connections, getConnectorConnections } = useSimulatorContext();
+    const { components, connections, getConnectorConnection } = useSimulatorContext();
     const [circuitGraph, setCircuitGraph] = useState<CircuitGraph | null>(null);
 
     const { powerDistribution, powerSupply, breadboard } = useFindPowerDistribution(components, connections);
@@ -39,7 +39,7 @@ export const useCircuitDetection = () => {
         let graph = initialiseCircuitGraph();
         graph = initialisePowerDistribution(powerDistribution, powerSupply, graph);
         graph = initialiseActiveRegularStrips(graph, connections, breadboard);
-        graph = createEdgesFromConnections(graph, connections, components, powerDistribution, getConnectorConnections);
+        graph = createEdgesFromConnections(graph, connections, components, powerDistribution, getConnectorConnection);
         graph = findConnectedCircuit(graph);
         const validationResult = validateCircuit(graph);
 
