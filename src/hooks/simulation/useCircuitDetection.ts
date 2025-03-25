@@ -11,7 +11,6 @@ import {
     removeDisconnectedPaths
 } from '@/simulation/analysis/circuitDetection';
 import { validateCircuit } from '@/simulation/validation';
-import toast from 'react-hot-toast';
 import { sendErrorToast, sendSuccessToast, sendWarningToast } from '@/lib/utils';
 
 export const useCircuitDetection = () => {

@@ -152,42 +152,44 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         setIsAlertDialogOpen(false)
     }
 
-    const handleSave = useCallback(async () => {
-        toast.promise(
-            saveProject(),
-            {
-                loading: 'Saving project...',
-                success: 'Project saved successfully.',
-                error: (err) => `Error saving project: ${err.message}`,
+    const handleSaveLogic = useCallback(async (isSaveAs: boolean) => {
+        try {
+            const result = await saveProject(isSaveAs);
+            if (result.success) {
+                sendSuccessToast('Project saved');
+            } else {
+                console.error('Error saving project:', result.error);
             }
-        );
+        } catch (error) {
+            console.error('Unexpected error during save:', error);
+        }
     }, [saveProject]);
 
+    const handleSave = useCallback(async () => {
+        await handleSaveLogic(false);
+    }, [handleSaveLogic]);
+
     const handleSaveAs = useCallback(async () => {
-        toast.promise(
-            saveProject(true),
-            {
-                loading: 'Saving project...',
-                success: 'Project saved successfully.',
-                error: (err) => `Error saving project: ${err.message}`,
+        await handleSaveLogic(true);
+    }, [handleSaveLogic]);
+
+    const handleLoadProject = useCallback(async () => {
+        try {
+            const result = await loadProject();
+            if (result.success) {
+                sendSuccessToast('Project loaded');
+            } else {
+                console.error('Error loading project:', result.error);
             }
-        );
-    }, [saveProject]);
+        } catch (error) {
+            console.error('Unexpected error during load:', error);
+        }
+    }, [loadProject]);
 
     const handleExportAsImage = useCallback(async () => {
         await exportProjectAsImage();
     }, [exportProjectAsImage]);
 
-    const handleLoadProject = useCallback(async () => {
-        toast.promise(
-            loadProject(),
-            {
-                loading: 'Loading project...',
-                success: 'Project loaded successfully.',
-                error: (err) => `Error loading project: ${err.message}`,
-            }
-        );
-    }, [loadProject]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

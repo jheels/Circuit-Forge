@@ -121,6 +121,9 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
 
             return { success: true };
         } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                return { success: false, error: 'Aborted save' };
+            }
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Failed to save project.'
@@ -154,10 +157,15 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
             setComponentCounts(project.componentCounts);
             setCurrentFileHandle(fileHandle);
             setHasUnsavedChanges(false);
+
+            return { success: true };
         } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                return { success: false, error: 'Aborted loading' };
+            }
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Failed to load project.'
+                error: error instanceof Error ? error.message : 'Failed to load project'
             }
         }
     }, [addComponent, addConnection, addWire, deserialiseProject, resetProject, setComponentCounts, setProjectName]);
