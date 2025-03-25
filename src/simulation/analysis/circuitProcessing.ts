@@ -155,6 +155,7 @@ export const processTwoTerminalComponentConnections = (
     const stripIDs: string[] = [];
     Object.values(component.connectors).forEach(connector => {
         const connectorConnectionID = getConnectorConnection(connector.id);
+        if (!connectorConnectionID) return;
         const stripID = updateStripIDForPowerAndGround(connections[connectorConnectionID].metadata.stripID, powerDistribution);
         stripIDs.push(stripID);
     });

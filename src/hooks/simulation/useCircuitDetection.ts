@@ -20,6 +20,9 @@ export const useCircuitDetection = () => {
     const { powerDistribution, powerSupply, breadboard } = useFindPowerDistribution(components, connections);
 
     useEffect(() => {
+        if (!powerSupply || !breadboard) {
+            return;
+        }
         // TODO: refactor to central store for easy access
         if ((!powerSupply || !breadboard) && Object.entries(components).length !== 0) {
             toast.error('Please add a power supply/breadboard', {
