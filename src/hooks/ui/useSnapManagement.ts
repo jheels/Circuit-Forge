@@ -8,7 +8,7 @@
 import { useState, useCallback } from 'react';
 import { Point, EditorComponent } from '@/types/general';
 import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/types/connector';
-import { calculateDistance } from '@/lib/utils';
+import { calculateDistance, sendErrorToast } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
 
@@ -79,7 +79,7 @@ export const useSnapManagement = (
                     if (distance < SNAPPING_THRESHOLD) {
                         // Check if the target connector is occupied
                         if (otherConnector.isConnected) {
-                            toast.error('Pinhole is occupied.', { id: 'pinhole-occupied' });
+                            sendErrorToast('Pinhole already occupied', 'occupied-connector');
                             return;
                         }
     
@@ -107,10 +107,10 @@ export const useSnapManagement = (
         // we should reject the entire snap attempt
         if (potentialConnections.length > 0 && 
             potentialConnections.length !== unconnectedConnectors.length) {
-            toast.error('Please connect all terminals.', { id: 'hanging-component' });
+            sendErrorToast('Connect all terminals', 'hanging-component');
             return { firstSnap: null, potentialConnections: [] };
         }
-    
+
         return { firstSnap, potentialConnections };
     }, [componentID, components, connectors, dimensions, setHoveredConnectorID]);
     

@@ -9,7 +9,7 @@ import { LED } from '../circuit/active/LED';
 import { Resistor } from '../circuit/passive/Resistor';
 import { PowerSupply } from '../circuit/active/PowerSupply';
 import { Wire } from '../circuit/passive/Wire';
-import { findConnectorIDAtPoint } from '@/lib/utils';
+import { findConnectorIDAtPoint, sendErrorToast, sendSuccessToast } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';
 import { Breadboard } from '../circuit/board/Breadboard';
@@ -100,8 +100,13 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const dropX = (point.x - stage.x()) / scaleRef.current;
         const dropY = (point.y - stage.y()) / scaleRef.current;
 
-        if ((item.sidebarID == 'breadboard' || item.sidebarID == 'power-supply') && componentCounts[item.sidebarID] > 0) {
-            toast.error('Only one breadboard or power supply is allowed.');
+        if (item.sidebarID === 'breadboard' && componentCounts['breadboard'] > 0) {
+            sendErrorToast('Only one breadboard can be added.');
+            return;
+        }
+
+        if (item.sidebarID === 'power-supply' && componentCounts['power-supply'] > 0) {
+            sendErrorToast('Only one power supply can be added.');
             return;
         }
         const newComponent = createComponent(item.sidebarID, { x: dropX, y: dropY });
@@ -118,7 +123,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
                 setCreatingWire(null);
                 setClickedConnector(null);
             }
-            toast.success('Component deleted.');
+            sendSuccessToast('Deleted component');
         }
     }, [creatingWire, removeComponent, removeWire, selectedComponent, setClickedConnector, setCreatingWire, setSelectedComponent]);
 

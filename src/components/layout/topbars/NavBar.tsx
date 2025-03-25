@@ -6,6 +6,7 @@ import { useUIContext } from '@/context/UIContext';
 import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
 import { TooltipButton } from '@/components/ui/ToolTipButton';
 import toast from 'react-hot-toast';
+import { sendErrorToast } from '@/lib/utils';
 
 export function NavBar() {
     const { selectedTool, setSelectedTool } = useUIContext();
@@ -22,7 +23,7 @@ export function NavBar() {
                 <div className="flex items-center space-x-8">
                     <div className="flex items-center space-x-6">
                         <TooltipButton icon={CircuitBoard} tooltip="Simulator" isSelected={selectedTool === 'simulator'} onClick={() => setSelectedTool('simulator')} />
-                        <TooltipButton icon={Microchip} tooltip="IC Editor" isSelected={selectedTool === 'ic-editor'} onClick={() => toast.error('Feature not implemented!')} />
+                        <TooltipButton icon={Microchip} tooltip="IC Editor" isSelected={selectedTool === 'ic-editor'} onClick={() => sendErrorToast('Feature not implemented!')} />
                     </div>
                     <div className="flex items-center space-x-2">
                         <Switch

@@ -9,6 +9,7 @@ import { Connection, isWireConnection } from "@/types/connection";
 import { toast } from "react-hot-toast";
 import { createDIPSwitchComponent } from "@/types/components/dipswitch";
 import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/types/components/ic";
+import { sendErrorToast, sendSuccessToast } from "@/lib/utils";
 
 interface SimulatorContextType {
     projectName: string;
@@ -77,31 +78,33 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
     const [componentElectricalValues, setComponentElectricalValues] = useState<{ [key: string]: { [key: number]: { voltage: number, current: number } } }>({});
 
-    const copySelectedComponent = () => {
+    const handleComponentAction = (action: 'copy' | 'cut') => {
         if (!selectedComponent || !components[selectedComponent]) return;
 
-        const componentToCopy = components[selectedComponent];
-        if (componentToCopy.type === 'breadboard' || componentToCopy.type === 'power-supply') {
-            toast.error('Cannot copy breadboard or power supply components.');
+        const component = components[selectedComponent];
+        if (component.type === 'breadboard') {
+            sendErrorToast(`Cannot ${action} breadboard`);
             return;
         }
-        setClipboardComponent(componentToCopy);
-        toast.success('Component copied to clipboard.');
-    };
 
-    const cutSelectedComponent = () => {
-        if (!selectedComponent || !components[selectedComponent]) return;
-
-        const componentToCut = components[selectedComponent];
-        if (componentToCut.type === 'breadboard' || componentToCut.type === 'power-supply') {
-            toast.error('Cannot cut breadboard or power supply components.');
+        if (component.type === 'power-supply') {
+            sendErrorToast(`Cannot ${action} power supply`);
             return;
         }
-        setClipboardComponent(componentToCut);
-        removeComponent(selectedComponent);
-        setSelectedComponent(null);
-        toast.success('Component cut to clipboard.');
+
+        setClipboardComponent(component);
+
+        if (action === 'cut') {
+            removeComponent(selectedComponent);
+            setSelectedComponent(null);
+            sendSuccessToast(`${component.properties.name} cut`);
+        } else {
+            sendSuccessToast(`${component.properties.name} copied`);
+        }
     };
+
+    const copySelectedComponent = () => handleComponentAction('copy');
+    const cutSelectedComponent = () => handleComponentAction('cut');
 
     const pasteClipboardComponent = () => {
         if (!clipboardComponent) return;
@@ -120,7 +123,7 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
 
         addComponent(newComponent);
         setSelectedComponent(newComponent.editorID);
-        toast.success('Component pasted.');
+        sendSuccessToast(`${newName} pasted`);
     };
 
     const addConnection = (connection: Connection) => {

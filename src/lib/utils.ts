@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { EditorComponent, Point } from "@/types/general"
 import { isPointInConnector } from "@/types/connector"
+import { toast } from 'react-hot-toast';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -69,4 +70,35 @@ export const getOS = () => {
 
 export const isBreadboard = (component: EditorComponent): boolean => {
     return component.type === 'breadboard';
+}
+
+export const sendSuccessToast = (message: string, id?: string) => {
+    toast.success(message, {
+        id: id,
+        style: {
+            background: '#D1FAE5',
+            color: '#065F46',
+        },
+    });
+};
+
+export const sendErrorToast = (message: string, id?: string) => {
+    toast.error(message, {
+        id: id,
+        style: {
+            background: '#FEE2E2',
+            color: '#991B1B', 
+        },
+    });
+}
+
+export const sendWarningToast = (message: string, id?: string) => {
+    toast(message, {
+        icon: '⚠️',
+        style: {
+            background: '#FEF3C7', 
+            color: '#92400E',
+        },
+        id: id,
+    });
 }

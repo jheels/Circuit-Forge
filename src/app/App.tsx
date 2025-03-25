@@ -6,7 +6,10 @@ import { Toaster } from 'react-hot-toast';
 const AppContent: React.FC = () => {
     return (
         <div>
-        <Toaster/>
+        <Toaster
+            position='bottom-center'
+            reverseOrder={false}
+        />
         <div className="relative flex flex-col h-screen">
             <NavBar />
             <Simulator />

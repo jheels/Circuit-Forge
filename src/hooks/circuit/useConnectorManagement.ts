@@ -9,6 +9,7 @@ import { Connector, getConnectorPosition } from '@/types/connector';
 import { Connection, createAppropriateConnection } from '@/types/connection';
 import { ConnectorPair, SnapState } from './ui/useSnapManagement';
 import toast from 'react-hot-toast';
+import { sendErrorToast } from '@/lib/utils';
 
 export const useConnectorManagement = (
     position: Point,
@@ -28,9 +29,7 @@ export const useConnectorManagement = (
     const handleConnectorClick = useCallback((connectorID: string) => {
         const connectorConnection = getConnectorConnection(connectorID);
         if (connectorConnection) {
-            toast.error('Max 1 connection per connector.', {
-                id: 'max-connection-toast'
-            });
+            sendErrorToast('Connector already connected', 'connector-connected-toast');
             return;
         }
 
@@ -40,7 +39,7 @@ export const useConnectorManagement = (
 
         if (creatingWire) {
             if (creatingWire.startConnector.id === connectorID) {
-                toast.error('Cannot connect a connector to itself.');
+                sendErrorToast('Cannot connect to same connector', 'same-connector-toast');
                 return;
             }
             try {

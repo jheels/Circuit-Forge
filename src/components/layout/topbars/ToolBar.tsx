@@ -15,7 +15,7 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
-import { getOS } from "@/lib/utils"
+import { getOS, sendErrorToast, sendSuccessToast } from "@/lib/utils"
 import toast from "react-hot-toast"
 
 interface DropdownItem {
@@ -210,7 +210,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                         } else if (hasUnsavedChanges && currentFileHandle) {
                             handleSave();
                         } else if (!currentFileHandle) {
-                            toast.error('Must use Save As first.')
+                            sendErrorToast('Must use Save As first.');
                         }
                         break;
                     case 'x':
@@ -228,7 +228,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                     case 'e':
                         e.preventDefault();
                         handleExportAsImage();
-                        toast.success('Exported as PNG.');
+                        sendSuccessToast('Exported as PNG');
                         break;
                     case 'd':
                         e.preventDefault();
