@@ -6,7 +6,6 @@ import { createPowerSupplyComponent } from "@/types/components/powerSupply";
 import { createBreadboardComponent } from "@/types/components/breadboard";
 import { Connector } from "@/types/connector";
 import { Connection, isWireConnection } from "@/types/connection";
-import { toast } from "react-hot-toast";
 import { createDIPSwitchComponent } from "@/types/components/dipswitch";
 import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/types/components/ic";
 import { sendErrorToast, sendSuccessToast } from "@/lib/utils";
