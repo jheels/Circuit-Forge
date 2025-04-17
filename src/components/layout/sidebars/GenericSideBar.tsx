@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useDrag } from 'react-dnd';
-import { Search, Download, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImportChipDialog } from '@/components/dialogs/ImportChipDialog';
 import { useUIContext } from '@/context/UIContext';
 import { SidebarComponent } from '@/types/general';
+import { sendErrorToast } from '@/lib/utils';
+import { getComponentImage } from '@/lib/componentImages';
 
 interface GenericSideBarProps {
     components: SidebarComponent[];
@@ -21,26 +23,26 @@ const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
         }),
     }));
 
+    const graphic = getComponentImage(component.sidebarID);
+
     return (
         <div
             ref={drag}
             className={`flex flex-col items-center bg-white rounded-lg shadow-sm p-2 ${isDragging ? 'opacity-50' : ''}`}
             title={component.name}
         >
-            {component.graphic ? (
-                component.graphic
+            {graphic ? (
+                <img  src={graphic} alt={component.name} className="w-full aspect-square rounded-md flex items-center justify-center mb-2" />
             ) : (
                 <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2"></div>
             )}
 
             <div className="flex items-center justify-between w-full">
-                <span className="text-xs text-center flex-grow truncate">{component.name}</span>
-                <Info className="h-3.5 w-3.5 text-gray-600 ml-2 flex-shrink-0" />
+                <span className="text-[8pt] text-center flex-grow overflow-wrap">{component.name}</span>
             </div>
         </div>
     );
 };
-
 
 export function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
     const { isSideBarOpen, toggleSidebar } = useUIContext();
@@ -54,8 +56,7 @@ export function GenericSideBar({ components, showImportChipDialog }: GenericSide
 
     const handleImport = () => {
         if (selectedFile) {
-            // Implement file import logic here
-            console.log('Importing file:', selectedFile.name);
+            sendErrorToast('Feature not implemented', 'import-not-implemented');
             setIsImportDialogOpen(false);
             setSelectedFile(null);
         }
