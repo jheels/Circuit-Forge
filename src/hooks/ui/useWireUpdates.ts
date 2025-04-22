@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { Point, Wire } from '@/types/general';
-import { Connector, getConnectorPosition } from '@/types/connector';
-import { Connection, isWireConnection } from '@/types/connection';
+import { Point, Wire } from '@/definitions/general';
+import { Connector, getConnectorPosition } from '@/definitions/connector';
+import { Connection, isWireConnection } from '@/definitions/connection';
 
 export const useWireUpdates = (
     connectors: Record<string, Connector>,

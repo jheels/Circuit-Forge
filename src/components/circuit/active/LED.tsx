@@ -1,9 +1,9 @@
 import React from 'react';
 import { Circle, Line, Rect, Shape } from 'react-konva';
-import { LEDComponent } from '@/types/components/led';
+import { LEDComponent } from '@/definitions/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
-import { ComponentProps } from '@/types/general';
+import { ComponentProps } from '@/definitions/general';
 
 const getColorWithOpacity = (baseColor: string, opacity: number = 1): string => {
     if (baseColor === 'red') return `rgba(255, 0, 0, ${opacity})`;

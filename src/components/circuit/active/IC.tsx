@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSimulatorContext } from "@/context/SimulatorContext";
-import { ICComponent } from "@/types/components/ic";
+import { ICComponent } from "@/definitions/components/ic";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Arc, Text, Circle, Star } from "react-konva";
-import { ComponentProps } from '@/types/general';
-import { DEFAULT_HIT_AREA } from '@/types/connector';
+import { ComponentProps } from '@/definitions/general';
+import { DEFAULT_HIT_AREA } from '@/definitions/connector';
 
 const MIN_VOLTAGE = -0.8;
 const MAX_VOLTAGE = 5.5;

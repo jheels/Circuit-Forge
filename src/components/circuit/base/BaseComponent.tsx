@@ -4,7 +4,7 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useSnapManagement } from '@/hooks/ui/useSnapManagement';
 import { useWireUpdates } from '@/hooks/ui/useWireUpdates';
 import { useConnectorManagement } from '@/hooks/circuit/useConnectorManagement';
-import { getInteractionRegion } from '@/types/connector';
+import { getInteractionRegion } from '@/definitions/connector';
 import { ComponentTooltip } from '@/components/ComponentTooltip';
 
 import Konva from 'konva';

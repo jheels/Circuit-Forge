@@ -1,13 +1,13 @@
 
 import { PowerDistribution } from '@/hooks/simulation/useFindPowerDistribution';
 import { v4 as uuidv4 } from 'uuid';
-import { PowerSupplyComponent } from '@/types/components/powerSupply';
-import { Connection, isWireConnection } from '@/types/connection';
-import { BreadboardComponent } from '@/types/components/breadboard';
-import { EditorComponent } from '@/types/general';
-import { DIPSwitchComponent } from '@/types/components/dipswitch';
+import { PowerSupplyComponent } from '@/definitions/components/powerSupply';
+import { Connection, isWireConnection } from '@/definitions/connection';
+import { BreadboardComponent } from '@/definitions/components/breadboard';
+import { EditorComponent } from '@/definitions/general';
+import { DIPSwitchComponent } from '@/definitions/components/dipswitch';
 import { processDIPSwitchConnections, processTwoTerminalComponentConnections, processICComponentConnections, processWireConnections } from './circuitProcessing';
-import { ICComponent } from '@/types/components/ic';
+import { ICComponent } from '@/definitions/components/ic';
 
 export type NodeType = 'power' | 'ground' | 'regular';
 

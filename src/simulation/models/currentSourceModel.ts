@@ -1,5 +1,5 @@
 import { Matrix } from "mathjs";
-import { CircuitEdge } from "../analysis/circuitDetection";
+import { CircuitEdge } from "../circuit/circuitDetection";
 import { ComponentModel } from "./componentModelFactory";
 
 export interface CurrentSourceModel extends ComponentModel {

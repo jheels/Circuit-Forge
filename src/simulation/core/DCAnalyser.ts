@@ -1,5 +1,5 @@
-import { EditorComponent } from "@/types/general";
-import { CircuitEdge, CircuitGraph, isICComponentConnection } from "../analysis/circuitDetection";
+import { EditorComponent } from "@/definitions/general";
+import { CircuitEdge, CircuitGraph, isICComponentConnection } from "../circuit/circuitDetection";
 import { ComponentModel, createComponentModel } from "../models/componentModelFactory";
 import { createWireModel } from "../models/wireModel";
 import { solveCircuit } from "./MNASystem";

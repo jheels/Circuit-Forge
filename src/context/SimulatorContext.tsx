@@ -1,13 +1,13 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import { EditorComponent, Point, Wire } from '@/types/general';
-import { createLEDComponent } from "@/types/components/led";
-import { createResistorComponent } from "@/types/components/resistor";
-import { createPowerSupplyComponent } from "@/types/components/powerSupply";
-import { createBreadboardComponent } from "@/types/components/breadboard";
-import { Connector } from "@/types/connector";
-import { Connection, isWireConnection } from "@/types/connection";
-import { createDIPSwitchComponent } from "@/types/components/dipswitch";
-import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/types/components/ic";
+import { EditorComponent, Point, Wire } from '@/definitions/general';
+import { createLEDComponent } from "@/definitions/components/led";
+import { createResistorComponent } from "@/definitions/components/resistor";
+import { createPowerSupplyComponent } from "@/definitions/components/powerSupply";
+import { createBreadboardComponent } from "@/definitions/components/breadboard";
+import { Connector } from "@/definitions/connector";
+import { Connection, isWireConnection } from "@/definitions/connection";
+import { createDIPSwitchComponent } from "@/definitions/components/dipswitch";
+import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/definitions/components/ic";
 import { sendErrorToast, sendSuccessToast } from "@/lib/utils";
 
 interface SimulatorContextType {

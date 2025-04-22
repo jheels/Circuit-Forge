@@ -9,7 +9,7 @@ import {
     createEdgesFromConnections,
     findConnectedCircuit,
     removeDisconnectedPaths
-} from '@/simulation/analysis/circuitDetection';
+} from '@/simulation/circuit/circuitDetection';
 import { validateCircuit } from '@/simulation/validation';
 import { sendErrorToast, sendSuccessToast, sendWarningToast } from '@/lib/utils';
 

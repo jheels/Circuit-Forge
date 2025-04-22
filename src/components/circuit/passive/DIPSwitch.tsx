@@ -1,8 +1,8 @@
 import { useSimulatorContext } from "@/context/SimulatorContext";
-import { DIPSwitchComponent } from "@/types/components/dipswitch";
+import { DIPSwitchComponent } from "@/definitions/components/dipswitch";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Text } from "react-konva";
-import { ComponentProps } from "@/types/general";
+import { ComponentProps } from "@/definitions/general";
 
 import Konva from "konva";
 

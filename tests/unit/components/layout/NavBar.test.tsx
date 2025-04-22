@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { NavBar } from '@/components/topbars/NavBar';
+import { NavBar } from '@/components/layout/topbars/NavBar';
 import { UIProvider } from '@/context/UIContext';
 
 describe('NavBar', () => {
@@ -51,25 +51,6 @@ describe('NavBar', () => {
         expect(screen.queryByTestId('settings-dialog')).not.toBeInTheDocument();
     });
 
-    it('should switch between simulator and ic-editor when corresponding buttons are clicked.', () => {
-        renderWithContext(<NavBar />);
-
-        const simulatorButton = screen.getByTestId('Simulator');
-        const icEditorButton = screen.getByTestId('IC Editor');
-
-        // Default selected tool is simulator
-        expect(simulatorButton).toHaveClass('bg-white text-black');
-        expect(icEditorButton).not.toHaveClass('bg-white text-black');
-
-        fireEvent.click(icEditorButton);
-        expect(simulatorButton).not.toHaveClass('bg-white text-black');
-        expect(icEditorButton).toHaveClass('bg-white text-black');
-
-        fireEvent.click(simulatorButton);
-        expect(simulatorButton).toHaveClass('bg-white text-black');
-        expect(icEditorButton).not.toHaveClass('bg-white text-black');
-    });
-
     it('should render tooltip content when tooltip button is hovered.', () => {
         renderWithContext(<NavBar />);
 
@@ -90,5 +71,16 @@ describe('NavBar', () => {
         }, 1000);
         fireEvent.mouseLeave(icEditorButton);
         expect(screen.queryByText('IC Editor')).not.toBeInTheDocument();
+    });
+
+    it('should show an error when trying to click the IC editor as its not implemented yet.', () => {
+        renderWithContext(<NavBar />);
+
+        const icEditorButton = screen.getByTestId('IC Editor');
+        fireEvent.click(icEditorButton);
+        // small delay for error message to render
+        setTimeout(() => {
+            expect(screen.getByText('Feature not implemented!')).toBeInTheDocument();
+        }, 1000);
     });
 });

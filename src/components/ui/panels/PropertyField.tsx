@@ -10,7 +10,7 @@ import {
     isNumberProperty,
     isBooleanProperty,
     isSelectProperty
-} from '@/types/properties';
+} from '@/definitions/properties';
 
 interface PropertyFieldProps {
     definition: PropertyDefinition;

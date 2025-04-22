@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { EditorComponent } from '@/types/general';
+import { EditorComponent } from '@/definitions/general';
 
 interface ComponentTooltipProps {
   componentId: string;

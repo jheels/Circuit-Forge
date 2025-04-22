@@ -1,11 +1,11 @@
-import { EditorComponent } from "@/types/general";
-import { CircuitEdge, getSwitchIndex, isDIPSwitchConnection } from "../analysis/circuitDetection";
-import { DIPSwitchComponent } from "@/types/components/dipswitch";
+import { EditorComponent } from "@/definitions/general";
+import { CircuitEdge, getSwitchIndex, isDIPSwitchConnection } from "../circuit/circuitDetection";
+import { DIPSwitchComponent } from "@/definitions/components/dipswitch";
 import { applyDipSwitchStamp, createDipSwitchModel, DipSwitchModel } from "./DIPSwitchModel";
 import { applyResistorStamp, createResistorModel, ResistorModel } from "./resistorModel";
-import { ResistorComponent } from "@/types/components/resistor";
+import { ResistorComponent } from "@/definitions/components/resistor";
 import { applyIndependentVoltageSourceStamp, createIndependentVoltageSourceModel, IndependentVoltageSource } from "./independentVoltageSourceModel";
-import { PowerSupplyComponent } from "@/types/components/powerSupply";
+import { PowerSupplyComponent } from "@/definitions/components/powerSupply";
 import { Matrix } from "mathjs";
 import { applyLEDStamp, createLEDModel, LEDModel } from "./LEDModel";
 import { applyLogicGateStamp, LogicGateModel } from "./logicGateModel";

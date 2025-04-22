@@ -1,4 +1,4 @@
-import { CircuitGraph } from "../analysis/circuitDetection";
+import { CircuitGraph } from "../circuit/circuitDetection";
 import { CircuitValidator, ValidationIssue, ValidationResult } from "./types";
 import { selfLoopValidator } from "./validators/selfLoopValidator";
 import { wirePathValidator } from "./validators/wirePathValidator";

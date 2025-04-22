@@ -1,5 +1,5 @@
-import { PowerSupplyComponent } from "@/types/components/powerSupply";
-import { CircuitEdge } from "../analysis/circuitDetection";
+import { PowerSupplyComponent } from "@/definitions/components/powerSupply";
+import { CircuitEdge } from "../circuit/circuitDetection";
 import { Matrix } from 'mathjs';
 import { ComponentModel } from "./componentModelFactory";
 

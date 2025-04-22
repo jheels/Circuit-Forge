@@ -2,10 +2,10 @@
  * Need to add check for connecting directly to bidirectional strips (not allowed).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { EditorComponent } from '@/types/general';
-import { Connection, isWireConnection } from '@/types/connection';
-import {  BreadboardComponent, Strip } from '@/types/components/breadboard';
-import { PowerSupplyComponent } from '@/types/components/powerSupply';
+import { EditorComponent } from '@/definitions/general';
+import { Connection, isWireConnection } from '@/definitions/connection';
+import {  BreadboardComponent, Strip } from '@/definitions/components/breadboard';
+import { PowerSupplyComponent } from '@/definitions/components/powerSupply';
 
 export interface PowerDistribution {
     sourceNode: string;

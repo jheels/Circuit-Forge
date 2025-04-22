@@ -1,5 +1,5 @@
 import { lusolve, matrix, Matrix, zeros } from "mathjs";
-import { CircuitGraph, CircuitNode } from "../analysis/circuitDetection";
+import { CircuitGraph, CircuitNode } from "../circuit/circuitDetection";
 import { applyComponentStamp, ComponentModel } from "../models/componentModelFactory";
 
 interface MNAMatrixSystem {

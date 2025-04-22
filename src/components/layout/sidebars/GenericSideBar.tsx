@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImportChipDialog } from '@/components/dialogs/ImportChipDialog';
 import { useUIContext } from '@/context/UIContext';
-import { SidebarComponent } from '@/types/general';
+import { SidebarComponent } from '@/definitions/general';
 import { sendErrorToast } from '@/lib/utils';
 import { getComponentImage } from '@/lib/componentImages';
 

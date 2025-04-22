@@ -1,4 +1,4 @@
-import { CircuitGraph } from "../analysis/circuitDetection";
+import { CircuitGraph } from "../circuit/circuitDetection";
 import { v4 as uuidv4 } from 'uuid';
 
 export type Severity = 'error' | 'warning';

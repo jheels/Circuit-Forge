@@ -1,10 +1,10 @@
-import { Connection, isWireConnection } from "@/types/connection";
+import { Connection, isWireConnection } from "@/definitions/connection";
 import { CircuitGraph, createCircuitEdge, createComponentConnection, createDIPSwitchConnection, createICComponentConnection, createWireConnection } from "./circuitDetection";
 import { PowerDistribution } from "@/hooks/simulation/useFindPowerDistribution";
-import { DIPSwitchComponent } from "@/types/components/dipswitch";
-import { EditorComponent } from "@/types/general";
-import { getICDefinition, ICComponent } from "@/types/components/ic";
-import { Connector } from "@/types/connector";
+import { DIPSwitchComponent } from "@/definitions/components/dipswitch";
+import { EditorComponent } from "@/definitions/general";
+import { getICDefinition, ICComponent } from "@/definitions/components/ic";
+import { Connector } from "@/definitions/connector";
 
 const updateStripIDForPowerAndGround = (
     stripID: string,

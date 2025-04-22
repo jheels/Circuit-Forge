@@ -1,4 +1,4 @@
-import {  CircuitGraph } from "@/simulation/analysis/circuitDetection";
+import {  CircuitGraph } from "@/simulation/circuit/circuitDetection";
 
 export const hasWireOnlyPath = (
     graph: CircuitGraph,

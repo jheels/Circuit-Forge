@@ -3,7 +3,7 @@ import { DropTargetMonitor, useDrop } from 'react-dnd';
 import { Stage, Layer, Line } from 'react-konva';
 import { useUIContext } from '@/context/UIContext';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { SidebarComponent, Point } from '@/types/general';
+import { SidebarComponent, Point } from '@/definitions/general';
 import { PropertiesPanel } from '../ui/panels/PropertiesPanel';
 import { LED } from '../circuit/active/LED';
 import { Resistor } from '../circuit/passive/Resistor';

@@ -1,5 +1,5 @@
 import { Matrix } from "mathjs";
-import { CircuitEdge } from "../analysis/circuitDetection";
+import { CircuitEdge } from "../circuit/circuitDetection";
 import { applyResistorStamp, ResistorModel } from "./resistorModel";
 
 type WireModel = ResistorModel;

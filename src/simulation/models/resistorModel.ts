@@ -1,5 +1,5 @@
-import { ResistorComponent } from "@/types/components/resistor";
-import { CircuitEdge } from "../analysis/circuitDetection";
+import { ResistorComponent } from "@/definitions/components/resistor";
+import { CircuitEdge } from "../circuit/circuitDetection";
 import { Matrix } from 'mathjs';
 import { ComponentModel } from "./componentModelFactory";
 

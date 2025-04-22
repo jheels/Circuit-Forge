@@ -5,8 +5,8 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { X } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PropertyField } from '@/components/ui/panels/PropertyField';
-import { getComponentProperties } from '@/types/properties';
-import { PropertyValue } from '@/types/properties';
+import { getComponentProperties } from '@/definitions/properties';
+import { PropertyValue } from '@/definitions/properties';
 
 export const PropertiesPanel: React.FC = () => {
     const { 

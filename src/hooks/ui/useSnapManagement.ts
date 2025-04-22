@@ -6,8 +6,8 @@
  * 
  */
 import { useState, useCallback } from 'react';
-import { Point, EditorComponent } from '@/types/general';
-import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/types/connector';
+import { Point, EditorComponent } from '@/definitions/general';
+import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/definitions/connector';
 import { calculateDistance, sendErrorToast } from '@/lib/utils';
 import Konva from 'konva';
 import toast from 'react-hot-toast';

@@ -2,9 +2,9 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { Line, Circle, Group } from 'react-konva';
 import { useSimulatorContext } from '@/context/SimulatorContext';
-import { isPointInConnector, getConnectorPosition, validateConnection } from '@/types/connector';
-import { Connection, createAppropriateConnection, isWireConnection } from '@/types/connection';
-import { Point } from '@/types/general';
+import { isPointInConnector, getConnectorPosition, validateConnection } from '@/definitions/connector';
+import { Connection, createAppropriateConnection, isWireConnection } from '@/definitions/connection';
+import { Point } from '@/definitions/general';
 import { findConnectorIDAtPoint, sendErrorToast, sendSuccessToast } from '@/lib/utils';
 
 import Konva from 'konva';

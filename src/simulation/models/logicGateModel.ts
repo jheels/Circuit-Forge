@@ -1,5 +1,5 @@
 import { Matrix } from "mathjs";
-import { CircuitEdge, isICComponentConnection } from "../analysis/circuitDetection";
+import { CircuitEdge, isICComponentConnection } from "../circuit/circuitDetection";
 import { ComponentModel } from "./componentModelFactory";
 import { applyVoltageSourceStamp } from "./independentVoltageSourceModel";
 

@@ -7,8 +7,8 @@ import {
     PIN_SPACING,
     REGULAR_SECTION_WIDTH,
     BOARD_ROWS
-} from '@/types/components/breadboard';
-import { ComponentProps } from '@/types/general';
+} from '@/definitions/components/breadboard';
+import { ComponentProps } from '@/definitions/general';
 
 
 const CONNECTOR_COLORS = {

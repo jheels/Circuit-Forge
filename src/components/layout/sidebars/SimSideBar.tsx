@@ -1,5 +1,5 @@
 import { GenericSideBar } from './GenericSideBar';
-import { SidebarComponent } from '@/types/general'; // Adjust the import path as needed
+import { SidebarComponent } from '@/definitions/general'; // Adjust the import path as needed
 
 const simulatorComponents: SidebarComponent[] = [
     {

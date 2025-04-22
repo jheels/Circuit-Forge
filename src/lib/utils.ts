@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { EditorComponent, Point } from "@/types/general"
-import { isPointInConnector } from "@/types/connector"
+import { EditorComponent, Point } from "@/definitions/general"
+import { isPointInConnector } from "@/definitions/connector"
 import { toast } from 'react-hot-toast';
 
 export function cn(...inputs: ClassValue[]) {

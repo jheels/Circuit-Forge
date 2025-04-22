@@ -1,5 +1,5 @@
-import { Connection } from '@/types/connection';
-import { EditorComponent, Wire } from '@/types/general';
+import { Connection } from '@/definitions/connection';
+import { EditorComponent, Wire } from '@/definitions/general';
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import Konva from 'konva';

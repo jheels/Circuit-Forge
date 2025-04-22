@@ -1,9 +1,9 @@
 import React from 'react';
 import { Rect, Text, Circle } from 'react-konva';
-import { PowerSupplyComponent } from '@/types/components/powerSupply';
+import { PowerSupplyComponent } from '@/definitions/components/powerSupply';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
-import { ComponentProps } from '@/types/general';
+import { ComponentProps } from '@/definitions/general';
 
 export const PowerSupply: React.FC<ComponentProps> = ({
     componentID,

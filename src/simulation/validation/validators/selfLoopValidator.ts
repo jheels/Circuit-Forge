@@ -1,4 +1,4 @@
-import { CircuitGraph } from "@/simulation/analysis/circuitDetection";
+import { CircuitGraph } from "@/simulation/circuit/circuitDetection";
 import { CircuitValidator, createValidationIssue, ValidationIssue } from "../types";
 import { hasWireOnlyPath } from "../utils/graphTraversal";
 

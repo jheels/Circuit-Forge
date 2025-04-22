@@ -1,9 +1,9 @@
 import React from 'react';
 import { Line, Rect, Group, Circle } from 'react-konva';
-import { ResistorComponent } from '@/types/components/resistor';
+import { ResistorComponent } from '@/definitions/components/resistor';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
-import { ComponentProps } from '@/types/general';
+import { ComponentProps } from '@/definitions/general';
 
 const convertToBaseUnits = (value: number, unit: string): number => {
     switch (unit) {

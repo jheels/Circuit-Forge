@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useCircuitDetection } from '@/hooks/simulation/useCircuitDetection';
 import { performDCAnalysis, AnalysisResult } from '@/simulation/core/DCAnalyser';
-import { getSwitchIndex, isDIPSwitchConnection, isICComponentConnection } from '@/simulation/analysis/circuitDetection';
+import { getSwitchIndex, isDIPSwitchConnection, isICComponentConnection } from '@/simulation/circuit/circuitDetection';
 import { ComponentModel } from '@/simulation/models/componentModelFactory';
 import { ResistorModel } from '@/simulation/models/resistorModel';
 import { DipSwitchModel } from '@/simulation/models/DIPSwitchModel';
