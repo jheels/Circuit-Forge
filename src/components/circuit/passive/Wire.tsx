@@ -121,7 +121,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                         addConnection(newConnection);
                         sendSuccessToast('Updated connection');
                     }
-                } else 
+                } else {
                     updateWire(wireID, { endConnector: connector, points: newPoints });
                     if (wireConnection) {
                         const newConnection = createAppropriateConnection(wireConnection.sourceConnector, connector, components, wireID);
