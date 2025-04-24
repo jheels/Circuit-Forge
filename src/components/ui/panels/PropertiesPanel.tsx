@@ -38,7 +38,7 @@ export const PropertiesPanel: React.FC = () => {
         <div className="absolute top-0 right-0 w-64 bg-white shadow-md rounded-lg border border-gray-200">
             <div className="flex justify-between items-center p-3 bg-black border-b border-gray-200">
                 <h3 className="text-sm font-medium text-white">
-                    {component.type} Properties
+                Properties
                 </h3>
                 <button
                     onClick={() => setSelectedComponent(null)}

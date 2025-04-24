@@ -32,10 +32,14 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
 
     const handleMouseEnter = useCallback(() => {
         setIsHovered(true);
+        if (selectedWire !== wireID) {
+            document.body.style.cursor = 'pointer';
+        }
     }, []);
 
     const handleMouseLeave = useCallback(() => {
         setIsHovered(false);
+        document.body.style.cursor = 'default';
     }, []);
 
     const handleClick = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -117,7 +121,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                         addConnection(newConnection);
                         sendSuccessToast('Updated connection');
                     }
-                } else {
+                } else 
                     updateWire(wireID, { endConnector: connector, points: newPoints });
                     if (wireConnection) {
                         const newConnection = createAppropriateConnection(wireConnection.sourceConnector, connector, components, wireID);

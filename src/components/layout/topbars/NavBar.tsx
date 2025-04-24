@@ -10,7 +10,6 @@ import { sendErrorToast } from '@/lib/utils';
 
 export function NavBar() {
     const { selectedTool, setSelectedTool } = useUIContext();
-    const [isDarkMode, setIsDarkMode] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
@@ -26,13 +25,6 @@ export function NavBar() {
                         <TooltipButton icon={Microchip} tooltip="IC Editor" isSelected={selectedTool === 'ic-editor'} onClick={() => sendErrorToast('Feature not implemented!')} />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Switch
-                            checked={isDarkMode}
-                            onCheckedChange={setIsDarkMode}
-                            className="data-[state=checked]:bg-gray-700 data-[state=unchecked]:bg-gray-200"
-                            data-testid="dark-mode-switch"
-                        />
-                        {isDarkMode ? <Moon data-testid='moon-icon' className="h-4 w-4" /> : <Sun data-testid='sun-icon' className="h-4 w-4" />}
                         <Button data-testid='settings-switch' variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
                             <Settings className="h-6 w-6" />
                         </Button>

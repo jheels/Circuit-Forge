@@ -81,16 +81,19 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         scaleRef.current = scale;
     }, [position, scale]);
 
-    const handleResize = useCallback(() => {
+    const handleResize = () => {
         setStageWidth(isSideBarOpen ? window.innerWidth * 0.8 : window.innerWidth - 12);
         setStageHeight(window.innerHeight - 100);
-    }, [isSideBarOpen]);
+    }
 
     useEffect(() => {
         window.addEventListener('resize', handleResize);
-        handleResize();
         return () => window.removeEventListener('resize', handleResize);
-    }, [handleResize]);
+    });
+
+    useEffect(() => {
+        handleResize();
+    }, [isSideBarOpen]);
 
     const handleDrop = useCallback((item: SidebarComponent, monitor: DropTargetMonitor) => {
         const point = monitor.getSourceClientOffset();
@@ -112,7 +115,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         const newComponent = createComponent(item.sidebarID, { x: dropX, y: dropY });
 
         addComponent(newComponent);
-    }, [addComponent, componentCounts, createComponent, stageRef]);
+    }, [componentCounts, stageRef]);
 
     const handleComponentDeletion = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Backspace' && selectedComponent) {
