@@ -179,6 +179,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
             if (result.success) {
                 sendSuccessToast('Project loaded');
             } else {
+                sendErrorToast(result.error || 'Failed to load project');
                 console.error('Error loading project:', result.error);
             }
         } catch (error) {

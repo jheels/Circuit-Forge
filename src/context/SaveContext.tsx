@@ -3,6 +3,7 @@ import { EditorComponent, Wire } from '@/definitions/general';
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import Konva from 'konva';
+import { z } from 'zod';
 
 interface CircuitMetadata {
     name: string;
@@ -39,6 +40,48 @@ interface SaveProviderProps {
     children: React.ReactNode;
     stageRef: React.RefObject<Konva.Stage>;
 }
+
+// Zod schemas matching the structure of the project
+const PointSchema = z.object({ x: z.number(), y: z.number() });
+const ConnectorSchema = z.object({
+    id: z.string(),
+    componentID: z.string(),
+    type: z.string(),
+    hitAreaSize: z.number(),
+    offset: z.object({ x: z.number(), y: z.number() }),
+    isConnected: z.boolean(),
+    metadata: z.record(z.unknown()).optional(),
+});
+const EditorComponentSchema = z.object({
+    editorID: z.string(),
+    type: z.string(),
+    dimensions: z.object({ width: z.number(), height: z.number() }),
+    rotation: z.number(),
+    position: PointSchema,
+    properties: z.record(z.unknown()),
+    connectors: z.record(ConnectorSchema),
+});
+const WireSchema = z.object({
+    id: z.string(),
+    startConnector: ConnectorSchema,
+    endConnector: ConnectorSchema.nullable(),
+    points: z.array(PointSchema),
+});
+const ConnectionSchema = z.object({
+    id: z.string(),
+    sourceConnector: ConnectorSchema,
+    targetConnector: ConnectorSchema,
+    type: z.string(),
+    metadata: z.record(z.unknown()),
+});
+const CircuitProjectSchema = z.object({
+    metadata: z.object({ name: z.string(), lastSaved: z.number() }),
+    components: z.record(EditorComponentSchema),
+    componentCounts: z.record(z.number()),
+    connections: z.record(ConnectionSchema),
+    connectorConnectionMap: z.record(z.string()),
+    wires: z.record(WireSchema),
+}).strict(); // Reject unknown fields
 
 export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }) => {
     const {
@@ -83,6 +126,16 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
 
         return { ...deserialisedProject };
     }, []);
+
+    const validateProject = (project: any): { valid: boolean, error?: string } => {
+        const result = CircuitProjectSchema.safeParse(project);
+        if (!result.success) {
+            console.error("Project validation error:", result.error);
+            console.log("Loaded project object:", project);
+            return { valid: false, error: "Project file is invalid or corrupted. Please check your file." };
+        }
+        return { valid: true };
+    };
 
     const saveProject = useCallback(async (saveAs: boolean = false): Promise<SaveResult> => {
         if (!currentProject) {
@@ -147,8 +200,13 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
             const contents = await file.text();
             const project = deserialiseProject(contents);
 
+            // Validate project structure before loading
+            const validation = validateProject(project);
+            if (!validation.valid) {
+                return { success: false, error: validation.error || 'Project validation failed.' };
+            }
+
             // Update SimulatorContext with the loaded project
-            // Need to add specific error handling here
             resetProject();
             setProjectName(project.metadata.name);
             Object.values(project.components).forEach(component => {addComponent(component)});

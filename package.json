@@ -35,7 +35,8 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "use-image": "^1.1.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
