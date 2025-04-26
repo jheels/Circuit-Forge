@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useMemo } 
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import Konva from 'konva';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 interface CircuitMetadata {
     name: string;
@@ -130,9 +131,9 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
     const validateProject = (project: any): { valid: boolean, error?: string } => {
         const result = CircuitProjectSchema.safeParse(project);
         if (!result.success) {
-            console.error("Project validation error:", result.error);
-            console.log("Loaded project object:", project);
-            return { valid: false, error: "Project file is invalid or corrupted. Please check your file." };
+            const validationError = fromError(result.error);
+            console.error("Loading error:", validationError.toString());
+            return { valid: false, error: "Project file is invalid - check console" };
         }
         return { valid: true };
     };
@@ -214,7 +215,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
             Object.values(project.wires).forEach(wire => addWire(wire));
             setComponentCounts(project.componentCounts);
             setCurrentFileHandle(fileHandle);
-            setHasUnsavedChanges(false);
+            setHasUnsavedChanges(true);
 
             return { success: true };
         } catch (error) {

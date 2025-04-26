@@ -62,7 +62,6 @@ export const IC: React.FC<ComponentProps> = ({ componentID }) => {
 
     const renderPins = () => {
         const pins: JSX.Element[] = [];
-        console.log(component.connectors);
         const pinSize  = DEFAULT_HIT_AREA;
         
         Object.values(component.connectors).forEach(connector => {
