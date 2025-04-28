@@ -205,4 +205,25 @@ describe('ImportChipDialog', () => {
 
         expect(onOpenChange).toHaveBeenCalled();
     });
+    it('should trigger file input when "Select a file..." is clicked.', () => {
+        render(
+            <ImportChipDialog
+                isOpen={true}
+                onOpenChange={() => {}}
+                selectedFile={null}
+                onFileChange={() => {}}
+                onImport={() => {}}
+            />
+        );
+    const fileInputLabel = screen.getByText('Select a file...');
+    const fileInputContainer = fileInputLabel.parentElement;
+    expect(fileInputContainer).not.toBeNull();
+    const fileInput = fileInputContainer!.querySelector('input[type="file"]');
+    expect(fileInput).not.toBeNull();
+    const clickSpy = vi.spyOn(fileInput as HTMLInputElement, 'click');
+    // Simulate clicking the container
+    fireEvent.click(fileInputContainer!);
+    // Assert that the file input's click method was called
+    expect(clickSpy).toHaveBeenCalled();
+    });
 });

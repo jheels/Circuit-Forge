@@ -76,19 +76,44 @@ describe('ToolBar', () => {
         }
     });
 
-    it('should call the appropriate functions when the View menu options are clicked.', async () => {
+    it('should call the Zoom in function when clicked', async () => {
         renderWithContext(<ToolBar onZoomIn={onZoomIn} onZoomOut={onZoomOut} onZoomReset={onZoomReset} />);
-
         const viewMenuButton = screen.getByText('View');
         await userEvent.click(viewMenuButton);
+
         const zoomInButton = await screen.getByText('Zoom In');
-        const zoomOutButton = await screen.getByText('Zoom Out');
-        const resetZoomButton = await screen.getByText('Reset Zoom');
         await userEvent.click(zoomInButton);
         expect(onZoomIn).toHaveBeenCalled();
+    });
+    it('should call the Zoom out function when clicked', async () => {
+        renderWithContext(<ToolBar onZoomIn={onZoomIn} onZoomOut={onZoomOut} onZoomReset={onZoomReset} />);
+        const viewMenuButton = screen.getByText('View');
+        await userEvent.click(viewMenuButton);
+
+        const zoomOutButton = await screen.getByText('Zoom Out');
         await userEvent.click(zoomOutButton);
         expect(onZoomOut).toHaveBeenCalled();
+    });
+    it('should call the Reset zoom function when clicked', async () => {
+        renderWithContext(<ToolBar onZoomIn={onZoomIn} onZoomOut={onZoomOut} onZoomReset={onZoomReset} />);
+        const viewMenuButton = screen.getByText('View');
+        await userEvent.click(viewMenuButton);
+
+        const resetZoomButton = await screen.getByText('Reset Zoom');
         await userEvent.click(resetZoomButton);
         expect(onZoomReset).toHaveBeenCalled();
+    }
+    );
+    it('should update the project name when clicking on the project name', async () => {
+        renderWithContext(<ToolBar onZoomIn={onZoomIn} onZoomOut={onZoomOut} onZoomReset={onZoomReset} />);
+        const projectName = screen.getByText('Untitled Project');
+        await userEvent.click(projectName);
+
+        const input = screen.getByRole('textbox');
+        // Delete the default value
+        await userEvent.clear(input);
+        // Type the new project name
+        await userEvent.type(input, 'New Project Name');
+        expect(input).toHaveValue('New Project Name');
     });
 });

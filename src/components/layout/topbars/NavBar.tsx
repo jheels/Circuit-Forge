@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { Anvil, Moon, Sun, Settings, Microchip, CircuitBoard } from 'lucide-react';
+import { Anvil, Settings, Microchip, CircuitBoard } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useUIContext } from '@/context/UIContext';
 import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
 import { TooltipButton } from '@/components/ui/ToolTipButton';
-import toast from 'react-hot-toast';
 import { sendErrorToast } from '@/lib/utils';
 
 export function NavBar() {

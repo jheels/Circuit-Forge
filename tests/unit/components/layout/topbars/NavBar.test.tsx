@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { NavBar } from '@/components/layout/topbars/NavBar';
 import { UIProvider } from '@/context/UIContext';
+import { ReactNode } from 'react';
 
 describe('NavBar', () => {
     const renderWithContext = (component: ReactNode) => {
@@ -18,26 +19,13 @@ describe('NavBar', () => {
 
         const simulatorButton = screen.getByTestId('Simulator');
         const icEditorButton = screen.getByTestId('IC Editor');
-        const darkModeToggle = screen.getByTestId('dark-mode-switch');
         const settingsButton = screen.getByTestId('settings-switch');
 
         expect(screen.getByText('Circuit')).toBeInTheDocument();
         expect(screen.getByText('Forge')).toBeInTheDocument();
         expect(simulatorButton).toBeInTheDocument();
         expect(icEditorButton).toBeInTheDocument();
-        expect(darkModeToggle).toBeInTheDocument();
         expect(settingsButton).toBeInTheDocument();
-    });
-
-    it('should toggle dark mode when dark mode switch is clicked.', () => {
-        renderWithContext(<NavBar />);
-
-        const darkModeToggle = screen.getByTestId('dark-mode-switch');
-        expect(darkModeToggle).toHaveClass('data-[state=unchecked]:bg-gray-200');
-        fireEvent.click(darkModeToggle);
-        expect(darkModeToggle).toHaveClass('data-[state=checked]:bg-gray-700');
-        fireEvent.click(darkModeToggle);
-        expect(darkModeToggle).toHaveClass('data-[state=unchecked]:bg-gray-200');
     });
 
     it('should open settings dialog when settings button is clicked.', () => {

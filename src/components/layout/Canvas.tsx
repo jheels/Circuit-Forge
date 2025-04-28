@@ -11,7 +11,6 @@ import { PowerSupply } from '../circuit/active/PowerSupply';
 import { Wire } from '../circuit/passive/Wire';
 import { findConnectorIDAtPoint, sendErrorToast, sendSuccessToast } from '@/lib/utils';
 import Konva from 'konva';
-import toast from 'react-hot-toast';
 import { Breadboard } from '../circuit/board/Breadboard';
 import { useSimulationExecution } from '@/hooks/simulation/useSimulationExecution';
 import { DipSwitch } from '../circuit/passive/DIPSwitch';

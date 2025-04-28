@@ -78,3 +78,5 @@ dist-ssr
 
 *.png
 *.pdf
+
+coverage/

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { UIProvider } from '@/context/UIContext';
 import { DndProviderWrapper } from '@/context/DndContext';
 import { GenericSideBar } from '@/components/layout/sidebars/GenericSideBar';
@@ -70,5 +70,10 @@ describe('GenericSideBar', () => {
         expect(screen.getByText('Component 1')).toBeInTheDocument();
         expect(screen.queryByText('Component 2')).not.toBeInTheDocument();
         expect(screen.queryByText('Component 3')).not.toBeInTheDocument();
+    });
+
+    it('should not render ImportChipDialog if showImportChipDialog is false', () => {
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={false} />);
+        expect(screen.queryByText('Import Chip')).not.toBeInTheDocument();
     });
 });
