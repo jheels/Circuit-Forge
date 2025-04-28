@@ -7,7 +7,7 @@ import { LEDModel, updateLEDModel } from "../models/LEDModel";
 import { createLogicGateModel, LogicGateModel, updateLogicGateModel } from "../models/logicGateModel";
 
 const MAX_ITERATIONS = 50;
-const CONVERGENCE_THRESHOLD = 1e-5;
+const CONVERGENCE_THRESHOLD = 1e-4;
 
 export interface AnalysisState {
     models: Record<string, ComponentModel>;
@@ -148,7 +148,8 @@ const roundVoltages = (voltages: Record<string, number>): Record<string, number>
 
 export const updateNonLinearModels = (
     state: AnalysisState,
-    circuitGraph: CircuitGraph
+    circuitGraph: CircuitGraph,
+    previousAnalysis?: AnalysisResult
 ): {
     updatedState: AnalysisState,
     allModelsConverged: boolean
@@ -179,7 +180,9 @@ export const updateNonLinearModels = (
             updatedModels[modelId] = updatedModel;
         } else if (model.type === 'logic-gate') {
             const logicModel = model as LogicGateModel;
-            const updatedModel = updateLogicGateModel(logicModel, voltages);
+            // Use previous model if available
+            const prevModel = previousAnalysis?.models[modelId] as LogicGateModel | undefined;
+            const updatedModel = updateLogicGateModel(logicModel, voltages, prevModel);
             const modelConverged = hasConverged(logicModel.lastOutputVoltage, updatedModel.lastOutputVoltage);
             if (!modelConverged) {
                 allModelsConverged = false;
@@ -202,11 +205,12 @@ export const updateNonLinearModels = (
 
 export const performIteration = (
     state: AnalysisState,
-    circuitGraph: CircuitGraph
+    circuitGraph: CircuitGraph,
+    previousAnalysis?: AnalysisResult
 ): AnalysisState => {
     try {
         const previousVoltages = { ...state.voltages };
-        const { updatedState, allModelsConverged } = updateNonLinearModels(state, circuitGraph);
+        const { updatedState, allModelsConverged } = updateNonLinearModels(state, circuitGraph, previousAnalysis);
         const newVoltages = solveCircuit(circuitGraph, updatedState.models);
         const voltagesConverged = checkConvergence(previousVoltages, newVoltages);
 
@@ -229,7 +233,8 @@ export const performIteration = (
 
 export const performDCAnalysis = (
     circuitGraph: CircuitGraph,
-    components: Record<string, EditorComponent>
+    components: Record<string, EditorComponent>,
+    previousAnalysis?: AnalysisResult
 ): AnalysisResult => {
     try {
         const { models, nonLinearModels } = createComponentModels(circuitGraph, components);
@@ -242,8 +247,27 @@ export const performDCAnalysis = (
             converged: false
         };
 
-        state.voltages = solveCircuit(circuitGraph, state.models);
-
+        // Warm start: use previous voltages and model states if available and compatible
+        if (previousAnalysis && previousAnalysis.success) {
+            state.voltages = { ...previousAnalysis.voltages };
+            // Optionally, copy over lastOutputVoltage/lastInputVoltages for non-linear models
+            Object.entries(state.nonLinearModels).forEach(([id, model]) => {
+                const prevModel = previousAnalysis.models[id];
+                if (prevModel) {
+                    // Only copy relevant state fields
+                    if ('lastOutputVoltage' in model && 'lastOutputVoltage' in prevModel) {
+                        (model as LogicGateModel).lastOutputVoltage = (prevModel as LogicGateModel).lastOutputVoltage;
+                    }
+                    if ('lastInputVoltages' in model && 'lastInputVoltages' in prevModel) {
+                        (model as LogicGateModel).lastInputVoltages = [...(prevModel as LogicGateModel).lastInputVoltages];
+                    }
+                }
+            });
+        } else {
+            console.log('No previous analysis found, starting from scratch.');
+            // Cold start: solve from scratch
+            state.voltages = solveCircuit(circuitGraph, state.models);
+        }
 
         if (Object.keys(state.nonLinearModels).length === 0) {
             return {
@@ -254,8 +278,17 @@ export const performDCAnalysis = (
             }
         }
 
+        let lastStableVoltages = { ...state.voltages };
+        let stableIterations = 0;
+
         while (!state.converged && state.iteration < MAX_ITERATIONS) {
-            state = performIteration(state, circuitGraph);
+            const prevVoltages = { ...state.voltages };
+            state = performIteration(state, circuitGraph, previousAnalysis);
+
+            if (checkConvergence(prevVoltages, state.voltages)) {
+                lastStableVoltages = { ...state.voltages };
+                stableIterations = state.iteration;
+            }
         }
 
         if (state.converged) {
@@ -268,10 +301,10 @@ export const performDCAnalysis = (
         } else {
             return {
                 success: false,
-                voltages: roundVoltages(state.voltages),
+                voltages: roundVoltages(lastStableVoltages),
                 models: state.models,
-                iterations: state.iteration,
-                error: state.error || `Failed to converge after ${MAX_ITERATIONS} iterations`
+                iterations: stableIterations,
+                error: state.error || `Failed to converge after ${MAX_ITERATIONS} iterations (returned last stable state)`
             };
         }
     } catch (error) {

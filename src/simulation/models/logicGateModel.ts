@@ -33,7 +33,8 @@ export const createLogicGateModel =  (
 export const evaluateLogicGate = (
     gateType: string,
     inputVoltages: number[],
-    lastOutputVoltage: number
+    lastOutputVoltage: number,
+    previousModel?: LogicGateModel
 ): number => {
     // convert voltages into digital states with support for hysteresis on the unsupported region to keep the last output
     const inputStates = inputVoltages.map(voltage => {
@@ -66,13 +67,14 @@ export const evaluateLogicGate = (
         default:
             outputState = false;
     }
-
+    
     return outputState ? 5.0 : 0.0;
 }
 
 export const updateLogicGateModel = (
     model: LogicGateModel,
-    voltages: Record<string, number>
+    voltages: Record<string, number>,
+    previousModel?: LogicGateModel
 ): LogicGateModel => {
     const currentInputVoltages = model.inputNodeIds.map(nodeId => 
         voltages[nodeId] || 0  // Default to 0V if node voltage not found
@@ -81,9 +83,11 @@ export const updateLogicGateModel = (
     const newOutputVoltage = evaluateLogicGate(
         model.gateType,
         currentInputVoltages,
-        model.lastOutputVoltage
+        model.lastOutputVoltage,
+        previousModel
     );
-
+        
+    
     return {
         ...model,
         lastInputVoltages: currentInputVoltages,

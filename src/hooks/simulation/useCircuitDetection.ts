@@ -43,8 +43,12 @@ export const useCircuitDetection = () => {
             validationResult.issues.forEach((issue) => {
                 if (issue.severity === 'error') {
                     sendErrorToast(issue.message, issue.message);
+                    if (issue.suggestedFix)  // Check if suggestedFix is not undefined
+                    sendErrorToast(issue.suggestedFix, issue.suggestedFix);
                 } else {
                     sendWarningToast(issue.message, issue.message);
+                    if (issue.suggestedFix)  // Check if suggestedFix is not undefined
+                    sendWarningToast(issue.suggestedFix, issue.suggestedFix);
                 }
             })
         }

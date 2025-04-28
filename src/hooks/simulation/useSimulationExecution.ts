@@ -1,25 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { useCircuitDetection } from '@/hooks/simulation/useCircuitDetection';
 import { performDCAnalysis, AnalysisResult } from '@/simulation/core/DCAnalyser';
-import { getSwitchIndex, isDIPSwitchConnection, isICComponentConnection } from '@/simulation/circuit/circuitDetection';
+import { CircuitGraph, getSwitchIndex, isDIPSwitchConnection, isICComponentConnection } from '@/simulation/circuit/circuitDetection';
 import { ComponentModel } from '@/simulation/models/componentModelFactory';
 import { ResistorModel } from '@/simulation/models/resistorModel';
 import { DipSwitchModel } from '@/simulation/models/DIPSwitchModel';
 import { LEDModel } from '@/simulation/models/LEDModel';
+import { EditorComponent } from '@/definitions/general';
 
-/**
- * A simple hook to perform circuit analysis based on the detected circuit graph.
- * This hook focuses solely on getting analysis results for inspection and debugging.
- * 
- * @returns An object containing analysis results and a function to manually trigger analysis
- */
+// Hash only the circuit topology (not component state)
+const hashCircuitTopology = (circuitGraph: CircuitGraph, components: Record<string, EditorComponent>) => {
+    return JSON.stringify({
+        nodes: Object.keys(circuitGraph.nodes).sort(),
+        edges: Object.values(circuitGraph.edges)
+            .map(e => ({
+                source: e.sourceId,
+                target: e.targetId,
+                type: e.connection.type,
+                id: e.connection.id,
+                meta: e.connection.metadata?.pinFunction || null
+            }))
+            .sort((a, b) => a.id.localeCompare(b.id)),
+        componentTypes: Object.entries(components)
+            .map(([id, c]) => ({ id, type: c.type }))
+            .sort((a, b) => a.id.localeCompare(b.id))
+    });
+};
+
 export const useSimulationExecution = () => {
     // Get components and circuit graph
     const { components, updateComponentElectricalValues } = useSimulatorContext();
     const { circuitGraph } = useCircuitDetection();
-    const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+    const [analysisResult, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
+    const prevTopologyHash = useRef<string | null>(null);
 
     // Function to manually trigger analysis
     const runAnalysis = () => {
@@ -30,12 +45,18 @@ export const useSimulationExecution = () => {
 
         setError(null);
 
-        try {
-            // Perform DC analysis
-            const result = performDCAnalysis(circuitGraph, components);
+        const currentTopologyHash = hashCircuitTopology(circuitGraph, components);
+        const useWarmStart = prevTopologyHash.current === currentTopologyHash;
 
+        try {
+            const result = performDCAnalysis(
+                circuitGraph,
+                components,
+                useWarmStart ? analysisResult : undefined
+            );
             // Store results
             setAnalysisResult(result);
+            prevTopologyHash.current = currentTopologyHash;
 
             // Set error if analysis failed
             if (!result.success && result.error) {
@@ -51,18 +72,30 @@ export const useSimulationExecution = () => {
         }
     };
 
-
     // Run analysis when circuit graph changes
     useEffect(() => {
         if (circuitGraph) {
             console.log('Running analysis...');
-            const result = runAnalysis();
+            const currentTopologyHash = hashCircuitTopology(circuitGraph, components);
+            const useWarmStart = prevTopologyHash.current === currentTopologyHash;
+
+            // Pass previous analysis result for stateful simulation
+            const result = performDCAnalysis(
+                circuitGraph,
+                components,
+                useWarmStart ? analysisResult : undefined
+            );
+            console.log('Analysis result:', result);
+            setAnalysisResult(result);
+            prevTopologyHash.current = currentTopologyHash;
+
             if (!result) return;
             updateComponentElectricalValues(getCircuitValues(result));
         } else {
             // Clear previous results if no circuit graph
-            setAnalysisResult(null);
+            setAnalysisResult(undefined);
             setError("No valid circuit detected");
+            prevTopologyHash.current = null;
         }
     }, [circuitGraph]);
 
