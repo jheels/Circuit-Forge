@@ -27,6 +27,10 @@ export const applyCurrentSourceStamp = (
     const sourceIndex = nodeMap[sourceId];
     const targetIndex = nodeMap[targetId];
 
+    if (sourceIndex === undefined && targetIndex === undefined) {
+        return;
+    }
+
     if (sourceIndex === undefined || targetIndex === undefined) {
         const nonGroundIndex = sourceIndex === undefined ? targetIndex : sourceIndex;
         inputSourcesVector.set([nonGroundIndex, 0], inputSourcesVector.get([nonGroundIndex, 0]) + current);

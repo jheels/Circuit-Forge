@@ -149,7 +149,6 @@ const roundVoltages = (voltages: Record<string, number>): Record<string, number>
 export const updateNonLinearModels = (
     state: AnalysisState,
     circuitGraph: CircuitGraph,
-    previousAnalysis?: AnalysisResult
 ): {
     updatedState: AnalysisState,
     allModelsConverged: boolean
@@ -180,9 +179,7 @@ export const updateNonLinearModels = (
             updatedModels[modelId] = updatedModel;
         } else if (model.type === 'logic-gate') {
             const logicModel = model as LogicGateModel;
-            // Use previous model if available
-            const prevModel = previousAnalysis?.models[modelId] as LogicGateModel | undefined;
-            const updatedModel = updateLogicGateModel(logicModel, voltages, prevModel);
+            const updatedModel = updateLogicGateModel(logicModel, voltages);
             const modelConverged = hasConverged(logicModel.lastOutputVoltage, updatedModel.lastOutputVoltage);
             if (!modelConverged) {
                 allModelsConverged = false;
@@ -206,11 +203,10 @@ export const updateNonLinearModels = (
 export const performIteration = (
     state: AnalysisState,
     circuitGraph: CircuitGraph,
-    previousAnalysis?: AnalysisResult
 ): AnalysisState => {
     try {
         const previousVoltages = { ...state.voltages };
-        const { updatedState, allModelsConverged } = updateNonLinearModels(state, circuitGraph, previousAnalysis);
+        const { updatedState, allModelsConverged } = updateNonLinearModels(state, circuitGraph);
         const newVoltages = solveCircuit(circuitGraph, updatedState.models);
         const voltagesConverged = checkConvergence(previousVoltages, newVoltages);
 
