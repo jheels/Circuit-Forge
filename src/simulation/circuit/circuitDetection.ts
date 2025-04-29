@@ -251,6 +251,7 @@ export const findConnectedCircuit = (
         if (visitedNodes.has(nodeId)) return;
 
         visitedNodes.add(nodeId);
+        if (!graph.nodes[nodeId]) return;
         connectedNodes[nodeId] = graph.nodes[nodeId];
 
         const connectedEdges = Object.values(graph.edges).filter(edge => {

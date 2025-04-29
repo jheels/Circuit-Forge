@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { UIProvider, useUIContext } from '../../../../src/context/UIContext';
+import { UIProvider, useUIContext } from '../../../src/context/UIContext';
 
 // Helper component to consume the context
 const Consumer = () => {

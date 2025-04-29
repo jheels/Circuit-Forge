@@ -158,7 +158,6 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
                 });
                 setCurrentFileHandle(fileHandle);
             }
-
             const writable = await fileHandle?.createWritable();
             const updateProject = {
                 ...currentProject,
