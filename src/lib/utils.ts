@@ -69,7 +69,7 @@ export const getOS = () => {
 };
 
 export const isBreadboard = (component: EditorComponent): boolean => {
-    return component.type === 'breadboard';
+    return component && component.type === 'breadboard' ? true : false;
 }
 
 export const sendSuccessToast = (message: string, id?: string) => {

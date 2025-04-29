@@ -16,7 +16,7 @@ interface ICPinDefinition {
     // no output index as only 1 output for now
 }
 
-interface ICDefinition {
+export interface ICDefinition {
     icType: string,
     description: string,
     gateType: string,
@@ -31,20 +31,24 @@ export const createICComponent = (
     name: string,
     definition: ICDefinition
 ): ICComponent => {
+    if (!position || !name || !definition) {
+        throw new Error('Position, name, and definition are required to create an IC component.');
+    }
+
     const editorID = `IC-${definition.icType}-${uuidv4()}`;
     const dimensions = { width: 15, height: 35 };
 
     const connectors: Record<string, Connector> = {};
-
-    for (let pinNum = 1; pinNum <= 14; pinNum++) {
-        const isLeftSide = pinNum <= 7;
+    const pinCount = Object.keys(definition.pinMappings).length;
+    for (let pinNum = 1; pinNum <= pinCount; pinNum++) {
+        const isLeftSide = pinNum <= (pinCount / 2);
         const pinDefinition = definition.pinMappings[pinNum];
 
         let yPosition;
         if (isLeftSide) {
-            yPosition = (pinNum - 1) / 7 + 1/14;
+            yPosition = (pinNum - 1) / (pinCount / 2) + 1/(pinCount / 2);
         } else {
-            yPosition = (14 - pinNum) / 7 + 1/14;
+            yPosition = (pinCount - pinNum) / (pinCount / 2) + 1/(pinCount / 2);
         }
         const connector = createConnector(
             editorID,
