@@ -26,7 +26,7 @@ export interface AnalysisResult {
     error?: string;
 }
 
-const createComponentModels = (
+export const createComponentModels = (
     circuitGraph: CircuitGraph,
     components: Record<string, EditorComponent>
 ): {

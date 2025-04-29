@@ -16,7 +16,6 @@ import {
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { getOS, sendErrorToast, sendSuccessToast } from "@/lib/utils"
-import toast from "react-hot-toast"
 
 interface DropdownItem {
     label?: string
@@ -302,7 +301,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         },
     ]
 
-    //usePreventUnloadWithUnsavedChanges(hasUnsavedChanges); // remove for now to allow HMR
+    usePreventUnloadWithUnsavedChanges(hasUnsavedChanges);
 
     return (
         <div className="bg-white text-foreground flex justify-between items-center shadow-md z-10">

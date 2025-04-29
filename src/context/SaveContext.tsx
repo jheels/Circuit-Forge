@@ -25,7 +25,7 @@ interface SaveResult {
     error?: string;
 }
 
-interface SaveContextType {
+export interface SaveContextType {
     currentProject: CircuitProject | null;
     currentFileHandle: FileSystemFileHandle | null;
     hasUnsavedChanges: boolean;

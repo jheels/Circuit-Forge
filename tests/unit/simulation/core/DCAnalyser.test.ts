@@ -8,6 +8,7 @@ import {
     performDCAnalysis,
     AnalysisState,
     AnalysisResult,
+    createComponentModels
 } from "@/simulation/core/DCAnalyser";
 
 // Mocks for dependencies
@@ -165,5 +166,80 @@ describe("DCAnalyser", () => {
             expect(result.success).toBe(true);
             expect(result.voltages.n1).toBe(2);
         });
+        it("returns success for a nonlinear circuit", () => {
+            const circuitGraphWithNonLinear = {
+                edges: {
+                    e1: { id: "e1", sourceId: "n1", targetId: "n2", connection: { type: "component", id: "led1" } },
+                    g1: { id: "g1", sourceId: "n1", targetId: "n2", connection: { type: "component", id: "ic1" } }
+                }
+            };
+            const componentsWithNonLinear = {
+                led1: { id: "led1", type: "led" },
+                ic1: { id: "ic1", type: "logic-gate" }
+            };
+            const result = performDCAnalysis(circuitGraphWithNonLinear, componentsWithNonLinear);
+            expect(result.success).toBe(true);
+            expect(result.voltages.n1).toBe(5);
+        });
     });
+    describe('createComponentModels', () => {
+        it('creates models for multiple linear components', () => {
+            const circuitGraph = {
+                edges: {
+                    e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'r1' } },
+                    e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'c1' } }
+                },
+                nodes : {
+                    n1: { id: 'n1', voltage: 5 },
+                    n2: { id: 'n2', voltage: 0 },
+                    n3: { id: 'n3', voltage: 0 }
+                }
+            };
+            const components = {
+                r1: { id: 'r1', type: 'resistor' },
+                c1: { id: 'c1', type: 'capacitor' }
+            };
+            const models = createComponentModels(circuitGraph, components);
+            expect(Object.keys(models).length).toBe(2);
+        })
+        it('creates models for multiple non-linear components', () => {
+            const circuitGraph = {
+                edges: {
+                    e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'led1' } },
+                    e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'ic1' } }
+                },
+                nodes : {
+                    n1: { id: 'n1', voltage: 5 },
+                    n2: { id: 'n2', voltage: 0 },
+                    n3: { id: 'n3', voltage: 0 }
+                }
+            };
+            const components = {
+                led1: { id: 'led1', type: 'led' },
+                ic1: { id: 'ic1', type: 'logic-gate' }
+            };
+            const models = createComponentModels(circuitGraph, components);
+            expect(Object.keys(models).length).toBe(2);
+        })
+        it('creates models for mixed components', () => {
+            const circuitGraph = {
+                edges: {
+                    e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'r1' } },
+                    e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'led1' } }
+                },
+                nodes : {
+                    n1: { id: 'n1', voltage: 5 },
+                    n2: { id: 'n2', voltage: 0 },
+                    n3: { id: 'n3', voltage: 0 }
+                }
+            };
+            const components = {
+                r1: { id: 'r1', type: 'resistor' },
+                led1: { id: 'led1', type: 'led' }
+            };
+            const models = createComponentModels(circuitGraph, components);
+            expect(Object.keys(models).length).toBe(2);
+        }
+        )
+    })
 });

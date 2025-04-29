@@ -10,7 +10,7 @@ import { createDIPSwitchComponent } from "@/definitions/components/dipswitch";
 import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/definitions/components/ic";
 import { sendErrorToast, sendSuccessToast } from "@/lib/utils";
 
-interface SimulatorContextType {
+export interface SimulatorContextType {
     projectName: string;
     components: Record<string, EditorComponent>;
     componentElectricalValues: Record<string, Record<number, { voltage: number, current: number }>>
@@ -49,7 +49,7 @@ interface SimulatorContextType {
     resetProject: () => void;
 }
 
-const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
+export const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
 export const useSimulatorContext = () => {
     const context = useContext(SimulatorContext);
