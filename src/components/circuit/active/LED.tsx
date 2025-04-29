@@ -5,13 +5,13 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
 import { ComponentProps } from '@/definitions/general';
 
-const getColorWithOpacity = (baseColor: string, opacity: number = 1): string => {
+export const getColorWithOpacity = (baseColor: string, opacity: number = 1): string => {
     if (baseColor === 'red') return `rgba(255, 0, 0, ${opacity})`;
     if (baseColor === 'green') return `rgba(0, 255, 0, ${opacity})`;
     if (baseColor === 'blue') return `rgba(0, 0, 255, ${opacity})`;
     if (baseColor === 'yellow') return `rgba(255, 255, 0, ${opacity})`;
     
-    return baseColor;
+    return `${baseColor} is not supported`;
 };
 
 export const LED: React.FC<ComponentProps> = ({
