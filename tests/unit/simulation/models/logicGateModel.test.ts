@@ -168,7 +168,6 @@ describe('LogicGateModel', () => {
             const model = createLogicGateModel(edge, ['a'], 'out');
             const voltages = { a: 1.5 };
             const updated = updateLogicGateModel(model, voltages);
-            console.log(updated);
             expect(updated.lastOutputVoltage).toBe(5);
         });
 

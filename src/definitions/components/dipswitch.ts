@@ -11,7 +11,10 @@ export interface DIPSwitchComponent extends EditorComponent {
 export const createDIPSwitchComponent = (position: Point, name: string): DIPSwitchComponent => {
     const editorID = `DIPSwitch-${uuidv4()}`;
     const connectors: Record<string, Connector> = {};
-    
+    if (!position || !name) {
+        throw new Error('Position and name are required to create a DIP switch component.');
+    }
+
     // Create 16 connectors - 2 for each switch
     for (let i = 0; i < 8; i++) {
         // Left side connectors
@@ -22,6 +25,7 @@ export const createDIPSwitchComponent = (position: Point, name: string): DIPSwit
             2.5,
             'terminal-' + i + '-left'
         );
+        console.log('leftConnector', leftConnector);
         connectors[leftConnector.id] = leftConnector;
         
         // Right side connectors
