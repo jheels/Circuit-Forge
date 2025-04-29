@@ -10,6 +10,7 @@ import {
     AnalysisResult,
     createComponentModels
 } from "@/simulation/core/DCAnalyser";
+import { LogicGateModel } from "@/simulation/models/logicGateModel";
 
 // Mocks for dependencies
 vi.mock("@/simulation/core/MNASystem", () => ({
@@ -182,6 +183,59 @@ describe("DCAnalyser", () => {
             expect(result.voltages.n1).toBe(5);
         });
     });
+
+    describe("performDCAnalysis - Warm Start", () => {
+        let circuitGraph: any;
+        let components: any;
+    
+        beforeEach(() => {
+            circuitGraph = {
+                edges: {
+                    e1: { id: "e1", sourceId: "n1", targetId: "n2", connection: { type: "component", id: "r1" } },
+                    g1: { id: "g1", sourceId: "n1", targetId: "n2", connection: { type: "component", id: "ic1" } }
+                }, nodes: {
+                    n1: { id: "n1", voltage: 0 },
+                    n2: { id: "n2", voltage: 0 }
+                }
+            };
+            components = {
+                r1: { id: "r1", type: "resistor" },
+                ic1: { id: "ic1", type: "logic-gate" }
+            };
+        });
+    
+        it("uses previous voltages for warm start", () => {
+            const previousAnalysis: AnalysisResult = {
+                success: true,
+                voltages: { n1: 3, n2: 1 },
+                models: {},
+                iterations: 1
+            };
+    
+            const result = performDCAnalysis(circuitGraph, components, previousAnalysis);
+    
+            expect(result.success).toBe(true);
+            expect(result.voltages.n1).toBe(3);
+            expect(result.voltages.n2).toBe(1);
+        });
+    
+    
+        it("does not copy state if previous analysis is unsuccessful", () => {
+            const previousAnalysis: AnalysisResult = {
+                success: false,
+                voltages: { n1: 3, n2: 1 },
+                models: {},
+                iterations: 1
+            };
+    
+            const result = performDCAnalysis(circuitGraph, components, previousAnalysis);
+    
+            expect(result.success).toBe(true); // Analysis should still succeed
+            expect(result.voltages.n1).not.toBe(3); // Voltages should not be copied
+            expect(result.voltages.n2).not.toBe(1);
+        });
+    });
+
     describe('createComponentModels', () => {
         it('creates models for multiple linear components', () => {
             const circuitGraph = {
@@ -189,7 +243,7 @@ describe("DCAnalyser", () => {
                     e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'r1' } },
                     e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'c1' } }
                 },
-                nodes : {
+                nodes: {
                     n1: { id: 'n1', voltage: 5 },
                     n2: { id: 'n2', voltage: 0 },
                     n3: { id: 'n3', voltage: 0 }
@@ -208,7 +262,7 @@ describe("DCAnalyser", () => {
                     e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'led1' } },
                     e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'ic1' } }
                 },
-                nodes : {
+                nodes: {
                     n1: { id: 'n1', voltage: 5 },
                     n2: { id: 'n2', voltage: 0 },
                     n3: { id: 'n3', voltage: 0 }
@@ -227,7 +281,7 @@ describe("DCAnalyser", () => {
                     e1: { id: 'e1', sourceId: 'n1', targetId: 'n2', connection: { type: 'component', id: 'r1' } },
                     e2: { id: 'e2', sourceId: 'n2', targetId: 'n3', connection: { type: 'component', id: 'led1' } }
                 },
-                nodes : {
+                nodes: {
                     n1: { id: 'n1', voltage: 5 },
                     n2: { id: 'n2', voltage: 0 },
                     n3: { id: 'n3', voltage: 0 }

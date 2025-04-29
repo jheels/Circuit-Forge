@@ -5,7 +5,6 @@ import { SimulatorContext, SimulatorContextType } from '@/context/SimulatorConte
 import { LEDComponent } from '@/definitions/components/led';
 import { Circle, Shape } from 'react-konva';
 import { describe, it, expect, vi } from 'vitest';
-import { string } from 'zod';
 
 vi.mock('react-konva', () => ({
     Circle: vi.fn(() => <div data-testid="circle" />),
