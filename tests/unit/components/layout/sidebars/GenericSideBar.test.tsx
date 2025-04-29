@@ -5,12 +5,15 @@ import { UIProvider } from '@/context/UIContext';
 import { DndProviderWrapper } from '@/context/DndContext';
 import { GenericSideBar } from '@/components/layout/sidebars/GenericSideBar';
 import { ReactNode } from 'react';
+import * as utils from '@/lib/utils';
+
 
 const mockComponents = [
     { sidebarID: '1', name: 'Component 1', description: 'Description 1' },
     { sidebarID: '2', name: 'Component 2', description: 'Description 2' },
     { sidebarID: '3', name: 'Component 3', description: 'Description 3' },
 ];
+vi.spyOn(utils, 'sendErrorToast').mockImplementation(() => {});
 
 describe('GenericSideBar', () => {
     const renderWithContext = (component: ReactNode) => {
@@ -76,4 +79,19 @@ describe('GenericSideBar', () => {
         renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={false} />);
         expect(screen.queryByText('Import Chip')).not.toBeInTheDocument();
     });
+
+    it('should send an error toast when a file is selected for import.', () => {
+        renderWithContext(<GenericSideBar components={mockComponents} showImportChipDialog={true} />);
+        const importChipButton = screen.getByTestId('importChipButton');
+
+        fireEvent.click(importChipButton);
+
+        const fileInput = screen.getByTestId('file-input');
+        const file = new File([''], 'test.chip', { type: 'text/plain' });
+
+        fireEvent.change(fileInput, { target: { files: [file] } });
+        fireEvent.click(screen.getByTestId('importFile'));
+        expect(utils.sendErrorToast).toHaveBeenCalledOnce();
+    }
+    );
 });

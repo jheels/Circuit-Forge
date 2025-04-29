@@ -43,6 +43,7 @@ export const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOp
                             onChange={handleFileChange}
                             accept=".chip"
                             className="hidden"
+                            data-testid="file-input"
                         />
                         <span className="text-gray-500">
                             {selectedFile ? selectedFile.name : 'Select a file...'}
@@ -51,7 +52,7 @@ export const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOp
                     </div>
                 </div>
                 <div className="flex justify-end">
-                    <Button onClick={onImport} disabled={!selectedFile}>
+                    <Button data-testid='importFile' onClick={onImport} disabled={!selectedFile}>
                         Import
                     </Button>
                 </div>

@@ -71,4 +71,14 @@ describe('NavBar', () => {
             expect(screen.getByText('Feature not implemented!')).toBeInTheDocument();
         }, 1000);
     });
+
+    it('should select simulator tool when simulator button is clicked.', () => {
+        renderWithContext(<NavBar />);
+
+        const simulatorButton = screen.getByTestId('Simulator');
+        fireEvent.click(simulatorButton);
+
+        expect(screen.getByTestId('Simulator')).toHaveClass('bg-white');
+        expect(screen.getByTestId('IC Editor')).not.toHaveClass('bg-white');
+    });
 });
