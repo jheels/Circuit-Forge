@@ -5,7 +5,7 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
 import { ComponentProps } from '@/definitions/general';
 
-const convertToBaseUnits = (value: number, unit: string): number => {
+export const convertToBaseUnits = (value: number, unit: string): number => {
     switch (unit) {
         case 'kΩ':
             return value * 1000;
@@ -17,7 +17,7 @@ const convertToBaseUnits = (value: number, unit: string): number => {
 };
 
 // Calculate the color bands for a resistor based on value
-const calculateColorBands = (resistance: number): string[] => {
+export const calculateColorBands = (resistance: number): string[] => {
 
     // Standard resistor color codes
     const RESISTOR_COLOURS: Record<number, string> = {
