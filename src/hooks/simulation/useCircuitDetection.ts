@@ -20,14 +20,14 @@ export const useCircuitDetection = () => {
     const { powerDistribution, powerSupply, breadboard } = useFindPowerDistribution(components, connections);
 
     useEffect(() => {
-        if (!powerSupply || !breadboard) {
-            return;
-        }
-        // TODO: refactor to central store for easy access
         if ((!powerSupply || !breadboard) && Object.entries(components).length !== 0) {
             sendErrorToast('Power supply and breadboard not found', 'ps-breadboard-not-found');
             return;
         }
+        if (!powerSupply || !breadboard) {
+            return;
+        }
+
         if (powerDistribution.sourceNode === '' || !powerDistribution.poweredRails.size || !powerDistribution.groundedRails.size) {
             return;
         };
