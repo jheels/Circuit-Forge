@@ -25,7 +25,7 @@ const CONNECTOR_COLORS = {
 
 const REGULAR_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-const PinHole: React.FC<{
+export const PinHole: React.FC<{
     x: number;
     y: number;
     type: 'positive' | 'negative' | 'bidirectional';
@@ -42,7 +42,7 @@ const PinHole: React.FC<{
         />
 );
 
-const PinLabel: React.FC<{
+export const PinLabel: React.FC<{
     x: number;
     y: number;
     text: string;
@@ -60,7 +60,7 @@ const PinLabel: React.FC<{
     />
 );
 
-const generatePowerLabels = () => {
+export const generatePowerLabels = () => {
     const labels: JSX.Element[] = [];
     for (let i = 0; i < 4; i++) {
         const x = PIN_SPACING * (16 * i) - 2.5;
@@ -72,7 +72,7 @@ const generatePowerLabels = () => {
     return labels;
 };
 
-const generateRegularLabels = () => {
+export const generateRegularLabels = () => {
     const labels: JSX.Element[] = [];
     for (let section = 0; section < 3; section++) {
         for (let i = 0; i < 6; i++) {

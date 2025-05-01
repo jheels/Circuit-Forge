@@ -49,13 +49,13 @@ const calculateBreadboardDimensions = () => {
 export const createBreadboardComponent = (position: Point, name: string): BreadboardComponent => {
     const editorID = `Breadboard-${uuidv4()}`;
     const dimensions = calculateBreadboardDimensions();
-    const connectors: Record<string, ReturnType<typeof createConnector>> = {};
+    const connectors: Record<string, Connector> = {};
     const stripMapping: StripMapping = {
         connectorToStrip: {},
         strips: {},
         positiveStripIDs: [],
         negativeStripIDs: [],
-    };  
+    };
 
     const createPinConnector = (
         x: number,

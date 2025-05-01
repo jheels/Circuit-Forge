@@ -46,9 +46,9 @@ export const createICComponent = (
 
         let yPosition;
         if (isLeftSide) {
-            yPosition = (pinNum - 1) / (pinCount / 2) + 1/(pinCount / 2);
+            yPosition = (pinNum - 1) / (pinCount / 2) + 1/ pinCount;
         } else {
-            yPosition = (pinCount - pinNum) / (pinCount / 2) + 1/(pinCount / 2);
+            yPosition = (pinCount - pinNum) / (pinCount / 2) + 1/pinCount;
         }
         const connector = createConnector(
             editorID,

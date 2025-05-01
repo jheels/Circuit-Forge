@@ -46,7 +46,9 @@ export const ComponentTooltip: React.FC<ComponentTooltipProps> = ({
 
   // Calculate tooltip dimensions and content
   const tooltipEntries: Array<{ label: string, value: string }> = [];
-  const componentName = component.properties.name as string || 'Component';
+  const componentName = (component.properties.name as string).length > 10 
+    ? (component.properties.name as string).substring(0, 10) + '...' 
+    : (component.properties.name as string);
   
   // If no values, show N/A
   if (Object.keys(electricalValues).length === 0) {
