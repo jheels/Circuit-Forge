@@ -187,7 +187,7 @@ describe("DCAnalyser", () => {
     describe("performDCAnalysis - Warm Start", () => {
         let circuitGraph: any;
         let components: any;
-    
+
         beforeEach(() => {
             circuitGraph = {
                 edges: {
@@ -203,7 +203,7 @@ describe("DCAnalyser", () => {
                 ic1: { id: "ic1", type: "logic-gate" }
             };
         });
-    
+
         it("uses previous voltages for warm start", () => {
             const previousAnalysis: AnalysisResult = {
                 success: true,
@@ -211,15 +211,15 @@ describe("DCAnalyser", () => {
                 models: {},
                 iterations: 1
             };
-    
+
             const result = performDCAnalysis(circuitGraph, components, previousAnalysis);
-    
+
             expect(result.success).toBe(true);
             expect(result.voltages.n1).toBe(3);
             expect(result.voltages.n2).toBe(1);
         });
-    
-    
+
+
         it("does not copy state if previous analysis is unsuccessful", () => {
             const previousAnalysis: AnalysisResult = {
                 success: false,
@@ -227,9 +227,9 @@ describe("DCAnalyser", () => {
                 models: {},
                 iterations: 1
             };
-    
+
             const result = performDCAnalysis(circuitGraph, components, previousAnalysis);
-    
+
             expect(result.success).toBe(true); // Analysis should still succeed
             expect(result.voltages.n1).not.toBe(3); // Voltages should not be copied
             expect(result.voltages.n2).not.toBe(1);
@@ -295,5 +295,37 @@ describe("DCAnalyser", () => {
             expect(Object.keys(models).length).toBe(2);
         }
         )
+
+        it('creates models for logic gates', () => {
+            const ICComponentConnection = {
+                type: 'component',
+                id: 'ic1',
+                metadata: {
+                    componentType: 'ic',
+                    icType: '74LS00',
+                    gateIndex: 0,
+                    gateType: 'NOT',
+                    pinFunction: 'input',
+                    inputIndex: 0,
+                }
+            }
+            const circuitGraph = {
+                edges: {
+                    edge1: { id: 'edge1', sourceId: 'n1', targetId: 'n2', connection: ICComponentConnection },
+                },
+                nodes: {
+                    n1: { id: 'n1', voltage: 5 },
+                    n2: { id: 'n2', voltage: 0 }
+                }
+            }
+            const components = {
+                ic1: {
+                    id: 'ic1'
+                }   
+            }
+            const models = createComponentModels(circuitGraph, components);
+            console.log(models);
+            expect(Object.keys(models).length).toBe(2);
+        });
     })
 });

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { DipSwitch } from "@/components/circuit/passive/DIPSwitch";
 import { DIPSwitchComponent } from "@/definitions/components/dipswitch";
+import { assert } from "console";
 
 // Mock react-konva components
 vi.mock("react-konva", () => ({
