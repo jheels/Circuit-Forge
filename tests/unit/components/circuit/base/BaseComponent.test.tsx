@@ -86,7 +86,7 @@ describe('BaseComponent', () => {
         const groups = getAllByTestId('Group');
         fireEvent.click(groups[0]);
 
-        expect(mockSimulatorContext.setSelectedComponent).toHaveBeenCalledWith(expect.any(Function));
+        expect(mockSimulatorContext.setSelectedComponent).toHaveBeenCalledWith('testComponent');
         expect(mockSimulatorContext.setSelectedWire).toHaveBeenCalledWith(null);
     });
 

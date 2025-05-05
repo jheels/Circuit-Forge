@@ -49,7 +49,7 @@ const SaveIndicator: React.FC = () => {
     return (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {hasUnsavedChanges ? (
-                <span className="text-yellow-500 font-semibold">Unsaved changes</span>
+                <span className="text-red-700 font-semibold">Unsaved changes</span>
             ) : currentProject?.metadata.lastSaved ? (
                 <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-green-500" strokeWidth={3} />

@@ -35,7 +35,6 @@ export const createDIPSwitchComponent = (position: Point, name: string): DIPSwit
             2.5,
             'terminal-' + i + '-left'
         );
-        console.log('leftConnector', leftConnector);
         connectors[leftConnector.id] = leftConnector;
         
         // Right side connectors

@@ -106,7 +106,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         setSelectedWire(null);
         const selectedComponentID = componentID === selectedComponent ? null : componentID;
         setSelectedComponent(selectedComponentID);
-    }, [componentID, setSelectedComponent, setSelectedWire]);
+    }, [componentID, selectedComponent, setSelectedComponent, setSelectedWire]);
 
     const handleWireEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape' && creatingWire) {

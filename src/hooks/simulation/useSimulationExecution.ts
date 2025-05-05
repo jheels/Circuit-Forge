@@ -8,7 +8,6 @@ import { ResistorModel } from '@/simulation/models/resistorModel';
 import { DipSwitchModel } from '@/simulation/models/DIPSwitchModel';
 import { LEDModel } from '@/simulation/models/LEDModel';
 import { EditorComponent } from '@/definitions/general';
-import assert from 'assert';
 
 /**
  * Generates a representation of a circuit's topology based on its graph structure
@@ -164,7 +163,9 @@ export const useSimulationExecution = () => {
             }
             if (isDIPSwitchConnection(edge.connection)) {
                 const switchIndex = getSwitchIndex(edge.connection);
-                assert(switchIndex !== undefined, 'Switch index should be defined for DIP switch connection');
+                if (switchIndex === undefined) {
+                    throw new Error('Switch index should be defined for DIP switch connection');
+                }
                 const componentModel = analysisResult.models[edge.id];
                 if (componentModel && componentModel.type === 'dip-switch') {
                     const current = calculateModelCurrent(componentModel, voltageDiff);

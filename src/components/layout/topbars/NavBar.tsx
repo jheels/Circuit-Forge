@@ -28,7 +28,7 @@ export function NavBar() {
                         <TooltipButton icon={Microchip} tooltip="IC Editor" isSelected={selectedTool === 'ic-editor'} onClick={() => sendErrorToast('Feature not implemented!')} />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button data-testid='settings-switch' variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
+                        <Button aria-label='settings-button' data-testid='settings-switch' variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}>
                             <Settings className="h-6 w-6" />
                         </Button>
                     </div>

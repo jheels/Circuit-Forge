@@ -53,7 +53,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         const newSelectedWireID = selectedWire === wireID ? null : wireID;
         setSelectedWire(newSelectedWireID);
         setSelectedComponent(null);
-    }, [setSelectedComponent, setSelectedWire, wireID]);
+    }, [selectedWire, setSelectedComponent, setSelectedWire, wireID]);
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Backspace' && selectedWire === wireID) {

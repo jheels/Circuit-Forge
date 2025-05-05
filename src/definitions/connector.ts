@@ -34,7 +34,7 @@ export interface Connector {
     readonly hitAreaSize: number;
     offset: ConnectorOffset;
     isConnected: boolean;
-    readonly metadata?: Record<string, object>;
+    readonly metadata?: Record<string, unknown>;
 }
 
 /**
@@ -54,7 +54,7 @@ export const createConnector = (
     offset: ConnectorOffset,
     hitAreaSize: number = DEFAULT_HIT_AREA,
     connectorIDOverride?: string,
-    metadata?: Record<string, object>
+    metadata?: Record<string, unknown>
 ): Connector => ({
     id: componentID + ':' + (connectorIDOverride || uuidv4()),
     componentID,

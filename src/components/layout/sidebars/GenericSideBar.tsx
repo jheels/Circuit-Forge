@@ -82,6 +82,7 @@ export function GenericSideBar({ components, showImportChipDialog }: GenericSide
         // Toggle button
         <div data-testid="sidebar" className={`relative h-full bg-gray-200 ${isSideBarOpen ? 'w-1/5' : 'w-3'} flex-shrink-0`}>
             <button
+                aria-label="Toggle Sidebar"
                 onClick={toggleSidebar}
                 data-testid="toggleSidebar"
                 className="absolute -left-3 top-1/2 -translate-y-1/2 h-16 w-6 flex items-center justify-center bg-gray-300"
@@ -108,7 +109,7 @@ export function GenericSideBar({ components, showImportChipDialog }: GenericSide
                                 <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600" />
                             </div>
                             {showImportChipDialog && (
-                                <Button data-testid="importChipButton" variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
+                                <Button aria-label='import chip button' data-testid="importChipButton" variant="ghost" size="icon" onClick={() => setIsImportDialogOpen(true)}>
                                     <Download className="h-7 w-7" />
                                 </Button>
                             )}
