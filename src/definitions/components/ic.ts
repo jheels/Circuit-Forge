@@ -69,9 +69,9 @@ export const createICComponent = (
             2.5,
             pinDefinition.name,
             {
-                pinNumber: pinNum,
-                gateIndex: pinDefinition.gateIndex,
-                inputIndex: pinDefinition.inputIndex
+                pinNumber: { value: pinNum },
+                gateIndex: { value: pinDefinition.gateIndex },
+                inputIndex: { value: pinDefinition.inputIndex }
             }
         );
 

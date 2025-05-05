@@ -1,5 +1,14 @@
 import {  CircuitGraph } from "@/simulation/circuit/circuitDetection";
 
+/**
+ * Determines if there is a path consisting only of "wire" connections between two nodes in a circuit graph.
+ *
+ * @param graph - The circuit graph containing nodes and edges.
+ * @param sourceNodeID - The ID of the starting node for the traversal.
+ * @param targetNodeID - The ID of the target node to reach.
+ * @param excludeEdgeIds - An optional array of edge IDs to exclude from the traversal.
+ * @returns `true` if a path consisting only of "wire" connections exists between the source and target nodes, otherwise `false`.
+ */
 export const hasWireOnlyPath = (
     graph: CircuitGraph,
     sourceNodeID: string,

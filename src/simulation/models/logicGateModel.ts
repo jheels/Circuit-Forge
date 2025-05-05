@@ -13,6 +13,19 @@ export interface LogicGateModel extends ComponentModel {
     edge: CircuitEdge;
 }
 
+/**
+ * Creates a logic gate model based on the provided circuit edge and node IDs.
+ *
+ * @param edge - The circuit edge that connects the logic gate. This contains
+ *               information about the connection and its metadata.
+ * @param inputNodeIds - An array of strings representing the IDs of the input nodes
+ *                       connected to the logic gate.
+ * @param outputNodeId - A string representing the ID of the output node connected
+ *                       to the logic gate.
+ * @returns A `LogicGateModel` object that represents the logic gate, including its
+ *          type, gate type, input/output node IDs, last input/output voltages, and
+ *          the associated circuit edge.
+ */
 export const createLogicGateModel =  (
     edge: CircuitEdge,
     inputNodeIds: string[],
@@ -30,12 +43,33 @@ export const createLogicGateModel =  (
     }
 }
 
+/**
+ * Evaluates the output voltage of a logic gate based on its type, input voltages, 
+ * and the last output voltage (used for hysteresis in unsupported regions).
+ *
+ * @param gateType - The type of the logic gate. Supported types are:
+ *   - 'AND': Logical AND gate
+ *   - 'OR': Logical OR gate
+ *   - 'NAND': Logical NAND gate
+ *   - 'NOR': Logical NOR gate
+ *   - 'XOR': Logical XOR gate
+ *   - 'NOT': Logical NOT gate (inverter)
+ *   - 'MYSTERY': A custom gate
+ * @param inputVoltages - An array of input voltages to the logic gate.
+ *   - Voltages below 0.8 are considered `false` (low).
+ *   - Voltages above 2.0 are considered `true` (high).
+ *   - Voltages in the range [0.8, 2.0] use hysteresis, retaining the last output state.
+ * @param lastOutputVoltage - The last output voltage of the gate, used for hysteresis
+ *   when input voltages are in the unsupported range.
+ * @returns The output voltage of the logic gate:
+ *   - `5.0` for `true` (high output state).
+ *   - `0.0` for `false` (low output state).
+ */
 export const evaluateLogicGate = (
     gateType: string,
     inputVoltages: number[],
     lastOutputVoltage: number,
 ): number => {
-    // convert voltages into digital states with support for hysteresis on the unsupported region to keep the last output
     const inputStates = inputVoltages.map(voltage => {
         if (voltage < 0.8) return false;
         if (voltage > 2.0) return true;

@@ -8,8 +8,17 @@ import { ResistorModel } from '@/simulation/models/resistorModel';
 import { DipSwitchModel } from '@/simulation/models/DIPSwitchModel';
 import { LEDModel } from '@/simulation/models/LEDModel';
 import { EditorComponent } from '@/definitions/general';
+import assert from 'assert';
 
-// Hash only the circuit topology (not component state)
+/**
+ * Generates a representation of a circuit's topology based on its graph structure
+ * and associated components. The hash is created by serialising the sorted nodes, edges, and
+ * component types of the circuit.
+ *
+ * @param circuitGraph - The graph representation of the circuit, containing nodes and edges.
+ * @param components - A record of component IDs mapped to their corresponding editor components.
+ * @returns A JSON string that uniquely represents the circuit's topology.
+ */
 const hashCircuitTopology = (circuitGraph: CircuitGraph, components: Record<string, EditorComponent>) => {
     return JSON.stringify({
         nodes: Object.keys(circuitGraph.nodes).sort(),
@@ -19,7 +28,7 @@ const hashCircuitTopology = (circuitGraph: CircuitGraph, components: Record<stri
                 target: e.targetId,
                 type: e.connection.type,
                 id: e.connection.id,
-                meta: e.connection.metadata?.pinFunction || null
+                meta: isICComponentConnection(e.connection) ? e.connection.metadata.pinFunction : null
             }))
             .sort((a, b) => a.id.localeCompare(b.id)),
         componentTypes: Object.entries(components)
@@ -28,17 +37,31 @@ const hashCircuitTopology = (circuitGraph: CircuitGraph, components: Record<stri
     });
 };
 
+/**
+ * Custom hook for executing circuit simulation and managing its state.
+ *
+ * This hook provides functionality to perform DC analysis on a circuit graph,
+ * retrieve node voltages, and compute electrical values for components in the circuit.
+ * It also handles errors and maintains state for warm-starting simulations.
+ * Warm-starting allows the simulation to reuse the previous state for faster convergence.
+ *
+ * @returns {Object} An object containing:
+ * - `analysisResult`: The result of the most recent circuit analysis, or `undefined` if no analysis has been performed.
+ * - `error`: A string describing the most recent error, or `null` if no error occurred.
+ * - `hasValidCircuit`: A boolean indicating whether a valid circuit graph is available.
+ * - `runAnalysis`: A function to manually trigger a DC analysis of the circuit.
+ * - `getNodeVoltages`: A function to retrieve the node voltages from the most recent analysis.
+ * - `getCircuitValues`: A function to compute electrical values (voltage and current) for components in the circuit.
+ * - `useWarmStart`: A boolean indicating whether the simulation is using warm-starting with the previous state.
+ */
 export const useSimulationExecution = () => {
-    // Get components and circuit graph
     const { components, updateComponentElectricalValues } = useSimulatorContext();
     const { circuitGraph } = useCircuitDetection();
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
     const [error, setError] = useState<string | null>(null);
     const prevTopologyHash = useRef<string | null>(null);
 
-    // Function to manually trigger analysis
     const runAnalysis = () => {
-        // Don't run if already analyzing or if circuit graph is null
         if (!circuitGraph) {
             return null;
         }
@@ -54,18 +77,14 @@ export const useSimulationExecution = () => {
                 components,
                 useWarmStart ? analysisResult : undefined
             );
-            // Store results
             setAnalysisResult(result);
             prevTopologyHash.current = currentTopologyHash;
-
-            // Set error if analysis failed
             if (!result.success && result.error) {
                 setError(result.error);
             }
 
             return result;
         } catch (error) {
-            // Handle unexpected errors
             const errorMessage = error instanceof Error ? error.message : String(error);
             setError(`Unexpected error: ${errorMessage}`);
             return null;
@@ -92,14 +111,12 @@ export const useSimulationExecution = () => {
             if (!result) return;
             updateComponentElectricalValues(getCircuitValues(result));
         } else {
-            // Clear previous results if no circuit graph
             setAnalysisResult(undefined);
             setError("No valid circuit detected");
             prevTopologyHash.current = null;
         }
     }, [circuitGraph]);
 
-    // Helper function to get node voltages
     const getNodeVoltages = () => {
         if (!analysisResult || !analysisResult.success) {
             return {};
@@ -107,7 +124,26 @@ export const useSimulationExecution = () => {
         return analysisResult.voltages;
     };
 
-    // Helper function to get component voltages
+    /**
+     * Computes the electrical values (voltage and current) for each component in the circuit
+     * based on the analysis results and the circuit graph.
+     *
+     * @param analysisResult - The result of the circuit analysis, containing voltage values
+     *                         for nodes and models for components.
+     * @returns A record where each key is a component ID, and the value is another record
+     *          mapping indices (e.g., switch index, gate index, or default index) to an object
+     *          containing `voltage` and `current` values for that component.
+     *
+     * The function processes the circuit graph's edges to determine the voltage difference
+     * across components and calculates the current based on the component model. It handles
+     * different types of connections:
+     * - DIP switches: Uses the switch index and calculates current using the model.
+     * - IC components: Uses the gate index and assigns voltage with zero current.
+     * - Other components: Calculates current unless the component is an independent voltage source.
+     *
+     * If the analysis result indicates failure or the circuit graph is undefined, an empty
+     * object is returned.
+     */
     const getCircuitValues = (analysisResult: AnalysisResult) => {
         if (!analysisResult.success || !circuitGraph) {
             return {};
@@ -128,12 +164,12 @@ export const useSimulationExecution = () => {
             }
             if (isDIPSwitchConnection(edge.connection)) {
                 const switchIndex = getSwitchIndex(edge.connection);
+                assert(switchIndex !== undefined, 'Switch index should be defined for DIP switch connection');
                 const componentModel = analysisResult.models[edge.id];
                 if (componentModel && componentModel.type === 'dip-switch') {
                     const current = calculateModelCurrent(componentModel, voltageDiff);
-                    componentElectricalValues[componentId][switchIndex] = { voltage: voltageDiff, current: current };
+                    componentElectricalValues[componentId][switchIndex] = { voltage: voltageDiff, current: current ?? 0 };
                 }
-
             } else if (isICComponentConnection(edge.connection)) {
                 const gateIndex = edge.connection.metadata?.gateIndex;
                 if (gateIndex !== undefined) {
@@ -145,18 +181,16 @@ export const useSimulationExecution = () => {
                     const current = calculateModelCurrent(componentModel, voltageDiff);
 
                     if (current !== null) {
-                        componentElectricalValues[componentId][0] = { voltage: voltageDiff, current: current};
+                        componentElectricalValues[componentId][0] = { voltage: voltageDiff, current: current };
                     }
                 } else {
                     componentElectricalValues[componentId][0] = { voltage: voltageDiff, current: analysisResult.voltages['unified_power_current'] || 0 };
                 }
             }
         });
-
         return componentElectricalValues;
     };
 
-    // Helper function to calculate current based on component model
     const calculateModelCurrent = (model: ComponentModel, voltage: number) => {
         switch (model.type) {
             case 'resistor':
@@ -173,15 +207,10 @@ export const useSimulationExecution = () => {
     }
 
     return {
-        // Analysis state
         analysisResult,
         error,
         hasValidCircuit: !!circuitGraph,
-
-        // Analysis actions
         runAnalysis,
-
-        // Helper functions
         getNodeVoltages,
         getCircuitValues,
     };

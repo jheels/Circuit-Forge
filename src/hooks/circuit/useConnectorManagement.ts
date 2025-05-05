@@ -1,15 +1,32 @@
-/*
-TODO: 
-- fix bug where when creating a wire and you are moving then it will not follow (cancel creation maybe?)
-*/
 import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { EditorComponent, Point, Wire } from '@/definitions/general';
 import { Connector, getConnectorPosition } from '@/definitions/connector';
 import { Connection, createAppropriateConnection } from '@/definitions/connection';
-import { ConnectorPair, SnapState } from './ui/useSnapManagement';
+import { ConnectorPair, SnapState } from '../ui/useSnapManagement';
 import { sendErrorToast } from '@/lib/utils';
 
+/**
+ * A custom hook for managing connectors and wires in a circuit editor.
+ *
+ * @param position - The current position of the circuit editor canvas.
+ * @param dimensions - The dimensions of the circuit editor canvas.
+ * @param components - A record of all editor components, keyed by their IDs.
+ * @param connectors - A record of all connectors, keyed by their IDs.
+ * @param creatingWire - The wire currently being created, or `null` if no wire is being created.
+ * @param setSelectedWire - A function to set the currently selected wire by its ID, or `null` to deselect.
+ * @param updateWire - A function to update a wire's properties by its ID.
+ * @param addConnection - A function to add a new connection between connectors.
+ * @param removeConnection - A function to remove a connection by its ID.
+ * @param setCreatingWire - A function to set the wire currently being created, or `null` to stop creating a wire.
+ * @param setClickedConnector - A function to set the connector that was last clicked, or `null` to clear it.
+ * @param addWire - A function to add a new wire to the circuit editor.
+ * @param getConnectorConnection - A function to get the connection ID associated with a connector by its ID.
+ *
+ * @returns An object containing:
+ * - `handleConnectorClick`: A function to handle click events on connectors.
+ * - `updateConnectionsOnDrop`: A function to update connections when connectors are dropped.
+ */
 export const useConnectorManagement = (
     position: Point,
     dimensions: { width: number; height: number },
@@ -23,7 +40,7 @@ export const useConnectorManagement = (
     setCreatingWire: (wire: Wire | null) => void,
     setClickedConnector: (connector: Connector | null) => void,
     addWire: (wire: Wire) => void,
-    getConnectorConnection: (connectorID: string) => string
+    getConnectorConnection: (connectorID: string) => string | null
 ) => {
     const handleConnectorClick = useCallback((connectorID: string) => {
         const connectorConnection = getConnectorConnection(connectorID);
@@ -42,6 +59,7 @@ export const useConnectorManagement = (
                 return;
             }
             try {
+                // Form a connection if we already have a wire
                 const connection = createAppropriateConnection(creatingWire.startConnector, connector, components, creatingWire.id);
                 addConnection(connection);
                 updateWire(creatingWire.id, {
@@ -54,6 +72,7 @@ export const useConnectorManagement = (
                 console.error(e);
             }
         } else {
+            // Create a new wire with partial rendering.
             const newWire = {
                 id: `wire-${uuidv4()}`,
                 startConnector: connector,

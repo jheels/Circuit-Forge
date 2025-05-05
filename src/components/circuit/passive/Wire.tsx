@@ -50,9 +50,14 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
     // Flip the wire selection state
     const handleClick = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
-        setSelectedWire((prevSelectedWire: string | null) =>
-            prevSelectedWire === wireID ? null : wireID
-        );
+        const selectedWireID = (prevSelectedWireID: string | null) => {
+            if (prevSelectedWireID === wireID) {
+                return null;
+            }
+            return wireID;
+        };
+        if (!selectedWireID)
+        setSelectedWire(selectedWireID);
         setSelectedComponent(null);
     }, [setSelectedComponent, setSelectedWire, wireID]);
 

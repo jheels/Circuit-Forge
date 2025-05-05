@@ -110,7 +110,7 @@ describe('createDefaultProperties', () => {
     it('creates default properties for resistor', () => {
         const defaults = createDefaultProperties('resistor', 'R1');
         expect(defaults.name).toBe('R1');
-        expect(defaults.value).toBe(1000);
+        expect(defaults.value).toBe(300);
         expect(defaults.unit).toBe('Ω');
     });
 

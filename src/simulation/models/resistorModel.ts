@@ -8,6 +8,16 @@ export interface ResistorModel extends ComponentModel {
     conductance: number;
 }
 
+/**
+ * Converts a resistance value to its equivalent in base units (ohms).
+ *
+ * @param value - The numerical value of the resistance.
+ * @param unit - The unit of the resistance value. Supported units are:
+ *   - 'kΩ' for kilo-ohms (multiplies the value by 1,000).
+ *   - 'MΩ' for mega-ohms (multiplies the value by 1,000,000).
+ *   - Any other unit will be treated as ohms (no conversion applied).
+ * @returns The resistance value converted to ohms.
+ */
 const convertToBaseUnits = (value: number, unit: string): number => {
     switch (unit) {
         case 'kΩ':
@@ -34,6 +44,28 @@ export const createResistorModel = (component: ResistorComponent, edge: CircuitE
     }
 }
 
+/**
+ * Applies the resistor stamp to the conductance matrix for circuit simulation.
+ *
+ * This function modifies the conductance matrix to account for the presence
+ * of a resistor in the circuit. It uses the resistor's conductance value and
+ * updates the matrix based on the nodes connected by the resistor.
+ *
+ * @param conductanceMatrix - The matrix representing the conductance of the circuit.
+ * @param model - The resistor model containing the conductance value and the edge
+ *                (connection between two nodes) information.
+ * @param nodeMap - A mapping of node IDs to their corresponding indices in the conductance matrix.
+ *
+ * @remarks
+ * If one of the nodes connected by the resistor is a ground node (undefined in the node map),
+ * the function only updates the conductance matrix for the non-ground node.
+ *
+ * The conductance matrix is updated as follows:
+ * - The diagonal elements corresponding to the source and target nodes are incremented
+ *   by the conductance value.
+ * - The off-diagonal elements corresponding to the source-target and target-source pairs
+ *   are decremented by the conductance value.
+ */
 export const applyResistorStamp = (
     conductanceMatrix: Matrix,
     model: ResistorModel,

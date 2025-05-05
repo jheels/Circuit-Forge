@@ -15,6 +15,20 @@ export interface PowerDistribution {
     groundedRails: Set<string>;
 }
 
+/**
+ * Custom hook to determine the power distribution in a circuit simulation.
+ * It identifies the powered and grounded rails on a breadboard based on the
+ * connections and components provided.
+ *
+ * @param components - A record of all components in the circuit, keyed by their IDs.
+ * @param connections - A record of all connections in the circuit, keyed by their IDs.
+ * 
+ * @returns An object containing:
+ * - `powerDistribution`: The calculated power distribution, including source node, power node,
+ *   ground node, powered rails, and grounded rails.
+ * - `powerSupply`: The power supply component identified from the components.
+ * - `breadboard`: The breadboard component identified from the components.
+ */
 export const useFindPowerDistribution = (
     components: Record<string, EditorComponent>,
     connections: Record<string, Connection>

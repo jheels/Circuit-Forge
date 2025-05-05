@@ -20,6 +20,21 @@ export const createDipSwitchModel = (switchIndex: number, switchState: boolean, 
     }
 }
 
+/**
+ * Applies a conductance stamp for a DIP switch model to the conductance matrix.
+ *
+ * This function determines the conductance of the DIP switch based on its state
+ * (open or closed) and applies the corresponding resistor stamp to the conductance matrix.
+ *
+ * @param conductanceMatrix - The matrix representing the circuit's conductance.
+ * @param model - The DIP switch model containing the switch state and edge information.
+ * @param nodeMap - A mapping of node identifiers to their corresponding indices in the matrix.
+ *
+ * @remarks
+ * - A closed switch is represented by a very high conductance (`1e10`).
+ * - An open switch is represented by a very low conductance (`1e-20`).
+ * - The `applyResistorStamp` function is used to apply the calculated conductance to the matrix.
+ */
 export const applyDipSwitchStamp = (
     conductanceMatrix: Matrix,
     model: DipSwitchModel,

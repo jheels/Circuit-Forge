@@ -28,7 +28,7 @@ export const createLEDModel = (
     const thermalVoltage = THERMAL_VOLTAGE * ideality;
     const initialVoltage = lastVoltage ?? DEFAULT_FORWARD_VOLTAGE;
     
-    // Calculate initial linearized model parameters
+    // Calculate initial linearised model parameters
     const { conductance, equivalentCurrent } = calculateLinearisedModel(
         initialVoltage, 
         saturationCurrent, 
@@ -48,6 +48,17 @@ export const createLEDModel = (
     };
 }
 
+/**
+ * Calculates the linearised model parameters for a diode using the Shockley diode equation.
+ *
+ * @param voltage - The voltage across the diode (in volts).
+ * @param saturationCurrent - The saturation current of the diode (in amperes).
+ * @param thermalVoltage - The thermal voltage of the diode (in volts).
+ * @returns An object containing:
+ *   - `conductance`: The small-signal conductance of the diode (in siemens).
+ *   - `equivalentCurrent`: The equivalent current source for the linearised model (in amperes).
+ * @see https://en.wikipedia.org/wiki/Shockley_diode_equation
+ */
 const calculateLinearisedModel = (
     voltage: number,
     saturationCurrent: number,
@@ -66,6 +77,9 @@ export const updateLEDModel = (
     newVoltage: number
 ): LEDModel => {
     const maxChange = model.thermalVoltage * 5;
+    // Clamp the voltage change to prevent excessive changes
+    // This is a simple way to limit the voltage change to a reasonable range
+    // to avoid numerical instability in the simulation
     const limitedVoltage = model.lastVoltage + Math.max(-maxChange, Math.min(maxChange, newVoltage - model.lastVoltage));
 
     const { conductance, equivalentCurrent } = calculateLinearisedModel(
@@ -82,6 +96,21 @@ export const updateLEDModel = (
     }
 }
 
+/**
+ * Applies the LED linear companion model stamp to the circuit simulation matrices.
+ * 
+ * This function modifies the conductance matrix and input sources vector
+ * to account for the behavior of an LED in the circuit. It uses the 
+ * equivalent conductance and current of the LED model to apply the 
+ * necessary stamps for simulation.
+ * 
+ * @param conductanceMatrix - The matrix representing the conductance of the circuit.
+ * @param inputSourcesVector - The vector representing the input sources in the circuit.
+ * @param model - The LED model containing the equivalent conductance, current, and edge information.
+ * @param nodeMap - A mapping of node identifiers to their corresponding indices in the matrices.
+ * 
+ * @returns void
+ */
 export const applyLEDStamp = (
     conductanceMatrix: Matrix,
     inputSourcesVector: Matrix,

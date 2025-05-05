@@ -34,6 +34,19 @@ export const applyVoltageSourceStamp = (
 }
 
 
+/**
+ * Applies the stamp of an independent voltage source to the conductance matrix
+ * and input sources vector in a circuit simulation.
+ *
+ * @param conductanceMatrix - The matrix representing the conductance of the circuit.
+ * @param inputSourcesVector - The vector representing the input sources in the circuit.
+ * @param model - The independent voltage source model containing the voltage value and associated edge.
+ * @param nodeMap - A mapping of node identifiers to their corresponding indices in the matrix.
+ *
+ * @remarks
+ * This function modifies the provided `conductanceMatrix` and `inputSourcesVector` in place
+ * by applying the voltage source stamp based on the given model and node mapping.
+ */
 export const applyIndependentVoltageSourceStamp = (
     conductanceMatrix: Matrix,
     inputSourcesVector: Matrix,
@@ -42,7 +55,6 @@ export const applyIndependentVoltageSourceStamp = (
 ): void => {
     const { voltage, edge } = model;
     const { sourceId } = edge;
-    // Generalise for any source node
     const sourceIndex = nodeMap[sourceId];
 
     applyVoltageSourceStamp(conductanceMatrix, inputSourcesVector, voltage, sourceIndex);

@@ -16,6 +16,24 @@ export interface ComponentModel {
     edge: CircuitEdge;
 }
 
+/**
+ * Creates a component model based on the provided editor component and circuit edge.
+ *
+ * @param component - The editor component to create a model for. The type of the component
+ * determines the specific model creation logic.
+ * @param edge - The circuit edge associated with the component, providing connection details.
+ * 
+ * @returns A `ComponentModel` instance if the component type is supported and the model
+ * creation is successful, or `null` if the component type is not supported.
+ * 
+ * @remarks
+ * - For a 'dip-switch' component, the function checks the connection type and retrieves
+ *   the switch index and state to create a DIP switch model.
+ * - For other supported component types ('resistor', 'power-supply', 'led'), the function
+ *   delegates to specific model creation functions.
+
+ * ```
+ */
 export const createComponentModel = (
     component: EditorComponent,
     edge: CircuitEdge
@@ -41,6 +59,24 @@ export const createComponentModel = (
     }
 }
 
+/**
+ * Applies the appropriate stamp to the conductance matrix and optionally the input sources matrix
+ * based on the type of the given component model.
+ *
+ * @param model - The component model containing the type and properties of the component.
+ * @param conductanceMatrix - The matrix representing the conductance of the circuit.
+ * @param nodeMap - A mapping of node identifiers to their corresponding indices in the matrices.
+ * @param inputSourcesMatrix - (Optional) The matrix representing input sources in the circuit.
+ *
+ * The function handles the following component types:
+ * - 'resistor': Applies a resistor stamp.
+ * - 'dip-switch': Applies a dip-switch stamp.
+ * - 'independent-voltage-source': Applies an independent voltage source stamp if `inputSourcesMatrix` is provided.
+ * - 'led': Applies an LED stamp if `inputSourcesMatrix` is provided.
+ * - 'logic-gate': Applies a logic gate stamp if `inputSourcesMatrix` is provided.
+ *
+ * If the component type is not supported, a warning is logged to the console.
+ */
 export const applyComponentStamp = (
     model: ComponentModel,
     conductanceMatrix: Matrix,

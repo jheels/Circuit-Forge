@@ -6,6 +6,16 @@ import { EditorComponent } from "@/definitions/general";
 import { getICDefinition, ICComponent } from "@/definitions/components/ic";
 import { Connector } from "@/definitions/connector";
 
+/**
+ * Updates the strip ID to either the power node or ground node based on the provided power distribution.
+ * If the strip ID corresponds to a powered rail, it is replaced with the power node.
+ * If the strip ID corresponds to a grounded rail, it is replaced with the ground node.
+ * If the strip ID does not match any powered or grounded rails, it is returned unchanged.
+ *
+ * @param stripID - The identifier of the strip to be updated.
+ * @param powerDistribution - An object containing the power and ground nodes, as well as the sets of powered and grounded rails.
+ * @returns The updated strip ID, which may be the power node, ground node, or the original strip ID.
+ */
 const updateStripIDForPowerAndGround = (
     stripID: string,
     powerDistribution: PowerDistribution
@@ -21,6 +31,17 @@ const updateStripIDForPowerAndGround = (
     return stripID;
 }
 
+/**
+ * Processes wire connections in a circuit graph by updating the graph's nodes and edges
+ * based on the provided connections and power distribution.
+ *
+ * @param graph - The circuit graph containing nodes and edges to be updated.
+ * @param connections - A record of connection objects, where each connection represents
+ * a potential wire connection in the circuit.
+ * @param powerDistribution - The power distribution object used to update strip IDs
+ * for power and ground connections.
+ * @returns The updated circuit graph with processed wire connections.
+ */
 export const processWireConnections = (
     graph: CircuitGraph,
     connections: Record<string, Connection>,
@@ -48,12 +69,24 @@ export const processWireConnections = (
     return { nodes, edges };
 }
 
+/**
+ * Processes the connections of a DIP switch component within a circuit graph.
+ * This function ensures that the DIP switch connections are properly represented
+ * as edges in the circuit graph, based on the provided connections and power distribution.
+ *
+ * @param graph - The current circuit graph containing nodes and edges.
+ * @param connections - A record of connection objects, keyed by their IDs.
+ * @param powerDistribution - The power distribution object used to manage power and ground strips.
+ * @param DIPSwitchComponent - The DIP switch component being processed.
+ * @param getConnectorConnection - A function that retrieves the connection ID for a given connector ID.
+ * @returns The updated circuit graph with the DIP switch connections added as edges.
+ */
 export const processDIPSwitchConnections = (
     graph: CircuitGraph,
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     DIPSwitchComponent: DIPSwitchComponent,
-    getConnectorConnection: (connectorID: string) => string
+    getConnectorConnection: (connectorID: string) => string | null
 ): CircuitGraph => {
     const { nodes, edges } = graph;
     const connectorArray = Object.values(DIPSwitchComponent.connectors);
@@ -63,8 +96,10 @@ export const processDIPSwitchConnections = (
     for (let i = 0; i < 8; i++) {
         const leftConnector = connectorArray[i * 2];
         const rightConnector = connectorArray[i * 2 + 1];
-        const leftConnection = connections[getConnectorConnection(leftConnector.id)];
-        const rightConnection = connections[getConnectorConnection(rightConnector.id)];
+        const leftConnectionID = getConnectorConnection(leftConnector.id);
+        const rightConnectionID = getConnectorConnection(rightConnector.id);
+        const leftConnection = leftConnectionID ? connections[leftConnectionID] : null;
+        const rightConnection = rightConnectionID ? connections[rightConnectionID] : null;
 
         if (!leftConnection || !rightConnection) return graph;
 
@@ -82,12 +117,24 @@ export const processDIPSwitchConnections = (
     return { nodes, edges };
 }
 
+/**
+ * Processes the connections of an integrated circuit (IC) component within a circuit graph.
+ * This function updates the circuit graph by creating edges between input and output connectors
+ * of the IC component based on their connections and metadata.
+ *
+ * @param graph - The current circuit graph containing nodes and edges.
+ * @param connections - A record of connection objects, keyed by connection ID.
+ * @param powerDistribution - The power distribution object used to update strip IDs for power and ground.
+ * @param ICComponent - The IC component being processed, containing its connectors and metadata.
+ * @param getConnectorConnection - A function that retrieves the connection ID for a given connector ID.
+ * @returns The updated circuit graph with new edges added for the IC component's connections.
+ */
 export const processICComponentConnections = (
     graph: CircuitGraph,
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     ICComponent: ICComponent,
-    getConnectorConnection: (connectorID: string) => string
+    getConnectorConnection: (connectorID: string) => string | null
 ): CircuitGraph => {
     const gateConnectors: Record<number, {
         inputs: { connector: Connector, node: string }[],
@@ -105,8 +152,8 @@ export const processICComponentConnections = (
         const stripID = updateStripIDForPowerAndGround(connection.metadata.stripID, powerDistribution);
         if (!connector.metadata) return;
         if (connector.metadata.gateIndex === undefined) return;
-
-        const gateIndex = connector.metadata.gateIndex;
+        
+        const gateIndex = Number(connector.metadata.gateIndex);
 
         if (!gateConnectors[gateIndex]) {
             gateConnectors[gateIndex] = { inputs: [], output: null };
@@ -132,7 +179,7 @@ export const processICComponentConnections = (
                     parseInt(gateIndex),
                     getICDefinition(ICComponent.icType).gateType,
                     'input',
-                    input.connector.metadata?.inputIndex
+                    Number(input.connector.metadata?.inputIndex)
                 )
             );
 
@@ -143,12 +190,28 @@ export const processICComponentConnections = (
     return { nodes, edges };
 }
 
+/**
+ * Processes the connections of a two-terminal component within a circuit graph.
+ * 
+ * This function updates the circuit graph by analyzing the connections of a 
+ * two-terminal component, determining the associated strip IDs, and creating 
+ * an edge between the corresponding nodes in the graph.
+ * 
+ * @param graph - The current circuit graph containing nodes and edges.
+ * @param connections - A record of connection objects, indexed by connection IDs.
+ * @param powerDistribution - The power distribution object used to update strip IDs.
+ * @param component - The two-terminal component being processed.
+ * @param getConnectorConnection - A function that retrieves the connection ID 
+ *                                  for a given connector ID.
+ * @returns The updated circuit graph with the new edge added, or the original 
+ *          graph if the component does not have exactly two valid connections.
+ */
 export const processTwoTerminalComponentConnections = (
     graph: CircuitGraph,
     connections: Record<string, Connection>,
     powerDistribution: PowerDistribution,
     component: EditorComponent,
-    getConnectorConnection: (connectorID: string) => string
+    getConnectorConnection: (connectorID: string) => string | null
 ): CircuitGraph => {
     const { nodes, edges } = graph;
 

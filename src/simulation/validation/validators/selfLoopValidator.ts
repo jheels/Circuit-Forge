@@ -13,6 +13,17 @@ export const selfLoopValidator: CircuitValidator = {
     }
 }
 
+/**
+ * Validates a circuit graph for direct loops (self-loops) where a component is connected
+ * to the same strip on both ends. This situation can cause a short circuit and is flagged
+ * as a warning.
+ *
+ * @param graph - The circuit graph to validate, containing nodes and edges representing
+ *                the circuit's structure.
+ * @returns An array of `ValidationIssue` objects representing detected self-loops.
+ *          Each issue includes details about the problematic component and suggestions
+ *          for resolution.
+ */
 const validateDirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
     const issues: ValidationIssue[] = [];
 
@@ -35,6 +46,21 @@ const validateDirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
     return issues;  
 }
 
+/**
+ * Validates a circuit graph for indirect loops that could cause short circuits.
+ * An indirect loop is detected when there exists a path consisting only of wires
+ * between the source and target of an edge, excluding the edge itself.
+ *
+ * @param graph - The circuit graph to validate.
+ * @returns An array of validation issues, each representing an indirect short circuit detected.
+ *
+ * @remarks
+ * - Edges with a connection type other than 'component' are ignored.
+ * - Edges connecting 'unified-power' to 'unified-ground' or vice versa are ignored.
+ * - Self-loops (edges where the source and target are the same) are ignored.
+ * - If an indirect loop is detected, a warning issue is created with a message
+ *   suggesting the removal of the loop of wires to prevent a short circuit.
+ */
 const validateIndirectLoops = (graph: CircuitGraph): ValidationIssue[] => {
     const issues: ValidationIssue[] = [];
 

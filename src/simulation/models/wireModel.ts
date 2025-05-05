@@ -4,7 +4,8 @@ import { applyResistorStamp, ResistorModel } from "./resistorModel";
 
 type WireModel = ResistorModel;
 
-const WIRE_RESISTANCE = 1; // 1Ω TEMPORARY FIX TO AVOID DIVISION BY ZERO
+// Since it is assumed to have resistance, we can use a very low value
+const WIRE_RESISTANCE = 1; 
 
 export const createWireModel = (edge: CircuitEdge): WireModel => {
     return {
@@ -15,6 +16,15 @@ export const createWireModel = (edge: CircuitEdge): WireModel => {
     }
 }
 
+/**
+ * Applies a wire stamp to the conductance matrix by delegating to the resistor stamp function.
+ *
+ * @param conductanceMatrix - The matrix representing the conductance of the circuit.
+ * @param model - The wire model containing the properties of the wire to be stamped.
+ * @param nodeMap - A mapping of node identifiers to their corresponding indices in the matrix.
+ * @returns void
+ * @see {@link applyResistorStamp}
+ */
 export const applyWireStamp = (
     conductanceMatrix: Matrix,
     model: WireModel,

@@ -10,7 +10,7 @@ import IC74LS32 from '../assets/74LS32.svg';
 import IC74LS02 from '../assets/74LS02.svg';
 import IC74LS86 from '../assets/74LS86.svg';
 
-const componentImages = {
+const componentImages: Record<string, string> = {
     'led': LED,
     'breadboard': Breadboard,
     'resistor': Resistor,
@@ -30,6 +30,6 @@ const componentImages = {
  * @description - Returns the image associated with the sidebar component ID.
  * @returns {string | null} - The image URL or null if not found
  */
-export const getComponentImage = (sideBarID: keyof typeof componentImages) => {
+export const getComponentImage = (sideBarID: string) => {
     return componentImages[sideBarID] || null;
 }

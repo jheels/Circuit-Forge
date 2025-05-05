@@ -26,6 +26,21 @@ export interface AnalysisResult {
     error?: string;
 }
 
+/**
+ * Creates component models for a given circuit graph and its associated components.
+ *
+ * This function processes the circuit graph to generate models for each component
+ * and wire in the circuit. It also identifies and groups logic gates (IC gates)
+ * by their output nodes, creating specialized models for them. The resulting models
+ * are categorised into linear and non-linear models.
+ *
+ * @param circuitGraph - The graph representation of the circuit, containing nodes and edges.
+ * @param components - A record of component IDs mapped to their corresponding editor components.
+ * 
+ * @returns An object containing:
+ * - `models`: A record of all component models, keyed by their unique identifiers.
+ * - `nonLinearModels`: A record of non-linear component models, keyed by their unique identifiers.
+ */
 export const createComponentModels = (
     circuitGraph: CircuitGraph,
     components: Record<string, EditorComponent>
@@ -74,11 +89,8 @@ export const createComponentModels = (
         
         // Get a representative edge for the gate
         const representativeEdge = gateInfo.edges[0];
-        
-        // Get all input node IDs
         const inputNodeIds = gateInfo.edges.map(edge => edge.sourceId);
         
-        // Create a logic gate model
         const gateModel = createLogicGateModel(
             representativeEdge,
             inputNodeIds,
@@ -146,6 +158,16 @@ const roundVoltages = (voltages: Record<string, number>): Record<string, number>
     return roundedVoltages;
 }
 
+/**
+ * Updates the non-linear models in the circuit analysis state based on the current voltages
+ * and checks if all models have converged.
+ *
+ * @param state - The current analysis state containing voltages, models, and non-linear models.
+ * @param circuitGraph - The graph representation of the circuit, including edges and nodes.
+ * @returns An object containing:
+ * - `updatedState`: The updated analysis state with modified models and non-linear models.
+ * - `allModelsConverged`: A boolean indicating whether all non-linear models have converged.
+ */
 export const updateNonLinearModels = (
     state: AnalysisState,
     circuitGraph: CircuitGraph,
@@ -200,6 +222,24 @@ export const updateNonLinearModels = (
     }
 }
 
+
+/**
+ * Performs a single iteration of the DC analysis for a given circuit.
+ *
+ * @param state - The current analysis state, including voltages, models, and iteration count.
+ * @param circuitGraph - The circuit graph representing the electrical network to be analyzed.
+ * @returns The updated analysis state after performing the iteration, including updated voltages,
+ *          iteration count, convergence status, and any error encountered during the process.
+ *
+ * The function attempts to:
+ * 1. Copy the previous voltages from the current state.
+ * 2. Update the non-linear models in the circuit based on the current state.
+ * 3. Solve the circuit to compute new voltages.
+ * 4. Check for convergence of the voltages and models.
+ *
+ * If an error occurs during the iteration, it logs the error and returns an updated state
+ * with the iteration count incremented, convergence set to `false`, and an error message.
+ */
 export const performIteration = (
     state: AnalysisState,
     circuitGraph: CircuitGraph,
@@ -227,6 +267,23 @@ export const performIteration = (
     }
 }
 
+/**
+ * Performs a DC (Direct Current) analysis on a given circuit graph.
+ *
+ * @param circuitGraph - The graph representation of the circuit to analyse.
+ * @param components - A record of component IDs mapped to their corresponding editor components.
+ * @param previousAnalysis - (Optional) The result of a previous analysis to use for warm starting the analysis.
+ * @returns The result of the DC analysis, including success status, voltages, models, iterations, and any error encountered.
+ *
+ * The function attempts to solve the circuit using the provided graph and components. If a previous analysis result
+ * is provided and compatible, it uses the previous voltages and model states to warm start the analysis. Otherwise,
+ * it starts from scratch. The analysis iterates until convergence or until the maximum number of iterations is reached.
+ *
+ * If the circuit contains non-linear models, the function performs iterative analysis to achieve convergence.
+ * If convergence is not achieved within the maximum allowed iterations, the last stable state is returned.
+ *
+ * Errors encountered during the analysis are caught and returned in the result.
+ */
 export const performDCAnalysis = (
     circuitGraph: CircuitGraph,
     components: Record<string, EditorComponent>,
@@ -246,7 +303,6 @@ export const performDCAnalysis = (
         // Warm start: use previous voltages and model states if available and compatible
         if (previousAnalysis && previousAnalysis.success) {
             state.voltages = { ...previousAnalysis.voltages };
-            // Optionally, copy over lastOutputVoltage/lastInputVoltages for non-linear models
             Object.entries(state.nonLinearModels).forEach(([id, model]) => {
                 const prevModel = previousAnalysis.models[id];
                 if (prevModel) {
@@ -261,7 +317,6 @@ export const performDCAnalysis = (
             });
         } else {
             console.log('No previous analysis found, starting from scratch.');
-            // Cold start: solve from scratch
             state.voltages = solveCircuit(circuitGraph, state.models);
         }
 
@@ -279,7 +334,7 @@ export const performDCAnalysis = (
 
         while (!state.converged && state.iteration < MAX_ITERATIONS) {
             const prevVoltages = { ...state.voltages };
-            state = performIteration(state, circuitGraph, previousAnalysis);
+            state = performIteration(state, circuitGraph);
 
             if (checkConvergence(prevVoltages, state.voltages)) {
                 lastStableVoltages = { ...state.voltages };

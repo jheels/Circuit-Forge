@@ -103,9 +103,14 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         setSelectedWire(null);
-        setSelectedComponent((prevSelectedComponent: string | null) =>
-            prevSelectedComponent === componentID ? null : componentID
-        );
+        const selectedComponentID = (prevSelectedComponent: string | null) => {
+            if (prevSelectedComponent === componentID) {
+                return null;
+            }
+            return componentID;
+        };
+        if (!selectedComponentID)
+        setSelectedComponent(selectedComponentID);
     }, [componentID, setSelectedComponent, setSelectedWire]);
 
     const handleWireEscape = useCallback((e: KeyboardEvent) => {

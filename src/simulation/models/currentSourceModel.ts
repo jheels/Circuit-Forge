@@ -16,6 +16,18 @@ export const createCurrentSourceModel = (current: number, edge: CircuitEdge): Cu
     }
 }
 
+/**
+ * Applies the current source stamp to the input sources vector for circuit simulation.
+ * This function modifies the `inputSourcesVector` to account for the current source
+ * defined in the `model`, based on the node mapping provided in `nodeMap`.
+ *
+ * @param inputSourcesVector - The matrix representing the input sources vector
+ *                             in the circuit simulation.
+ * @param model - The current source model containing the current value and the
+ *                edge information (source and target nodes).
+ * @param nodeMap - A mapping of node IDs to their corresponding indices in the
+ *                  simulation matrix.
+ */
 export const applyCurrentSourceStamp = (
     inputSourcesVector: Matrix,
     model: CurrentSourceModel,
