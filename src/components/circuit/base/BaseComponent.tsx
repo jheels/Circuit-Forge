@@ -35,6 +35,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         connections,
         wires,
         hoveredConnectorID,
+        selectedComponent,
         creatingWire,
         componentElectricalValues,
         updateComponent,
@@ -103,13 +104,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         setSelectedWire(null);
-        const selectedComponentID = (prevSelectedComponent: string | null) => {
-            if (prevSelectedComponent === componentID) {
-                return null;
-            }
-            return componentID;
-        };
-        if (!selectedComponentID)
+        const selectedComponentID = componentID === selectedComponent ? null : componentID;
         setSelectedComponent(selectedComponentID);
     }, [componentID, setSelectedComponent, setSelectedWire]);
 
