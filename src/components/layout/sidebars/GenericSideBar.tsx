@@ -14,6 +14,14 @@ interface GenericSideBarProps {
     showImportChipDialog: boolean;
 }
 
+/**
+ * 
+ * @param {SidebarComponent} component - The component to be displayed
+ * @description - A draggable component that represents a sidebar component.
+ * It uses react-dnd for drag-and-drop functionality.
+ * The component displays an image and a name, and it can be dragged to the main area of the application.
+ * @returns {JSX.Element} - The DraggableComponent
+ */
 const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'COMPONENT',
@@ -32,8 +40,8 @@ const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
             title={component.name}
         >
             {graphic ? (
-                <img  src={graphic} alt={component.name} className="w-full aspect-square rounded-md flex items-center justify-center mb-2" />
-            ) : (
+                <img src={graphic} alt={component.name} className="w-full aspect-square rounded-md flex items-center justify-center mb-2" />
+            ) : ( // Fallback for when the image is not available
                 <div className="w-full aspect-square bg-gray-300 rounded-md flex items-center justify-center mb-2"></div>
             )}
 
@@ -44,6 +52,14 @@ const DraggableComponent = ({ component }: { component: SidebarComponent }) => {
     );
 };
 
+/**
+ * @param components - Array of SidebarComponent objects to be displayed in the sidebar
+ * @param showImportChipDialog - Boolean to control the visibility of the import chip dialog
+ * @description - A generic sidebar component that displays a list of components.
+ * It includes a search bar to filter components and an optional import chip dialog.
+ * The sidebar can be toggled open and closed, and it uses the UIContext for state management.
+ * @returns {JSX.Element} - The GenericSideBar component
+ */
 export function GenericSideBar({ components, showImportChipDialog }: GenericSideBarProps) {
     const { isSideBarOpen, toggleSidebar } = useUIContext();
     const [searchTerm, setSearchTerm] = useState('');
@@ -63,6 +79,7 @@ export function GenericSideBar({ components, showImportChipDialog }: GenericSide
     };
 
     return (
+        // Toggle button
         <div data-testid="sidebar" className={`relative h-full bg-gray-200 ${isSideBarOpen ? 'w-1/5' : 'w-3'} flex-shrink-0`}>
             <button
                 onClick={toggleSidebar}

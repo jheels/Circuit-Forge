@@ -10,11 +10,11 @@ import { Resistor } from '../circuit/passive/Resistor';
 import { PowerSupply } from '../circuit/active/PowerSupply';
 import { Wire } from '../circuit/passive/Wire';
 import { findConnectorIDAtPoint, sendErrorToast, sendSuccessToast } from '@/lib/utils';
-import Konva from 'konva';
 import { Breadboard } from '../circuit/board/Breadboard';
 import { useSimulationExecution } from '@/hooks/simulation/useSimulationExecution';
 import { DipSwitch } from '../circuit/passive/DIPSwitch';
 import { IC } from '../circuit/active/IC';
+import Konva from 'konva';
 
 interface CanvasProps {
     scale: number;
@@ -24,6 +24,17 @@ interface CanvasProps {
     stageRef: React.RefObject<Konva.Stage>;
 }
 
+/**
+ * 
+ * @param scale - The scale of the canvas
+ * @param position - The position of the canvas
+ * @param setPosition - Function to set the position of the canvas
+ * @param handleZoom - Function to handle zooming in and out
+ * @param stageRef - Ref to the Konva stage
+ * @description - A canvas component that contains the circuit components and wires.
+ * It uses react-konva for rendering and react-dnd for drag and drop functionality.
+ * @returns 
+ */
 export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, handleZoom, stageRef }) => {
     const { isSideBarOpen } = useUIContext();
     const {
@@ -89,7 +100,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     });
-
+    // separete hook to resize when sidebar is open
     useEffect(() => {
         handleResize();
     }, [isSideBarOpen]);
@@ -141,7 +152,7 @@ export const Canvas: React.FC<CanvasProps> = ({ scale, position, setPosition, ha
 
     const renderedComponents = useMemo(() => {
         let breadboard = null;
-        const otherComponents = [];
+        const otherComponents : JSX.Element[] = [];
 
         Object.values(components).forEach((component) => {
             switch (component.type) {

@@ -8,9 +8,16 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
+/**
+ * 
+ * @param {Point} point - The point to check
+ * @param {Record<string, EditorComponent>} components - The components to check against
+ * @returns {string | null} - The ID of the connector if found, otherwise null
+ * @description - This function checks if a point is inside any connector of the components.
+ */
 export const findConnectorIDAtPoint = (point: Point, components: Record<string, EditorComponent>) => {
     let breadboard = null;
-    
+
     for (const component of Object.values(components)) {
         if (component.type === 'breadboard') {
             breadboard = component;
@@ -25,7 +32,7 @@ export const findConnectorIDAtPoint = (point: Point, components: Record<string, 
             }
         }
     }
-
+    // Check breadboard last to avoid interference with other components
     if (breadboard) {
         const { position, dimensions, connectors } = breadboard;
         for (const connectorKey in connectors) {
@@ -50,10 +57,10 @@ export const rotatePoint = (point: Point, origin: Point, angle: number): Point =
     const radians = (angle * Math.PI) / 180;
     const cos = Math.cos(radians);
     const sin = Math.sin(radians);
-    
+
     const dx = point.x - origin.x;
     const dy = point.y - origin.y;
-    
+
     return {
         x: origin.x + (dx * cos - dy * sin),
         y: origin.y + (dx * sin + dy * cos)
@@ -87,7 +94,7 @@ export const sendErrorToast = (message: string, id?: string) => {
         id: id,
         style: {
             background: '#FEE2E2',
-            color: '#991B1B', 
+            color: '#991B1B',
         },
     });
 }
@@ -96,7 +103,7 @@ export const sendWarningToast = (message: string, id?: string) => {
     toast(message, {
         icon: '⚠️',
         style: {
-            background: '#FEF3C7', 
+            background: '#FEF3C7',
             color: '#92400E',
         },
         id: id,

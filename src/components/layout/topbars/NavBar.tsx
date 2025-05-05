@@ -6,6 +6,11 @@ import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
 import { TooltipButton } from '@/components/ui/ToolTipButton';
 import { sendErrorToast } from '@/lib/utils';
 
+/**
+ * 
+ * @returns {JSX.Element} - The NavBar component
+ * @description - A navigation bar component that contains the application title, simulator, IC editor, and settings button.
+ */
 export function NavBar() {
     const { selectedTool, setSelectedTool } = useUIContext();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);

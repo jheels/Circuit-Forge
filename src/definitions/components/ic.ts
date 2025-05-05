@@ -132,6 +132,23 @@ const NOR_GATE_PIN_MAPPINGS: Record<number, ICPinDefinition> = {
     14: { type: 'positive', name: 'VCC' }
 };
 
+const MYSTERY_PIN_MAPPINGS: Record<number, ICPinDefinition> = {
+    1: { type: 'input', name: 'input 1A', gateIndex: 0, inputIndex: 0 },
+    2: { type: 'input', name: 'input 1B', gateIndex: 0, inputIndex: 1 },
+    3: { type: 'input', name: 'input 1C', gateIndex: 0, inputIndex: 2 },
+    4: { type: 'output', name: 'output 1', gateIndex: 0 },
+    5: { type: 'input', name: 'input 2A', gateIndex: 1, inputIndex: 0 },
+    6: { type: 'input', name: 'input 2B', gateIndex: 1, inputIndex: 1 },
+    7: { type: 'negative', name: 'ground' },
+    8: { type: 'input', name: 'input 2C', gateIndex: 1, inputIndex: 2 },
+    9: { type: 'output', name: 'output 2', gateIndex: 1 },
+    10: { type: 'input', name: 'input 3A', gateIndex: 2, inputIndex: 0 },
+    11: { type: 'input', name: 'input 3B', gateIndex: 2, inputIndex: 1 },
+    12: { type: 'input', name: 'input 3C', gateIndex: 2, inputIndex: 2 },
+    13: { type: 'output', name: 'output 3', gateIndex: 2 },
+    14: { type: 'positive', name: 'VCC' }
+};
+
 
 const IC_DEFINITIONS: Record<string, ICDefinition> = {
     '74LS00': {
@@ -187,6 +204,15 @@ const IC_DEFINITIONS: Record<string, ICDefinition> = {
         inputsPerGate: 2,
         outputsPerGate: 1,
         pinMappings: COMMON_PIN_MAPPINGS
+    },
+    'MYSTERY': {
+        icType: 'MYSTERY',
+        description: 'Mystery IC',
+        gateType: 'MYSTERY',
+        gateCount: 3,
+        inputsPerGate: 3,
+        outputsPerGate: 1,
+        pinMappings: MYSTERY_PIN_MAPPINGS
     }
 }
 
@@ -216,4 +242,8 @@ export const createQuadORGate = (position: Point, name: string): ICComponent => 
 
 export const createQuadXORGate = (position: Point, name: string): ICComponent => {
     return createICComponent(position, name, getICDefinition('74LS86'));
+}
+
+export const createMysteryIC = (position: Point, name: string): ICComponent => {
+    return createICComponent(position, name, getICDefinition('MYSTERY'));
 }

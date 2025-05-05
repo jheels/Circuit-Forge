@@ -63,6 +63,9 @@ export const evaluateLogicGate = (
         case 'NOT':
             outputState = !inputStates[0];
             break;
+        case 'MYSTERY':
+            outputState = !!(inputStates.reduce((acc, state) => acc ^ + state, 0));
+            break;
         default:
             outputState = false;
     }

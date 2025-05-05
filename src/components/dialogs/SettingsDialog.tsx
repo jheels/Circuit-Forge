@@ -10,6 +10,15 @@ import {
     DialogDescription
 } from '@/components/ui/dialog'
 
+/**
+ * 
+ * @param open - Boolean to control the visibility of the dialog
+ * @param onOpenChange - Function to handle the opening and closing of the dialog
+ * @description - A dialog component that allows users to change settings such as high contrast and voice over.
+ * It uses localStorage to persist the settings across sessions.
+ * @returns {JSX.Element} - The SettingsDialog component
+ * 
+ */
 export function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
     const [highContrast, setHighContrast] = useState(false)
     const [voiceOver, setVoiceOver] = useState(false)
@@ -39,6 +48,8 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean, onOpenCh
         onOpenChange(false);
     };
 
+    // Currently accessibility features are not implemented
+    // but the settings are saved in localStorage for future use
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">

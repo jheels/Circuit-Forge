@@ -11,6 +11,17 @@ interface ImportChipDialogProps {
     onImport: () => void;
 }
 
+/**
+ * 
+ * @param isOpen - Whether the dialog is open or not
+ * @param onOpenChange - Function to change the open state of the dialog
+ * @param selectedFile - The currently selected file
+ * @param onFileChange - Function to handle file change
+ * @param onImport - Function to handle import action
+ * @description A dialog component for importing chip files.
+ * @returns {JSX.Element} - The rendered ImportChipDialog component.
+ * @see https://ui.shadcn.com/docs/components/dialog
+ */
 export const ImportChipDialog: React.FC<ImportChipDialogProps> = ({ isOpen, onOpenChange, selectedFile, onFileChange, onImport }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 

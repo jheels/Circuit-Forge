@@ -6,11 +6,16 @@ import { isPointInConnector, getConnectorPosition, validateConnection } from '@/
 import { Connection, createAppropriateConnection, isWireConnection } from '@/definitions/connection';
 import { Point } from '@/definitions/general';
 import { findConnectorIDAtPoint, sendErrorToast, sendSuccessToast } from '@/lib/utils';
-
 import Konva from 'konva';
-import toast from 'react-hot-toast';
 
-
+/**
+ * 
+ * @param wireID wireID of the wire to be rendered
+ * @description Renders a wire on the canvas. The wire is represented by a line with two draggable points at each end.
+ * The wire can be selected, and its points can be dragged to connect to connectors on components.
+ * The wire can also be deleted by pressing the backspace key when it is selected.
+ * @returns {JSX.Element} - The rendered wire component.
+ */
 export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
     const {
         wires,
@@ -42,6 +47,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         document.body.style.cursor = 'default';
     }, []);
 
+    // Flip the wire selection state
     const handleClick = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         setSelectedWire((prevSelectedWire: string | null) =>
@@ -57,16 +63,19 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         }
     }, [removeWire, wireID, selectedWire, setSelectedWire]);
 
+    // Add event listener for keydown events for deleting wires
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
+    // Index is used for the start and end points of the wire
     const handlePointDragStart = useCallback((index: 0 | 1) => {
         setDraggingEnd({ index, oldPoint: wire.points[index] });
         document.body.style.cursor = 'grabbing';
     }, [wire.points]);
 
+    // During dragging, we want to update the wire point, which updates the preview
     const handlePointDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>, index: 0 | 1) => {
         const newPoints = [...wire.points];
         newPoints[index] = { x: e.target.x(), y: e.target.y() };
@@ -85,6 +94,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         const dropPoint = { x: e.target.x(), y: e.target.y() };
         let foundConnector = false;
 
+        // Check if it is an existing connection that is being modified
         const wireConnection = (Object.values(connections) as Connection[]).find(
             (connection) => isWireConnection(connection) && connection.metadata.wireID === wireID
         );
@@ -92,8 +102,9 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
         Object.values(components).forEach((component) => {
             if (foundConnector) return;
             const { connectors, position, dimensions } = component;
-            
+
             Object.values(connectors).forEach((connector) => {
+                // early returns
                 if (!isPointInConnector(dropPoint, connector, position, dimensions)) return;
                 const connectorConnection = getConnectorConnection(connector.id);
                 if (connectorConnection) {
@@ -112,7 +123,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     sendErrorToast('Invalid connection attempted');
                     return;
                 }
-
+                // update appropriate endpoint of the wire
                 if (index === 0) {
                     updateWire(wireID, { startConnector: connector, points: newPoints });
                     if (wireConnection) {
@@ -134,7 +145,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 return;
             });
         });
-
+        // Reset to the old point if no connector was found and no connection was made
         if (!foundConnector) {
             const newPoints = [...wire.points];
             newPoints[index] = draggingEnd.oldPoint;
@@ -151,6 +162,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                 onMouseLeave={handleMouseLeave}
                 onClick={handleClick}
             >
+                {/* Highlight the wire when hovered or selected */}
                 {(isHovered || selectedWire == wireID) && (
                     <Line
                         key={`${wireID}-hover`}
@@ -161,12 +173,14 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                         opacity={0.5}
                     />
                 )}
+                {/* wire outline */}
                 <Line
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"black"}
                     strokeWidth={1}
                     lineCap="round"
                 />
+                {/* wire body */}
                 <Line
                     points={wire.points.flatMap((point) => [point.x, point.y])}
                     stroke={"gray"}
@@ -174,6 +188,7 @@ export const Wire: React.FC<{ wireID: string }> = ({ wireID }) => {
                     lineCap="round"
                 />
             </Group>
+            {/* Render the points at the ends of the wire */}
             {selectedWire === wireID && wire.points.map((point, index) => (
                 <Circle
                     key={`${wireID}-point-${index}`}

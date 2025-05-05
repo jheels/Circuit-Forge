@@ -24,6 +24,12 @@ const componentImages = {
     '74LS86': IC74LS86
 }
 
-export const getComponentImage = (sideBarID: string) => {
+/**
+ * 
+ * @param sideBarID - The ID of the sidebar component
+ * @description - Returns the image associated with the sidebar component ID.
+ * @returns {string | null} - The image URL or null if not found
+ */
+export const getComponentImage = (sideBarID: keyof typeof componentImages) => {
     return componentImages[sideBarID] || null;
 }

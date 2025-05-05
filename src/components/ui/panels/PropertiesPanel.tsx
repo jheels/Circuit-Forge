@@ -8,6 +8,14 @@ import { PropertyField } from '@/components/ui/panels/PropertyField';
 import { getComponentProperties } from '@/definitions/properties';
 import { PropertyValue } from '@/definitions/properties';
 
+/**
+ * 
+ * @returns {JSX.Element} - The PropertiesPanel component
+ * @description - A properties panel that displays the properties of the selected component in the simulator.
+ * It allows users to edit the properties and validates the input.
+ * The panel is displayed on the right side of the simulator.
+ * It uses the SimulatorContext to get the selected component and its properties.
+ */
 export const PropertiesPanel: React.FC = () => {
     const { 
         components,     

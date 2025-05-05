@@ -1,19 +1,33 @@
-import React from 'react';
 import { Circle, Line, Rect, Shape } from 'react-konva';
 import { LEDComponent } from '@/definitions/components/led';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
 import { ComponentProps } from '@/definitions/general';
+import React from 'react';
 
+/**
+ *  
+ * @param baseColor - Colour to render LED.
+ * @param opacity - How visible the colour should be
+ * @returns {string} RGB colour code with opacity added
+ */
 export const getColorWithOpacity = (baseColor: string, opacity: number = 1): string => {
     if (baseColor === 'red') return `rgba(255, 0, 0, ${opacity})`;
     if (baseColor === 'green') return `rgba(0, 255, 0, ${opacity})`;
     if (baseColor === 'blue') return `rgba(0, 0, 255, ${opacity})`;
     if (baseColor === 'yellow') return `rgba(255, 255, 0, ${opacity})`;
-    
+
     return `${baseColor} is not supported`;
 };
 
+/**
+ * 
+ * @param componentID The ID of the component to be rendered. Used to fetch the component from the simulator context.
+ * @returns {JSX.Element} Konva component representing the LED.
+ * @description This component renders a light-emitting diode (LED) with various states based on current.
+ * @see BaseComponent
+ * @see SimulatorContext
+ */
 export const LED: React.FC<ComponentProps> = ({
     componentID,
 }) => {
@@ -29,7 +43,7 @@ export const LED: React.FC<ComponentProps> = ({
     const isWarning = current > 0.025 && current <= 0.04; // 25mA to 40mA
     const hasFailed = current > 0.04; // Over 40mA
 
-    let bodyOpacity = 0.4; // Base opacity for unconnected state
+    let bodyOpacity = 0.4;
     if (isBarelyLit) {
         bodyOpacity = 0.5 + (current - 0.0005) * (0.2 / 0.0045); // 50% to 70%
     } else if (isNormal) {
@@ -42,12 +56,17 @@ export const LED: React.FC<ComponentProps> = ({
 
     const bodyColour = hasFailed ? 'black' : properties.colour;
 
+    /**
+     * 
+     * @returns {JSX.Element} Glow effect rendered as a circle.
+     * @description Renders a glow effect around the LED based on current.
+     */
     const renderGlowEffect = () => {
         if (hasFailed || isUnconnected) return null;
 
         const intensityFactor = Math.min(1, (current - 0.0005) / 0.025);
         const glowRadius = dimensions.width / 2 + (dimensions.width / 4) * intensityFactor;
-        const glowOpacity = 0.05 + intensityFactor; // More subtle glow
+        const glowOpacity = 0.05 + intensityFactor;
 
         return (
             <Circle
@@ -63,35 +82,37 @@ export const LED: React.FC<ComponentProps> = ({
                     0.3, getColorWithOpacity(properties.colour as string, 0.3 * glowOpacity),
                     1, getColorWithOpacity(properties.colour as string, 0)
                 ]}
-                listening={false}
+                listening={false} // Prevent interferences with any connectors around it
             />
         );
     }
 
+    /**
+     * 
+     * @returns {JSX.Element} Series of Konva Line objects representing cracks.
+     * @description Renders cracks on the LED when it has failed.
+     */
     const renderCrackedEffect = () => {
         if (!hasFailed) return null;
 
         const crackPaths = [
-            // Main crack from top to bottom
             [
                 dimensions.width / 2, 0,
                 dimensions.width / 2 - dimensions.width / 8, dimensions.height / 10,
                 dimensions.width / 2 + dimensions.width / 12, dimensions.height / 5,
                 dimensions.width / 2 - dimensions.width / 10, dimensions.height / 3
             ],
-            // Branching crack to the left
             [
                 dimensions.width / 2 - dimensions.width / 8, dimensions.height / 10,
                 dimensions.width / 4, dimensions.height / 8,
                 dimensions.width / 8, dimensions.height / 6
             ],
-            // Small branching crack to the right
             [
                 dimensions.width / 2 + dimensions.width / 12, dimensions.height / 5,
                 dimensions.width / 2 + dimensions.width / 6, dimensions.height / 5 + dimensions.height / 12
             ]
         ];
-        
+
         return crackPaths.map((points, i) => (
             <Line
                 x={-5.5}
@@ -112,7 +133,7 @@ export const LED: React.FC<ComponentProps> = ({
         >
             {/* Glow effect (behind everything) */}
             {renderGlowEffect()}
-            
+
             {/* LED Leads */}
             <Line
                 points={[
@@ -142,19 +163,18 @@ export const LED: React.FC<ComponentProps> = ({
                 strokeWidth={1}
                 lineCap="round"
             />
-            
+
             {/* LED Body */}
             <Shape
                 sceneFunc={(context, shape) => {
                     context.beginPath();
-                    // Draw the arc
                     context.arc(
                         0.5,
                         0,
                         dimensions.width / 4 + 0.5, // radius of the semicircle
                         Math.PI, // start angle
                         0, // end angle (ends at 0)
-                        false // counterclockwise drawing
+                        false
                     );
                     // Draw the rectangle
                     context.lineTo(dimensions.width / 4 + 1, 0);
@@ -167,7 +187,7 @@ export const LED: React.FC<ComponentProps> = ({
                 fill={bodyColour as string}
                 opacity={bodyOpacity}
             />
-
+            {/* LED Bottom */}
             <Rect
                 x={-dimensions.width / 4}
                 y={dimensions.height / 4 - 0.1}
@@ -176,7 +196,7 @@ export const LED: React.FC<ComponentProps> = ({
                 fill={bodyColour as string}
                 opacity={bodyOpacity}
             />
-            
+
             {/* Cracks (for failed state) */}
             {renderCrackedEffect()}
         </BaseComponent>

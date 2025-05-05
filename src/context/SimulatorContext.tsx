@@ -7,7 +7,7 @@ import { createBreadboardComponent } from "@/definitions/components/breadboard";
 import { Connector } from "@/definitions/connector";
 import { Connection, isWireConnection } from "@/definitions/connection";
 import { createDIPSwitchComponent } from "@/definitions/components/dipswitch";
-import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate } from "@/definitions/components/ic";
+import { createHexInverter, createQuadNANDGate, createQuadANDGate, createQuadORGate, createQuadNORGate, createQuadXORGate, createMysteryIC } from "@/definitions/components/ic";
 import { sendErrorToast, sendSuccessToast } from "@/lib/utils";
 
 export interface SimulatorContextType {
@@ -210,7 +210,8 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
                 return createQuadNORGate(position, name);
             case '74LS86':
                 return createQuadXORGate(position, name);
-
+            case 'MYSTERY':
+                return createMysteryIC(position, name);
             default:
                 throw new Error(`Invalid component type: ${type}`);
         }

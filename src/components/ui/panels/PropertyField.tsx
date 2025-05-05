@@ -26,6 +26,17 @@ const validateValue = (definition: PropertyDefinition, value: PropertyValue): bo
     return true;
 };
 
+/**
+ * 
+ * @param {PropertyFieldProps} props - The properties for the PropertyField component
+ * @param {PropertyDefinition} props.definition - The property definition
+ * @param {PropertyValue} props.value - The current value of the property
+ * @param {(value: PropertyValue) => void} props.onChange - The function to call when the value changes
+ * @param {(error: string) => void} [props.onValidationError] - The function to call when there is a validation error
+ * @description - A component that renders a property field based on the property definition.
+ * It supports text, number, boolean, and select properties.
+ * @returns {JSX.Element | null} - The rendered property field if the property is editable, otherwise null
+ */
 export const PropertyField: React.FC<PropertyFieldProps> = ({
     definition,
     value,

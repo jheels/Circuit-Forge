@@ -8,7 +8,15 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 10;
 const SCALE_BY = 1.05;
 
-export const Editor: React.FC<{stageRef: React.RefObject<Konva.Stage>}> = ({stageRef}) => {
+/**
+ * 
+ * @param { stageRef } - A reference to the Konva stage
+ * @description - The Editor component is the main component of the simulator. It contains the toolbar, canvas, and sidebar.
+ * It handles zooming in and out of the canvas using the mouse wheel and buttons.
+ * It also handles resetting the zoom level and position of the canvas.
+ * @returns {JSX.Element} - The Editor component
+ */
+export const Editor: React.FC<{ stageRef: React.RefObject<Konva.Stage> }> = ({ stageRef }) => {
     const [scale, setScale] = useState<number>(5);
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 

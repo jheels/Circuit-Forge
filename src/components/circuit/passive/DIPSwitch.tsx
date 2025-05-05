@@ -3,13 +3,17 @@ import { DIPSwitchComponent } from "@/definitions/components/dipswitch";
 import { BaseComponent } from "../base/BaseComponent";
 import { Rect, Group, Text } from "react-konva";
 import { ComponentProps } from "@/definitions/general";
-
 import Konva from "konva";
 
+/**
+ * 
+ * @param componentID - The ID of the component to be rendered.
+ * @returns {JSX.Element} - The rendered DIP switch component.
+ */
 export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
     const { components, selectedComponent, updateComponent } = useSimulatorContext();
     const component = components[componentID] as DIPSwitchComponent;
-    
+
     if (!component) {
         console.error(`Component with ID ${componentID} not found.`);
         return null;
@@ -24,15 +28,18 @@ export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
     const sliderOffsetY = 0.5;
     const sliderSpacingY = 5;
 
+    // flip the switch state based on the current state
     const handleToggle = (index: number, e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         const newSwitchStates = [...switchStates];
         newSwitchStates[index] = !newSwitchStates[index];
+        // update the component mode
         updateComponent(componentID, { ...component, switchStates: newSwitchStates } as Partial<DIPSwitchComponent>);
     };
 
     return (
         <BaseComponent componentID={componentID}>
+            {/* Draw the body of the DIP switch */}
             <Rect
                 width={dimensions.width}
                 height={dimensions.height}
@@ -41,6 +48,7 @@ export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
                 strokeEnabled={selectedComponent === componentID}
                 strokeWidth={0.25}
             />
+
             <Text
                 x={dimensions.width}
                 text="ON"
@@ -49,11 +57,12 @@ export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
                 fill="white"
                 rotation={90}
             />
+            {/* create toggle switches with switch number below it */}
             {Array.from({ length: switchStates.length }).map((_, index) => (
                 <Group key={index}>
                     <Text
                         x={sliderHeight - 0.5}
-                        y={index * sliderSpacingY + sliderOffsetY + 4/3}
+                        y={index * sliderSpacingY + sliderOffsetY + 4 / 3}
                         text={`${index + 1}`}
                         fontSize={2.5}
                         fill="white"
@@ -73,8 +82,9 @@ export const DipSwitch: React.FC<ComponentProps> = ({ componentID }) => {
                             strokeWidth={0.25}
                             onClick={(event) => handleToggle(index, event)}
                         />
+                        {/* change button position based on current state */}
                         <Rect
-                            x={switchStates[index] ? sliderWidth + sliderOffsetX -  sliderHeight : sliderOffsetX}
+                            x={switchStates[index] ? sliderWidth + sliderOffsetX - sliderHeight : sliderOffsetX}
                             y={index * sliderSpacingY + sliderOffsetY}
                             width={sliderHeight}
                             height={sliderHeight}

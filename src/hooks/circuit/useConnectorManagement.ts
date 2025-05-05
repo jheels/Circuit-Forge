@@ -8,7 +8,6 @@ import { EditorComponent, Point, Wire } from '@/definitions/general';
 import { Connector, getConnectorPosition } from '@/definitions/connector';
 import { Connection, createAppropriateConnection } from '@/definitions/connection';
 import { ConnectorPair, SnapState } from './ui/useSnapManagement';
-import toast from 'react-hot-toast';
 import { sendErrorToast } from '@/lib/utils';
 
 export const useConnectorManagement = (

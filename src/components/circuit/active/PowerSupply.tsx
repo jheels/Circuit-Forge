@@ -5,6 +5,14 @@ import { useSimulatorContext } from '@/context/SimulatorContext';
 import { BaseComponent } from '../base/BaseComponent';
 import { ComponentProps } from '@/definitions/general';
 
+/**
+ * 
+ * @param componentID component ID to retrieve properties from SimulatorContext.
+ * @returns {JSX.Element} Konva component representing the Power Supply.
+ * @description Power Supply graphic displaying current and voltage.
+ * @see BaseComponent
+ * @see SimulatorContext
+ */
 export const PowerSupply: React.FC<ComponentProps> = ({
     componentID,
 }) => {
@@ -18,24 +26,21 @@ export const PowerSupply: React.FC<ComponentProps> = ({
 
     const { dimensions } = component;
     const electricalValues = componentElectricalValues[componentID]?.[0] || { voltage: 0, current: 0 };
-    
-    // Format values for display
+
+    // Format values for display (prevent overflow)
     const voltage = component.properties.voltage as number || 0;
     const currentValue = Math.abs(electricalValues.current || 0);
-    const currentDisplay = currentValue < 1 
-        ? `${(currentValue * 1000).toFixed(2)}mA` 
+    const currentDisplay = currentValue < 1
+        ? `${(currentValue * 1000).toFixed(2)}mA`
         : `${currentValue.toFixed(2)}A`;
 
-    // Define dimensions for a larger power supply
     const width = dimensions.width;
     const height = dimensions.height;
-    
-    // Define display areas
     const displayWidth = width * 0.85;
     const displayHeight = height * 0.3;
     const displayMarginTop = height * 0.1;
     const displayMarginLeft = width * 0.075;
-    
+
     return (
         <BaseComponent
             componentID={componentID}
@@ -87,22 +92,23 @@ export const PowerSupply: React.FC<ComponentProps> = ({
                 fontFamily="Arial"
                 fill="#333333"
             />
-        <Circle
-            x={5/12 * width}
-            y={height - 2}
-            radius={1.25}
-            fill="#99ccff"
-            stroke="gray"
-            strokeWidth={0.25}  
-        />
-        <Circle
-            x={width * 7/12}
-            y={height - 2}
-            radius={1.25}
-            fill="#ff9999"
-            stroke="gray"
-            strokeWidth={0.25}
-        />
+            {/* Power and Ground connector displays (no legs) */}
+            <Circle
+                x={5 / 12 * width}
+                y={height - 2}
+                radius={1.25}
+                fill="#99ccff"
+                stroke="gray"
+                strokeWidth={0.25}
+            />
+            <Circle
+                x={width * 7 / 12}
+                y={height - 2}
+                radius={1.25}
+                fill="#ff9999"
+                stroke="gray"
+                strokeWidth={0.25}
+            />
         </BaseComponent>
     );
 };

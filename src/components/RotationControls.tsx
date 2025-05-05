@@ -1,12 +1,18 @@
-/**
- * Need to add rotation updates for snaps or something.
- */
 import { RotateCcw, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSimulatorContext } from '@/context/SimulatorContext';
 import { rotatePoint } from '@/lib/utils';
 import { updateWirePositions } from '@/hooks/ui/useWireUpdates';
+import { Connector } from '@/definitions/connector';
 
+/**
+ * 
+ * @returns {JSX.Element} - The RotationControls component
+ * @description - A component that provides rotation controls for the selected component in the simulator.
+ * It allows users to rotate the component clockwise or anticlockwise.
+ * The component uses the SimulatorContext to get the selected component and its properties.
+ * It also updates the wire positions based on the new rotation of the component.
+ */
 export const RotationControls = () => {
     const { 
         selectedComponent, 
@@ -22,14 +28,15 @@ export const RotationControls = () => {
 
     const component = components[selectedComponent];
 
+    // Disable rotation for breadboard and IC components
     if (component.type === 'breadboard' || component.type === 'ic') return null;
 
     const handleRotate = (direction: 'clockwise' | 'anticlockwise') => {
         const currentRotation = component.rotation || 0;
         const rotationChange = direction === 'clockwise' ? 90 : -90;
         const newRotation = (currentRotation + rotationChange + 360) % 360;
-
-        const updatedConnectors = Object.values(component.connectors).reduce((acc, connector) => {
+        // Update the component's rotation and connectors
+        const updatedConnectors = Object.values(component.connectors).reduce((acc: Record<string, Connector>, connector) => {
             const x = connector.offset.x * component.dimensions.width + component.position.x;
             const y = connector.offset.y * component.dimensions.height + component.position.y;
             const rotatedPoint = rotatePoint({ x, y }, component.position, rotationChange);
@@ -43,7 +50,7 @@ export const RotationControls = () => {
             };
             return acc;
         }, {});
-
+        
         updateComponent(selectedComponent, {
             rotation: newRotation,
             connectors: updatedConnectors,

@@ -6,7 +6,6 @@ import { useWireUpdates } from '@/hooks/ui/useWireUpdates';
 import { useConnectorManagement } from '@/hooks/circuit/useConnectorManagement';
 import { getInteractionRegion } from '@/definitions/connector';
 import { ComponentTooltip } from '@/components/ComponentTooltip';
-
 import Konva from 'konva';
 
 const ORIGIN = { x: 0, y: 0 };
@@ -17,11 +16,20 @@ interface BaseComponentProps {
     draggable?: boolean;
 }
 
+/**
+ * 
+ * @param componentID Component ID to retrieve properties from SimulatorContext
+ * @param children React elements to compose with
+ * @param draggable Whether the component should be draggable once placed
+ * @returns {JSX.Element} Wrapper component for component graphics to get their features from.
+ * @see SimulatorContext
+ */
 export const BaseComponent: React.FC<BaseComponentProps> = ({
     componentID,
     children,
     draggable = true,
 }) => {
+    // Get necessary states and functions from central store.
     const {
         components,
         connections,
@@ -48,6 +56,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
     const component = components[componentID];
     const { position, connectors, dimensions, rotation = 0 } = component;
 
+    // Get functions returned from hooks
     const updateWirePositions = useWireUpdates(
         connectors,
         dimensions,
@@ -90,6 +99,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         getConnectorConnection
     );
 
+    // Clicking a component sets to the opposite state
     const handleSelection = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
         e.cancelBubble = true;
         setSelectedWire(null);
@@ -126,7 +136,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         if (!hoveredConnector) return null;
 
         const region = getInteractionRegion(hoveredConnector, ORIGIN, dimensions);
-
+        // returns the connector that is being hovered over (only one at a time)
         return (
             <Rect
                 key={hoveredConnectorID}
@@ -147,6 +157,7 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
         );
     }, [hoveredConnectorID, connectors, dimensions, handleConnectorClick]);
 
+    // Returns the wrapper with common functionality 
     return (
         <Group
             draggable={draggable && !creatingWire}
@@ -158,10 +169,12 @@ export const BaseComponent: React.FC<BaseComponentProps> = ({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            {/* All graphics should rotate too */}
             <Group rotation={rotation}>
                 {children}
             </Group>
             {renderedConnectors}
+            {/* breadboard wouldn't need a tooltip and PS shows it in the graphic */}
             {(component.type !== 'breadboard' && component.type !== 'power-supply') && (
                 <ComponentTooltip
                     componentId={componentID}

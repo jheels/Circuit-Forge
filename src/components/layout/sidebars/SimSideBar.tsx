@@ -1,5 +1,5 @@
 import { GenericSideBar } from './GenericSideBar';
-import { SidebarComponent } from '@/definitions/general'; // Adjust the import path as needed
+import { SidebarComponent } from '@/definitions/general';
 
 const simulatorComponents: SidebarComponent[] = [
     {
@@ -27,7 +27,6 @@ const simulatorComponents: SidebarComponent[] = [
         name: 'Dip Switch x8',
         description: 'A collection of 8 toggle switches with two positions each.'
     },
-    // New IC components
     {
         sidebarID: '74LS04',
         name: '74LS04 Hex Inverter',
@@ -57,9 +56,20 @@ const simulatorComponents: SidebarComponent[] = [
         sidebarID: '74LS86',
         name: '74LS86 Quad XOR',
         description: 'Contains four independent 2-input XOR gates.'
+    },
+    {
+        sidebarID: 'MYSTERY',
+        name: 'Mystery IC',
+        description: 'A mystery IC with unknown functionality.'
     }
 ];
 
+/**
+ * 
+ * @returns {JSX.Element} - The SimSideBar component
+ * @description - A sidebar component for the simulator that contains various components such as breadboard, resistors, LEDs, and more.
+ * Applies composition with the GenericSideBar component.
+ */
 export function SimSideBar() {
     return <GenericSideBar components={simulatorComponents} showImportChipDialog={true} />;
 }

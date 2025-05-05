@@ -36,7 +36,13 @@ interface ToolBarProps {
     onZoomReset: () => void;
 }
 
-// Save status indicator component
+/**
+ * 
+ * @returns {JSX.Element} - The SaveIndicator component
+ * @description - A component that displays the save status of the project.
+ * If there are unsaved changes, it shows "Unsaved changes" in yellow.
+ * If the project is saved, it shows the last saved time in green.
+ */
 const SaveIndicator: React.FC = () => {
     const { hasUnsavedChanges, currentProject } = useSaveContext();
 
@@ -76,6 +82,9 @@ function ToolBarDropdown({ label, items }: ToolBarDropdownProps) {
     )
 }
 
+// Custom hook to prevent page unload if there are unsaved changes
+// This hook adds an event listener to the window's beforeunload event
+// and prevents the default action if there are unsaved changes
 const usePreventUnloadWithUnsavedChanges = (hasUnsavedChanges: boolean) => {
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -92,9 +101,36 @@ const usePreventUnloadWithUnsavedChanges = (hasUnsavedChanges: boolean) => {
     }, [hasUnsavedChanges]);
 };
 
+/**
+ * 
+ * @param {onZoomIn} - Function to handle zoom in
+ * @param {onZoomOut} - Function to handle zoom out
+ * @param {onZoomReset} - Function to handle zoom reset
+ * @description - A toolbar component that contains the project name, save indicator, and menu items.
+ * It uses the Menubar component to create a menu bar with dropdowns for File, Edit, View, and Help.
+ * The toolbar also includes a save indicator and a project name input field.
+ * @returns {JSX.Element} - The ToolBar component
+ * @see https://ui.shadcn.com/docs/components/menubar
+ */
 export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
-    const { projectName, setProjectName, resetProject, selectedComponent, clipboardComponent, copySelectedComponent, cutSelectedComponent, pasteClipboardComponent } = useSimulatorContext();
-    const { saveProject, exportProjectAsImage, loadProject, hasUnsavedChanges, currentFileHandle, setCurrentFileHandle } = useSaveContext();
+    const {
+        projectName,
+        setProjectName,
+        resetProject,
+        selectedComponent,
+        clipboardComponent,
+        copySelectedComponent,
+        cutSelectedComponent,
+        pasteClipboardComponent,
+    } = useSimulatorContext();
+    const {
+        saveProject,
+        exportProjectAsImage,
+        loadProject,
+        hasUnsavedChanges,
+        currentFileHandle,
+        setCurrentFileHandle,
+    } = useSaveContext();
     const [previousProjectName, setPreviousProjectName] = useState(projectName)
     const [isEditingName, setIsEditingName] = useState(false)
     const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false)
@@ -151,6 +187,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         setIsAlertDialogOpen(false)
     }
 
+    // unifies save and save as logic
     const handleSaveLogic = useCallback(async (isSaveAs: boolean) => {
         try {
             const result = await saveProject(isSaveAs);
@@ -190,15 +227,17 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         await exportProjectAsImage();
     }, [exportProjectAsImage]);
 
-
+    // Handle keyboard shortcuts
+    // This effect listens for keydown events and triggers the corresponding actions
+    // based on the pressed keys and modifiers (like metaKey for Command/Ctrl)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.metaKey) {
                 switch (e.key.toLowerCase()) {
                     case 'n':
                         if (e.shiftKey) {
-                        e.preventDefault();
-                        handleNewProject();
+                            e.preventDefault();
+                            handleNewProject();
                         }
                         break;
                     case 'l':
@@ -259,6 +298,8 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
         };
     }, [handleNewProject, handleLoadProject, handleSaveAs, handleSave, handleExportAsImage, onDocumentationClick, onZoomIn, onZoomOut, onZoomReset, hasUnsavedChanges, currentFileHandle, selectedComponent, cutSelectedComponent, copySelectedComponent, clipboardComponent, pasteClipboardComponent]);
 
+    // Structure the menu items for the Menubar
+    // Each menu item can have sub-items, shortcuts, and separators
     const menuItems = [
         {
             label: "File",
@@ -267,7 +308,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                 { label: "Load Project", shortcut: shortcutSymbol + "L", onClick: handleLoadProject },
                 { isSeparator: true },
                 { label: "Save", shortcut: shortcutSymbol + "S", onClick: handleSave, disabled: !hasUnsavedChanges || !currentFileHandle },
-                { label: "Save As", shortcut: shortcutSymbol+ "⇧S", onClick: handleSaveAs },
+                { label: "Save As", shortcut: shortcutSymbol + "⇧S", onClick: handleSaveAs },
                 { isSeparator: true },
                 { label: "Export as PNG", shortcut: shortcutSymbol + "E", onClick: handleExportAsImage },
             ],
@@ -310,6 +351,7 @@ export function ToolBar({ onZoomIn, onZoomOut, onZoomReset }: ToolBarProps) {
                     <ToolBarDropdown key={index} label={menu.label} items={menu.items} />
                 ))}
             </Menubar>
+            {/* show component rotation when selected */}
             <RotationControls />
             <div className="flex items-center space-x-4 pr-3">
                 <SaveIndicator />

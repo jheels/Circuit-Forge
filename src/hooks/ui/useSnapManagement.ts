@@ -10,7 +10,6 @@ import { Point, EditorComponent } from '@/definitions/general';
 import { Connector, getConnectorPosition, SNAPPING_THRESHOLD, BREAKAWAY_THRESHOLD, validateConnection } from '@/definitions/connector';
 import { calculateDistance, sendErrorToast } from '@/lib/utils';
 import Konva from 'konva';
-import toast from 'react-hot-toast';
 
 export interface SnapState {
     isSnapped: boolean;
