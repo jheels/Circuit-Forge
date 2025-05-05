@@ -21,6 +21,13 @@ export interface PowerSupplyComponent extends EditorComponent {
     readonly type: "power-supply";
 }
 
+/**
+ * Creates a power supply component with specified position and name.
+ *
+ * @param position - The position of the power supply component on the canvas.
+ * @param name - The name of the power supply component.
+ * @returns A `PowerSupplyComponent` object representing the power supply with its properties, connectors, and dimensions.
+ */
 export const createPowerSupplyComponent = (position: Point, name: string): PowerSupplyComponent => {
     const editorID = `PowerSupply-${uuidv4()}`;
     const groundConnector = createConnector(editorID, 'negative', { x: 5/12, y: 14/15 });

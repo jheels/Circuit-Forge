@@ -13,7 +13,6 @@ interface ICPinDefinition {
     name: string
     gateIndex?: number
     inputIndex?: number
-    // no output index as only 1 output for now
 }
 
 export interface ICDefinition {
@@ -26,6 +25,16 @@ export interface ICDefinition {
     pinMappings: Record<number, ICPinDefinition>
 }
 
+/**
+ * Creates an Integrated Circuit (IC) component with the specified position, name, and definition.
+ *
+ * @param position - The position of the IC component on the canvas, represented as a `Point` object.
+ * @param name - The name of the IC component.
+ * @param definition - The definition of the IC, including its type and pin mappings.
+ * @returns An `ICComponent` object representing the created IC component.
+ * Each connector is associated with
+ * metadata such as pin number, gate index, and input index.
+ */
 export const createICComponent = (
     position: Point,
     name: string,
@@ -80,7 +89,7 @@ export const createICComponent = (
         connectors
     }
 }
-
+// Min mappings for common ICs
 const COMMON_PIN_MAPPINGS: Record<number, ICPinDefinition> = {
     1: { type: 'input', name: 'input 1A', gateIndex: 0, inputIndex: 0 },
     2: { type: 'input', name: 'input 1B', gateIndex: 0, inputIndex: 1 },
@@ -148,7 +157,6 @@ const MYSTERY_PIN_MAPPINGS: Record<number, ICPinDefinition> = {
     13: { type: 'output', name: 'output 3', gateIndex: 2 },
     14: { type: 'positive', name: 'VCC' }
 };
-
 
 const IC_DEFINITIONS: Record<string, ICDefinition> = {
     '74LS00': {

@@ -8,6 +8,16 @@ export interface DIPSwitchComponent extends EditorComponent {
     switchStates: boolean[];  // Array of 8 boolean values (true = closed, false = open)
 }
 
+/**
+ * Creates a DIP switch component with the specified position and name.
+ *
+ * @param position - The position of the DIP switch component on the canvas.
+ * @param name - The name of the DIP switch component.
+ * @returns A `DIPSwitchComponent` object representing the created DIP switch.
+ *
+ * The created DIP switch component includes:
+ * - An array of 8 `switchStates`, all set to `false` initially (all switches off).
+ */
 export const createDIPSwitchComponent = (position: Point, name: string): DIPSwitchComponent => {
     const editorID = `DIPSwitch-${uuidv4()}`;
     const connectors: Record<string, Connector> = {};

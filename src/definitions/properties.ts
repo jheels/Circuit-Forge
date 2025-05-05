@@ -44,6 +44,7 @@ export type PropertyDefinition =
     | BooleanPropertyDefinition
     | SelectPropertyDefinition;
 
+// Type guards to check the type of property definitions
 export const isTextProperty = (prop: PropertyDefinition): prop is TextPropertyDefinition =>
     prop.type === 'text';
 
@@ -55,7 +56,6 @@ export const isBooleanProperty = (prop: PropertyDefinition): prop is BooleanProp
 
 export const isSelectProperty = (prop: PropertyDefinition): prop is SelectPropertyDefinition =>
     prop.type === 'select';
-
 
 
 const CommonProperties: Record<string, PropertyDefinition> = {
@@ -72,6 +72,37 @@ const CommonProperties: Record<string, PropertyDefinition> = {
     }
 };
 
+/**
+ * A record defining the properties for various electronic components.
+ * Each component is associated with an array of property definitions.
+ *
+ * @constant
+ * @type {Record<string, PropertyDefinition[]>}
+ *
+ * @property {'resistor'} resistor - Properties for a resistor component.
+ * - `name`: Common property for naming the component.
+ * - `value`: Resistance value (number) in the range of 1 to 1,000,000 (Ω).
+ * - `unit`: Unit of resistance, selectable from ['Ω', 'kΩ', 'MΩ'].
+ *
+ * @property {'led'} led - Properties for an LED component.
+ * - `name`: Common property for naming the component.
+ * - `colour`: LED color, selectable from ['red', 'green', 'blue', 'yellow'].
+ * - `intensity`: Intensity of the LED (number) in the range of 0 to 100 (%), non-editable.
+ * - `isIlluminated`: Boolean indicating whether the LED is illuminated, non-editable.
+ *
+ * @property {'power-supply'} power-supply - Properties for a power supply component.
+ * - `name`: Common property for naming the component.
+ * - `voltage`: Voltage value (number) in the range of 0 to 24 (V).
+ *
+ * @property {'breadboard'} breadboard - Properties for a breadboard component.
+ * - `name`: Common property for naming the component.
+ *
+ * @property {'dip-switch'} dip-switch - Properties for a DIP switch component.
+ * - `name`: Common property for naming the component.
+ *
+ * @property {'ic'} ic - Properties for an integrated circuit (IC) component.
+ * - `name`: Common property for naming the component.
+ */
 export const ComponentProperties: Record<string, PropertyDefinition[]> = {
     'resistor': [
         CommonProperties.name,
@@ -79,10 +110,10 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
             type: 'number',
             id: 'value',
             label: 'Resistance',
-            defaultValue: 1000,
+            defaultValue: 300,
             editable: true,
             required: true,
-            validationFn: (value) => typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 1e9, // resistance must be a whole number
+            validationFn: (value) => typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 1e6,
         },
         {
             type: 'select',
@@ -147,7 +178,14 @@ export const ComponentProperties: Record<string, PropertyDefinition[]> = {
     ],
 };
 
-// Helper function to get property definitions for a component type
+/**
+ * Retrieves the property definitions for a given component type.
+ *
+ * @param componentType - The type of the component for which to retrieve property definitions.
+ * @returns An array of `PropertyDefinition` objects associated with the specified component type.
+ *          If no properties are found for the given component type, an empty array is returned.
+ * @remarks Logs a warning to the console if no property definitions are found for the specified component type.
+ */
 export const getComponentProperties = (componentType: string): PropertyDefinition[] => {
     const properties = ComponentProperties[componentType];
     if (!properties) {
@@ -157,7 +195,14 @@ export const getComponentProperties = (componentType: string): PropertyDefinitio
     return properties;
 };
 
-// Helper function to create default properties for a component
+/**
+ * Creates a default set of properties for a given component type.
+ *
+ * @param componentType - The type of the component for which properties are being created.
+ * @param name - The name to assign to the 'name' property of the component.
+ * @returns A record where each key is a property ID and the value is either the default value
+ *          of the property or the provided name if the property ID is 'name'.
+ */
 export const createDefaultProperties = (componentType: string, name: string): Record<string, PropertyValue> => {
     const properties = getComponentProperties(componentType);
     return properties.reduce((acc, prop) => ({

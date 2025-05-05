@@ -4,6 +4,8 @@ import { createConnector, ConnectorType, Connector } from '../connector';
 import { createDefaultProperties } from '../properties';
 import { isBreadboard } from '@/lib/utils';
 
+
+// predefined constants for breadboard dimensions
 export const PIN_SPACING = 5;
 export const BOARD_ROWS = 64;
 const PINS_PER_STRIP = 5;
@@ -46,6 +48,19 @@ const calculateBreadboardDimensions = () => {
     return { width, height };
 };
 
+/**
+ * Creates a breadboard component with specified position and name.
+ *
+ * @param position - The position of the breadboard on the canvas.
+ * @param name - The name of the breadboard component.
+ * @returns A `BreadboardComponent` object containing the breadboard's properties, connectors, and strip mappings.
+ *
+ * The breadboard is constructed with alternating power rail sections and regular sections:
+ * - Power rail sections include positive and negative rails, each with their own connectors and strips.
+ * - Regular sections include left and right groups of connectors (A-E and F-J) and their corresponding strips.
+ *
+ * The breadboard layout alternates between power rail sections and regular sections, iterating through 7 sections.
+ */
 export const createBreadboardComponent = (position: Point, name: string): BreadboardComponent => {
     const editorID = `Breadboard-${uuidv4()}`;
     const dimensions = calculateBreadboardDimensions();
@@ -149,7 +164,7 @@ export const createBreadboardComponent = (position: Point, name: string): Breadb
     };
 
     let currentX = 0;
-
+    // alternate between power rail and regular sections
     for (let sectionIndex = 0; sectionIndex < 7; sectionIndex++) {
         if (sectionIndex % 2 === 0) {
             createPowerRailSection(currentX, sectionIndex.toString());

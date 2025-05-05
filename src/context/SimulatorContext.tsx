@@ -45,7 +45,7 @@ export interface SimulatorContextType {
     setClickedConnector: (connector: Connector | null) => void;
     addConnection: (connection: Connection) => void;
     removeConnection: (connectionID: string) => void;
-    getConnectorConnection: (connectorID: string) => string;
+    getConnectorConnection: (connectorID: string) => string | null;
     resetProject: () => void;
 }
 
@@ -59,6 +59,13 @@ export const useSimulatorContext = () => {
     return context;
 }
 
+/**
+ * 
+ * @param { ReactNode} children - The children components to be wrapped by the SimulatorContextProvider.
+ * @returns {JSX.Element} - A JSX element that wraps the children with the SimulatorContext provider.
+ * @description It provides a context for managing the state of the simulator, including components, wires, connections, and project name.
+ * It also provides functions to manipulate the state, such as adding, removing, and updating components and wires.
+ */
 export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [projectName, setProjectName] = useState<string>(() => {
         return localStorage.getItem('simulatorProjectName') || 'Untitled Project';
@@ -72,11 +79,18 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     const [hoveredConnectorID, setHoveredConnectorID] = useState<string | null>(null);
     const [clickedConnector, setClickedConnector] = useState<Connector | null>(null);
     const [connections, setConnections] = useState<Record<string, Connection>>({});
-    // TODO: refactor to just store a one to one map since we just added a limitation Record<string, string>;
     const [connectorConnectionMap, setConnectorConnectionMap] = useState<Record<string, string>>({});
     const [clipboardComponent, setClipboardComponent] = useState<EditorComponent | null>(null);
+    // Maps editorID to electrical values with multi terminal support
+    // e.g. { "editorID": { 1: { voltage: 5, current: 0.1 }, 2: { voltage: 3, current: 0.05 } } }
     const [componentElectricalValues, setComponentElectricalValues] = useState<{ [key: string]: { [key: number]: { voltage: number, current: number } } }>({});
 
+    /**
+     * 
+     * @param action - The action to perform, either 'copy' or 'cut'.
+     * @description Handles the action of copying or cutting a component. If the action is 'cut', it removes the component from the components state.
+     * If the action is 'copy', it simply copies the component to the clipboard.
+     */
     const handleComponentAction = (action: 'copy' | 'cut') => {
         if (!selectedComponent || !components[selectedComponent]) return;
 
@@ -105,6 +119,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
     const copySelectedComponent = () => handleComponentAction('copy');
     const cutSelectedComponent = () => handleComponentAction('cut');
 
+    /**
+     * 
+     * @description Handles the action of pasting a component from the clipboard. It creates a new component with the same properties as the clipboard component,
+     * but with a new position and a new name. The new component is then added to the components state and selected.
+     * It also sends a success toast notification with the name of the pasted component.
+     */
     const pasteClipboardComponent = () => {
         if (!clipboardComponent) return;
 
@@ -125,6 +145,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         sendSuccessToast(`${newName} pasted`);
     };
 
+    /**
+     * 
+     * @param connection - The connection to add.
+     * @description Adds a connection to the connections state and updates the connectorConnectionMap state.
+     * It also sets the isConnected property of the source and target connectors to true.
+     */
     const addConnection = (connection: Connection) => {
         setConnections((prev) => ({
             ...prev,
@@ -140,6 +166,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         connection.targetConnector.isConnected = true;
     }
 
+    /**
+     * 
+     * @param connectionID - The ID of the connection to remove.
+     * @description Removes a connection from the connections state and updates the connectorConnectionMap state.
+     * It also sets the isConnected property of the source and target connectors to false.
+     */
     const removeConnection = (connectionID: string) => {
         const connection = connections[connectionID];
         if (!connection) return;
@@ -158,12 +190,22 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         });
     }
 
+    /**
+     * 
+     * @param connectorID - The ID of the connector to get the connection for.
+     * @description Retrieves the connection ID for a given connector ID from the connectorConnectionMap state.
+     * @returns {string | null} - The connection ID if it exists, otherwise null.
+     */
     const getConnectorConnection = (connectorID: string) => {
         return connectorConnectionMap[connectorID] || null;
     }
 
+    /**
+     * 
+     * @param editorID - The ID of the component to clean up wires for.
+     * @description Cleans up the wires for a given component by removing the wires associated with its connectors.
+     */
     const cleanUpComponentWires = (editorID: string) => {
-        // TODO: Refactor to make it unified for connections so it handles wires or direct ones dynamically.
         const component = components[editorID];
         if (!component) return;
         const connectors = Object.values(component.connectors);
@@ -180,6 +222,14 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         });
     }
 
+    /**
+     * 
+     * @param type - The type of the component to create.
+     * @param position - The position of the component.
+     * @description Creates a new component of the specified type at the given position.
+     * It also updates the component counts state to keep track of the number of components of each type.
+     * @returns {EditorComponent} - The newly created component.
+     */
     const createComponent = (type: string, position: Point): EditorComponent => {
         const newCount = (componentCounts[type] || 0) + 1;
         setComponentCounts((prev) => ({
@@ -217,6 +267,11 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }
     }
 
+    /**
+     * 
+     * @param component - The component to add.
+     * @description Adds a component to the components state and updates the component counts state.
+     */
     const addComponent = (component: EditorComponent) => {
         setComponents((prev) => ({
             ...prev,
@@ -224,6 +279,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }));
     }
 
+    /**
+     * 
+     * @param editorID - The ID of the component to remove.
+     * @description Removes a component from the components state and updates the component counts state.
+     * It also cleans up the wires associated with the component.
+     */
     const removeComponent = (editorID: string) => {
         const component = components[editorID];
         if (!component) return;
@@ -245,6 +306,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         });
     }
 
+    /**
+     * 
+     * @param editorID - The ID of the component to update.
+     * @param updates - The updates to apply to the component.
+     * @description Updates a component in the components state with the provided updates.
+     */
     const updateComponent = (editorID: string, updates: Partial<EditorComponent>) => {
         setComponents((prev) => ({
             ...prev,
@@ -255,10 +322,20 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }));
     }
 
+    /**
+     * 
+     * @param componentElectricalValues - The electrical values to update.
+     * @description Updates the component electrical values in the componentElectricalValues state.
+     */
     const updateComponentElectricalValues = (componentElectricalValues: Record<string, Record<number, { voltage: number, current: number }>>) => {
         setComponentElectricalValues(componentElectricalValues);
     }
 
+    /**
+     * 
+     * @param wire - The wire to add.
+     * @description Adds a wire to the wires state.
+     */
     const addWire = (wire: Wire) => {
         setWires((prev) => ({
             ...prev,
@@ -266,6 +343,11 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }));
     }
 
+    /**
+     * 
+     * @param wireID - The ID of the wire to remove.
+     * @description Removes a wire from the wires state and cleans up any connections associated with it.
+     */
     const removeWire = (wireID: string) => {
         const wire = wires[wireID];
         if (!wire) return;
@@ -284,6 +366,12 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         });
     }
 
+    /**
+     * 
+     * @param wireID - The ID of the wire to update.
+     * @param updates - The updates to apply to the wire.
+     * @description Updates a wire in the wires state with the provided updates.
+     */
     const updateWire = (wireID: string, updates: Partial<Wire>) => {
         setWires((prev) => ({
             ...prev,
@@ -294,8 +382,11 @@ export const SimulatorContextProvider: React.FC<{ children: ReactNode }> = ({ ch
         }));
     }
 
+    /**
+     * 
+     * @description Resets the project by clearing all components, wires, connections, and other states.
+     */
     const resetProject = () => {
-        // check if it resets everything
         setProjectName('Untitled Project');
         setComponents({});
         setSelectedComponent(null);

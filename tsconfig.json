@@ -28,6 +28,17 @@
     "strictPropertyInitialization": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "alwaysStrict": true
-  }
+    "alwaysStrict": true,
+    "types": [ "@types/wicg-file-system-access"],
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "tests/**/*.spec.ts",
+    "tests/**/*.test.ts",
+    "tests/**/*.spec.tsx",
+    "tests/**/*.test.tsx"
+  ]
 }

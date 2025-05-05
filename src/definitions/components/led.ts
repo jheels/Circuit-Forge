@@ -7,6 +7,13 @@ export interface LEDComponent extends EditorComponent {
     readonly type: 'led';
 }
 
+/**
+ * Creates an LED component with specified position and name.
+ *
+ * @param position - The position of the LED component on the canvas, represented as a `Point` object.
+ * @param name - The name of the LED component.
+ * @returns An `LEDComponent` object representing the created LED with its properties, connectors, and metadata.
+ */
 export const createLEDComponent = (position: Point, name: string): LEDComponent => {
     const editorID = `LED-${uuidv4()}`;
     const anodeConnector = createConnector(editorID, 'anode', { x: 0.233333, y: 0.44444 });

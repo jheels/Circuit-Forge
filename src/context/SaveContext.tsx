@@ -11,6 +11,7 @@ interface CircuitMetadata {
     lastSaved: number;
 }
 
+// Mirroring the structure of the project from SimulatorContext
 interface CircuitProject {
     metadata: CircuitMetadata;
     components: Record<string, EditorComponent>;
@@ -82,8 +83,16 @@ const CircuitProjectSchema = z.object({
     connections: z.record(ConnectionSchema),
     connectorConnectionMap: z.record(z.string()),
     wires: z.record(WireSchema),
-}).strict(); // Reject unknown fields
+}).strict(); // Reject unknown fields even if rest of the object is valid
 
+/**
+ * 
+ * @param { ReactNode } children - The children components to be wrapped by the SaveProvider.
+ * @param { React.RefObject<Konva.Stage> } stageRef - A reference to the Konva stage used for rendering the circuit.
+ * @returns {JSX.Element} - A JSX element that wraps the children with the SaveContext provider.
+ * @description Provides a context for saving and loading circuit projects.
+ * This context includes methods for saving the current project, loading a project from a file,
+ */
 export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }) => {
     const {
         projectName,
@@ -118,6 +127,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         setHasUnsavedChanges(true);
     }, [projectName, components, connections, connectorConnectionMap, wires]);
 
+
     const serialiseProject = useCallback((project: CircuitProject) => {
         return JSON.stringify(project, null, 2);
     }, []);
@@ -128,7 +138,12 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         return { ...deserialisedProject };
     }, []);
 
-    const validateProject = (project: any): { valid: boolean, error?: string } => {
+    /**
+     * 
+     * @param project - The project object to validate.
+     * @returns { valid: boolean, error?: string } - An object indicating whether the project is valid and an error message if it is not.
+     */
+    const validateProject = (project: unknown): { valid: boolean, error?: string } => {
         const result = CircuitProjectSchema.safeParse(project);
         if (!result.success) {
             const validationError = fromError(result.error);
@@ -138,6 +153,11 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         return { valid: true };
     };
 
+    /**
+     * @param {boolean} saveAs - Whether to prompt the user for a new file name.
+     * @returns {Promise<SaveResult>} - A promise that resolves to an object indicating the success or failure of the save operation.
+     * @description Saves the current project to a file. If saveAs is true, prompts the user for a new file name.
+     */
     const saveProject = useCallback(async (saveAs: boolean = false): Promise<SaveResult> => {
         if (!currentProject) {
             return { success: false, error: 'No project to save.' };
@@ -156,7 +176,7 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
                         }
                     }]
                 });
-                setCurrentFileHandle(fileHandle);
+                setCurrentFileHandle(fileHandle); // For future saves overwriting it 
             }
             const writable = await fileHandle?.createWritable();
             const updateProject = {
@@ -184,6 +204,10 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
         }
     }, [currentFileHandle, currentProject, serialiseProject]);
 
+    /**
+     * @returns {Promise<LoadResult>} - A promise that resolves to an object indicating the success or failure of the load operation.
+     * @description Loads a project from a file. Prompts the user to select a file and deserialises it into the current project.
+     */
     const loadProject = useCallback(async () => {
         try {
             const [fileHandle] = await window.showOpenFilePicker({
@@ -271,6 +295,12 @@ export const SaveProvider: React.FC<SaveProviderProps> = ({ children, stageRef }
     );
 };
 
+/**
+ * 
+ * @returns {SaveContextType} - The current context value of the SaveContext.
+ * @throws {Error} - Throws an error if the context is used outside of a SaveProvider.
+ * @description A custom hook to access the SaveContext. It provides methods for saving, loading, and exporting projects.
+ */
 export const useSaveContext = () => {
     const context = useContext(SaveContext);
 

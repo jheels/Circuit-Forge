@@ -7,6 +7,13 @@ export interface ResistorComponent extends EditorComponent {
     readonly type: 'resistor';
 }
 
+/**
+ * Creates a resistor component with specified position and name.
+ *
+ * @param position - The position of the resistor component on the canvas, represented as a `Point` object.
+ * @param name - The name of the resistor component.
+ * @returns A `ResistorComponent` object representing the created resistor, including its editor ID, type, dimensions, rotation, position, properties, and connectors.
+ */
 export const createResistorComponent = (position: Point, name: string): ResistorComponent => {
     const editorID = `Resistor-${uuidv4()}`;
     const leftConnector = createConnector(editorID, 'bidirectional', { x: -1/6, y: 0.5 });
