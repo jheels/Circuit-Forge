@@ -9,6 +9,7 @@ import IC74LS08 from '../assets/74LS08.svg';
 import IC74LS32 from '../assets/74LS32.svg';
 import IC74LS02 from '../assets/74LS02.svg';
 import IC74LS86 from '../assets/74LS86.svg';
+import MYSTERY from '../assets/MYSTERY.svg';
 
 const componentImages: Record<string, string> = {
     'led': LED,
@@ -21,7 +22,8 @@ const componentImages: Record<string, string> = {
     '74LS08': IC74LS08,
     '74LS32': IC74LS32,
     '74LS02': IC74LS02,
-    '74LS86': IC74LS86
+    '74LS86': IC74LS86,
+    'MYSTERY': MYSTERY,
 }
 
 /**
